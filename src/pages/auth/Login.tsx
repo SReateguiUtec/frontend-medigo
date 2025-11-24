@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Shield, Bell, Zap, Check } from 'lucide-react';
+import { ArrowLeft, Heart, Bell, Zap, Activity } from 'lucide-react';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -44,9 +44,9 @@ export const Login = () => {
       description: 'Recibe actualizaciones instantáneas sobre tus citas'
     },
     {
-      icon: <Shield className="w-5 h-5" />,
-      title: 'Seguridad Garantizada',
-      description: 'Tus datos están protegidos con encriptación de nivel empresarial'
+      icon: <Heart className="w-5 h-5" />,
+      title: 'Salud en Tus Manos',
+      description: 'Gestiona tu bienestar con herramientas diseñadas para ti'
     },
     {
       icon: <Zap className="w-5 h-5" />,
@@ -71,7 +71,7 @@ export const Login = () => {
 
           <div className="mb-12">
             <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-              <Shield className="w-8 h-8" />
+              <Activity className="w-8 h-8" />
             </div>
             <h1 className="text-5xl font-bold mb-4">
               Bienvenido a MediGO
@@ -117,7 +117,7 @@ export const Login = () => {
           <div className="lg:hidden mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+                <Heart className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-white">MediGO</span>
             </div>

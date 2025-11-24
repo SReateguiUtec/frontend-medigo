@@ -111,6 +111,7 @@ export const Home = () => {
 
         <br></br>
         <br></br>
+        <br></br>
 
         <AnimatedSection delay={600}>
           <Carousel />

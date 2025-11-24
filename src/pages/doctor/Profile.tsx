@@ -17,6 +17,8 @@ export const DoctorProfile = () => {
     dni: '',
     numeroColegiado: '',
     bio: '',
+    precioConsulta: '',
+    especialidad: '',
   });
 
   useEffect(() => {
@@ -36,6 +38,8 @@ export const DoctorProfile = () => {
         dni: data.dni || '',
         numeroColegiado: data.numeroColegiado || '',
         bio: data.bio || '',
+        precioConsulta: data.precioConsulta?.toString() || '',
+        especialidad: data.especialidades && data.especialidades.length > 0 ? data.especialidades[0].nombre : '',
       });
     } catch (err: any) {
       console.error('Error loading profile:', err);
@@ -59,6 +63,8 @@ export const DoctorProfile = () => {
       if (formData.dni) updates.dni = formData.dni;
       if (formData.numeroColegiado) updates.numeroColegiado = formData.numeroColegiado;
       if (formData.bio !== undefined) updates.bio = formData.bio;
+      if (formData.precioConsulta) updates.precioConsulta = parseFloat(formData.precioConsulta);
+      if (formData.especialidad) updates.especialidad = formData.especialidad;
 
       const updated = await profileService.updateProfile(updates) as Medico;
       setProfile(updated);
@@ -141,8 +147,8 @@ export const DoctorProfile = () => {
             {/* Status Badge */}
             <div className="mt-4">
               <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${profile?.estadoCuenta === 'ACTIVADA'
-                  ? 'bg-green-100 text-green-800 border border-green-200'
-                  : 'bg-red-100 text-red-800 border border-red-200'
+                ? 'bg-green-100 text-green-800 border border-green-200'
+                : 'bg-red-100 text-red-800 border border-red-200'
                 }`}>
                 {profile?.estadoCuenta === 'ACTIVADA' ? '✓ Cuenta Activa' : '⚠ Cuenta Inactiva'}
               </span>
@@ -370,6 +376,36 @@ export const DoctorProfile = () => {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                     placeholder="CMP-12345"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Precio de Consulta (S/)
+                  </label>
+                  <input
+                    type="number"
+                    name="precioConsulta"
+                    value={formData.precioConsulta}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    placeholder="150.00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Especialidad
+                  </label>
+                  <input
+                    type="text"
+                    name="especialidad"
+                    value={formData.especialidad}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    placeholder="Cardiología, Pediatría, etc."
                   />
                 </div>
               </div>

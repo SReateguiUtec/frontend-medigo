@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../../api/auth.service';
-import { ArrowLeft, Shield, Users, Stethoscope, Check } from 'lucide-react';
+import { ArrowLeft, Activity, Users, Stethoscope, Check, Shield } from 'lucide-react';
 
 export const Register = () => {
   const [userType, setUserType] = useState<'PACIENTE' | 'MEDICO'>('PACIENTE');
@@ -82,7 +82,7 @@ export const Register = () => {
 
           <div className="mb-12">
             <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-              <Users className="w-8 h-8" />
+              <Activity className="w-8 h-8" />
             </div>
             <h1 className="text-5xl font-bold mb-4">
               Únete a MediGO
@@ -128,7 +128,7 @@ export const Register = () => {
           <div className="lg:hidden mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+                <Activity className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-white">MediGO</span>
             </div>
@@ -156,8 +156,8 @@ export const Register = () => {
                   type="button"
                   onClick={() => setUserType('PACIENTE')}
                   className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${userType === 'PACIENTE'
-                      ? 'bg-blue-600 border-blue-600 text-white'
-                      : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
                     }`}
                 >
                   <Users className="w-5 h-5" />
@@ -167,8 +167,8 @@ export const Register = () => {
                   type="button"
                   onClick={() => setUserType('MEDICO')}
                   className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${userType === 'MEDICO'
-                      ? 'bg-blue-600 border-blue-600 text-white'
-                      : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
                     }`}
                 >
                   <Stethoscope className="w-5 h-5" />
