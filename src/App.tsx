@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { SearchDoctors } from './pages/patient/SearchDoctors';
+import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
 import { PatientAppointments } from './pages/patient/PatientAppointments';
 import { PatientProfile } from './pages/patient/Profile';
 import { Appointments } from './pages/doctor/Appointments';
@@ -66,6 +67,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <SearchDoctors />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/doctor/:doctorId"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <DoctorPublicProfile />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }
