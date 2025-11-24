@@ -65,11 +65,12 @@ export const Home = () => {
 
         <br></br>
         <br></br>
+        <br></br>
 
         <AnimatedSection delay={200}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mx-auto">
             <Card className="border-2 border-blue-200/20 dark:border-blue-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-6 text-center">
+              <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 mb-2">
                   24/7
                 </div>
@@ -79,7 +80,7 @@ export const Home = () => {
               </CardContent>
             </Card>
             <Card className="border-2 border-purple-200/20 dark:border-purple-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-purple-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-6 text-center">
+              <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 mb-2">
                   &lt;20m
                 </div>
@@ -89,7 +90,7 @@ export const Home = () => {
               </CardContent>
             </Card>
             <Card className="border-2 border-indigo-200/20 dark:border-indigo-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-indigo-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-6 text-center">
+              <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-400 dark:to-indigo-600 mb-2">
                   99.9%
                 </div>

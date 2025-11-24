@@ -4,7 +4,7 @@ import { WorldMap } from "@/components/world-map";
 export function WorldMapDemo() {
     return (
         <div className="w-full">
-            <div className="max-w-7xl mx-auto text-center">
+            <div className="max-w-full mx-auto text-center">
             </div>
             <WorldMap
                 showLabels={false}

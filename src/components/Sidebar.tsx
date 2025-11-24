@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { LogOut } from 'lucide-react';
 
 export const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -93,7 +94,7 @@ export const Sidebar = () => {
                     onClick={handleLogout}
                     className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
                 >
-                    <span className="text-xl"></span>
+                    <LogOut className="w-5 h-5" />
                     <span className="font-medium">Cerrar Sesión</span>
                 </button>
             </div>

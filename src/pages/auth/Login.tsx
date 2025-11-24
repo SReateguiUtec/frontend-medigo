@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ArrowLeft, Shield, Bell, Zap, Check } from 'lucide-react';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -36,23 +37,106 @@ export const Login = () => {
     }
   };
 
+  const features = [
+    {
+      icon: <Bell className="w-5 h-5" />,
+      title: 'Notificaciones en Tiempo Real',
+      description: 'Recibe actualizaciones instantáneas sobre tus citas'
+    },
+    {
+      icon: <Shield className="w-5 h-5" />,
+      title: 'Seguridad Garantizada',
+      description: 'Tus datos están protegidos con encriptación de nivel empresarial'
+    },
+    {
+      icon: <Zap className="w-5 h-5" />,
+      title: 'Atención Rápida',
+      description: 'Conecta con médicos en menos de 20 minutos'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar Sesión en MediGO
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
+    <div className="min-h-screen flex">
+      {/* Left Panel - Gradient with Features */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 p-12 flex-col justify-between text-white relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-12">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Volver al inicio</span>
+          </Link>
+
+          <div className="mb-12">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+              <Shield className="w-8 h-8" />
             </div>
-          )}
-          <div className="rounded-md shadow-sm space-y-4">
+            <h1 className="text-5xl font-bold mb-4">
+              Bienvenido a MediGO
+            </h1>
+            <p className="text-xl text-white/90">
+              Accede a tu cuenta y gestiona tu salud de manera rápida y segura
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">{feature.title}</h3>
+                  <p className="text-white/80 text-sm">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination dots */}
+        <div className="relative z-10 flex gap-2">
+          <div className="w-2 h-2 bg-white rounded-full"></div>
+          <div className="w-2 h-2 bg-white/40 rounded-full"></div>
+          <div className="w-2 h-2 bg-white/40 rounded-full"></div>
+        </div>
+      </div>
+
+      {/* Right Panel - Dark Form */}
+      <div className="w-full lg:w-1/2 bg-gray-950 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mobile back button */}
+          <Link to="/" className="lg:hidden inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Volver al inicio</span>
+          </Link>
+
+          {/* Logo for mobile */}
+          <div className="lg:hidden mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-white">MediGO</span>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">Iniciar Sesión</h2>
+            <p className="text-gray-400">Ingresa tus credenciales para acceder a tu cuenta</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Correo Electrónico
               </label>
               <input
@@ -60,14 +144,15 @@ export const Login = () => {
                 name="email"
                 type="email"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="correo@ejemplo.com"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="tu.correo@ejemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Contraseña
               </label>
               <input
@@ -75,30 +160,29 @@ export const Login = () => {
                 name="password"
                 type="password"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-950"
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
-          </div>
 
-          <div className="text-center">
-            <Link to="/register" className="text-blue-600 hover:text-blue-500">
-              ¿No tienes cuenta? Regístrate aquí
-            </Link>
-          </div>
-        </form>
+            <div className="text-center">
+              <span className="text-gray-400">¿No tienes una cuenta? </span>
+              <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                Regístrate aquí
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

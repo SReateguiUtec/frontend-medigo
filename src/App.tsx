@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
@@ -42,11 +42,16 @@ const HomeRedirect = () => {
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  // Hide navbar on login and register pages
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const showNavbar = !isAuthenticated && !isAuthPage;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Show navbar only for unauthenticated users */}
-      {!isAuthenticated && <NavbarDemo />}
+      {/* Show navbar only for unauthenticated users and not on auth pages */}
+      {showNavbar && <NavbarDemo />}
 
       <Routes>
         {/* Public routes */}
@@ -117,8 +122,8 @@ function AppContent() {
         />
       </Routes>
 
-      {/* Show footer only for unauthenticated users */}
-      {!isAuthenticated && <Footer />}
+      {/* Show footer only for unauthenticated users and not on auth pages */}
+      {showNavbar && <Footer />}
     </div>
   );
 }

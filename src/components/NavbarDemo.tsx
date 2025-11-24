@@ -16,14 +16,14 @@ export function NavbarDemo() {
     };
 
     const navItems = [
-        // Public navigation items (for non-authenticated users)
+        // for non-authenticated users
         ...(!isAuthenticated ? [
             { name: "Beneficios", link: "/#beneficios" },
             { name: "Testimonios", link: "/#testimonios" },
             { name: "Pricing", link: "/#pricing" },
             { name: "FAQ", link: "/#faq" }
         ] : []),
-        // Authenticated user navigation
+        // Authenticated
         ...(isAuthenticated && user?.rol === 'PACIENTE' ? [{ name: "Buscar Médicos", link: "/patient/search" }] : []),
         ...(isAuthenticated && user?.rol === 'MEDICO' ? [{ name: "Mis Citas", link: "/doctor/appointments" }] : []),
         ...(isAuthenticated ? [{ name: "Perfil", link: "/profile" }] : []),
