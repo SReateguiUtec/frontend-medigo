@@ -10,6 +10,7 @@ export const Register = () => {
     apellidos: '',
     email: '',
     password: '',
+    dni: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,6 +35,7 @@ export const Register = () => {
           apellidos: formData.apellidos,
           email: formData.email,
           password: formData.password,
+          dni: formData.dni,
         });
       }
       navigate('/login');
@@ -210,6 +212,25 @@ export const Register = () => {
                 />
               </div>
             </div>
+
+            {userType === 'MEDICO' && (
+              <div>
+                <label htmlFor="dni" className="block text-sm font-medium text-gray-300 mb-2">
+                  DNI
+                </label>
+                <input
+                  id="dni"
+                  name="dni"
+                  type="text"
+                  required
+                  maxLength={8}
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="12345678"
+                  value={formData.dni}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">

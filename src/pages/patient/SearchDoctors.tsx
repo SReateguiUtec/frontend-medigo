@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import type { MedicoSearchResponse } from '../../api/search.service';
-import { Search, User } from 'lucide-react';
+import { Search, User, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Doctores de demostración
 const showcaseDoctors = [
@@ -80,11 +80,17 @@ export const SearchDoctors = () => {
   const [doctors, setDoctors] = useState<any[]>(showcaseDoctors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pageInfo, setPageInfo] = useState({
+    totalPages: 0,
+    number: 0,
+    first: true,
+    last: true,
+    totalElements: 0,
+  });
   const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = async () => {
+  const handleSearch = async (page: number = 0) => {
     if (!searchTerm.trim()) {
-      // Si no hay término de búsqueda, mostrar doctores de demostración
       setDoctors(showcaseDoctors);
       setIsSearching(false);
       return;
@@ -94,16 +100,41 @@ export const SearchDoctors = () => {
       setLoading(true);
       setError('');
       setIsSearching(true);
-      const response = await searchService.searchMedicosByNombre(searchTerm, 0, 12);
+      // CAMBIO: Usar tamaño 6 para probar la paginación
+      const pageSize = 9;
+      console.log(`Solicitando página ${page} con tamaño ${pageSize}`);
+
+      const response = await searchService.searchMedicosByNombre(searchTerm, page, pageSize);
+      console.log('Respuesta del backend:', response);
+
       setDoctors(response.content);
+      setPageInfo({
+        totalPages: response.totalPages,
+        number: response.number,
+        first: response.number === 0,
+        last: response.number === response.totalPages - 1,
+        totalElements: response.totalElements,
+      });
+
+      if (page > 0) {
+        const resultsElement = document.getElementById('search-results');
+        if (resultsElement) {
+          resultsElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     } catch (err: any) {
       console.error('Error searching doctors:', err);
       setError('Error al buscar médicos');
-      // En caso de error, volver a mostrar doctores de demostración
       setDoctors(showcaseDoctors);
       setIsSearching(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 0 && newPage < pageInfo.totalPages) {
+      handleSearch(newPage);
     }
   };
 
@@ -132,7 +163,7 @@ export const SearchDoctors = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="search-results">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Buscar Médicos</h1>
         <p className="mt-2 text-gray-600">Encuentra al especialista que necesitas</p>
@@ -149,11 +180,11 @@ export const SearchDoctors = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
             />
           </div>
           <button
-            onClick={handleSearch}
+            onClick={() => handleSearch(0)}
             disabled={loading}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -184,72 +215,101 @@ export const SearchDoctors = () => {
 
       {/* Doctors Grid */}
       {!loading && doctors.length > 0 && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {doctors.map((doctor) => (
-            <div
-              key={doctor.id}
-              onClick={() => handleDoctorClick(doctor.id)}
-              className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) ? 'cursor-pointer transform hover:-translate-y-1' : ''}`}
-            >
-              {/* Doctor Image */}
-              <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                {doctor.rutaFoto ? (
-                  <img
-                    src={doctor.rutaFoto}
-                    alt={`${doctor.nombres} ${doctor.apellidos}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = '<div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center"><svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                    }}
-                  />
-                ) : (
-                  <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
-                    <User className="w-12 h-12 text-white" />
-                  </div>
-                )}
-              </div>
-
-              {/* Doctor Info */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                  {doctor.nombres} {doctor.apellidos}
-                </h3>
-                <p className="text-blue-600 font-medium mb-3">
-                  {getEspecialidadNombre(doctor)}
-                </p>
-
-                {doctor.bio && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {doctor.bio}
-                  </p>
-                )}
-
-                <div className="flex items-center justify-between mb-4">
-                  {doctor.numeroColegiado && (
-                    <div>
-                      <p className="text-xs text-gray-500">Colegiado</p>
-                      <p className="text-sm font-semibold text-gray-900">{doctor.numeroColegiado}</p>
-                    </div>
-                  )}
-                  {doctor.precioConsulta && (
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">Consulta desde</p>
-                      <p className="text-lg font-bold text-blue-600">S/ {doctor.precioConsulta}</p>
+        <>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {doctors.map((doctor) => (
+              <div
+                key={doctor.id}
+                onClick={() => handleDoctorClick(doctor.id)}
+                className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) ? 'cursor-pointer transform hover:-translate-y-1' : ''}`}
+              >
+                {/* Doctor Image */}
+                <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  {doctor.rutaFoto ? (
+                    <img
+                      src={doctor.rutaFoto}
+                      alt={`${doctor.nombres} ${doctor.apellidos}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement!.innerHTML = '<div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center"><svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                      <User className="w-12 h-12 text-white" />
                     </div>
                   )}
                 </div>
 
-                {/* Solo mostrar botón para doctores reales o resultados de búsqueda */}
-                {(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) && (
-                  <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                    Ver Perfil
-                  </button>
-                )}
+                {/* Doctor Info */}
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    {doctor.nombres} {doctor.apellidos}
+                  </h3>
+                  <p className="text-blue-600 font-medium mb-3">
+                    {getEspecialidadNombre(doctor)}
+                  </p>
+
+                  {doctor.bio && (
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {doctor.bio}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between mb-4">
+                    {doctor.numeroColegiado && (
+                      <div>
+                        <p className="text-xs text-gray-500">Colegiado</p>
+                        <p className="text-sm font-semibold text-gray-900">{doctor.numeroColegiado}</p>
+                      </div>
+                    )}
+                    {doctor.precioConsulta && (
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Consulta desde</p>
+                        <p className="text-lg font-bold text-blue-600">S/ {doctor.precioConsulta}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Solo mostrar botón para doctores reales o resultados de búsqueda */}
+                  {(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) && (
+                    <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                      Ver Perfil
+                    </button>
+                  )}
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {isSearching && pageInfo.totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => handlePageChange(pageInfo.number - 1)}
+                disabled={pageInfo.first}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                aria-label="Página anterior"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+
+              <span className="text-sm font-medium text-gray-700">
+                Página {pageInfo.number + 1} de {pageInfo.totalPages}
+              </span>
+
+              <button
+                onClick={() => handlePageChange(pageInfo.number + 1)}
+                disabled={pageInfo.last}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                aria-label="Página siguiente"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-600" />
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* No Results */}

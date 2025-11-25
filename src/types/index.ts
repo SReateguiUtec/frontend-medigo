@@ -71,4 +71,5 @@ export interface RegisterMedicoRequest {
   apellidos: string;
   email: string;
   password: string;
+  dni: string;
 }
