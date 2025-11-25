@@ -1,3 +1,4 @@
+import LampDemo from '@/components/lamp-demo';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { WorldMapDemo } from '@/components/WorldMapDemo';
@@ -7,7 +8,7 @@ import Carousel from '@/components/Carousel';
 import { AnimatedSection } from '@/components/animated-section';
 import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Zap } from 'lucide-react';
+import { MessageSquare, Zap, PictureInPicture2 } from 'lucide-react';
 import Timer from '@/components/ui/timer';
 import {
   Accordion,
@@ -33,8 +34,8 @@ export const Home = () => {
               className="mb-8 px-6 py-3 text-base bg-gray-200/60 backdrop-blur-md border-2 border-blue-900 shadow-lg shadow-blue-500/20 text-gray-600"
             >
               <span className="font-semibold flex items-center gap-2 justify-center">
-                <Zap className="h-4 w-4 animate-pulse" />
-                GO! Gestiona mejor tu salud ahora!
+                <PictureInPicture2 className="h-4 w-4" />
+                Plataforma de Videoconsultas
               </span>
             </Badge>
 
@@ -305,6 +306,10 @@ export const Home = () => {
           </div>
         </AnimatedSection>
       </div>
+
+      <AnimatedSection delay={200}>
+        <LampDemo />
+      </AnimatedSection>
     </div>
   );
 };
