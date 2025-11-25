@@ -25,8 +25,6 @@ export const DoctorPublicProfile = () => {
             setLoading(true);
             setError('');
             const data = await searchService.getMedicoById(Number(doctorId));
-            console.log('Doctor data loaded:', data); // Debug log
-            console.log('numeroColegiado value:', data.numeroColegiado); // Specific field check
             setDoctor(data);
         } catch (err: any) {
             console.error('Error loading doctor profile:', err);
@@ -101,9 +99,6 @@ export const DoctorPublicProfile = () => {
             </div>
         );
     }
-
-    // Debug log to see what data we have
-    console.log('Doctor data in profile view:', doctor);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-emerald-50">
@@ -233,7 +228,6 @@ export const DoctorPublicProfile = () => {
                                     onClose={() => setIsModalOpen(false)}
                                     doctor={doctor as unknown as Medico}
                                     onSuccess={() => {
-                                        // Show success message or redirect
                                         console.log('Appointment created successfully!');
                                     }}
                                 />

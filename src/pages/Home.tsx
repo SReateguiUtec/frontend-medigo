@@ -69,7 +69,7 @@ export const Home = () => {
         <br></br>
 
         <AnimatedSection delay={200}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-7xl mx-auto">
             <Card className="border-2 border-blue-200/20 dark:border-blue-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2 transition-all duration-300">
               <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 mb-2">
@@ -113,11 +113,39 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
+        <br></br>
 
         <AnimatedSection delay={600}>
           <Carousel />
         </AnimatedSection>
 
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+
+        <AnimatedSection delay={400}>
+          <div className="w-full max-w-7xl mx-auto px-4">
+            <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300">
+              <div className="flex justify-center mb-4">
+                <MessageSquare className="h-16 w-16 animate-bounce" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
+              <p className="text-xl mb-6">
+                Únete a nuestra plataforma y expande tu alcance profesional
+              </p>
+              <Link
+                to="/register"
+                className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
+              >
+                Registrarse como Médico
+              </Link>
+            </div>
+          </div>
+        </AnimatedSection>
+
+        <br></br>
+        <br></br>
         <br></br>
 
         {/* Pricing Section */}
@@ -225,26 +253,6 @@ export const Home = () => {
           </AnimatedSection>
         </section>
 
-        <br></br>
-
-        <AnimatedSection delay={400}>
-          <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300">
-            <div className="flex justify-center mb-4">
-              <MessageSquare className="h-16 w-16 animate-bounce" />
-            </div>
-            <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
-            <p className="text-xl mb-6">
-              Únete a nuestra plataforma y expande tu alcance profesional
-            </p>
-            <Link
-              to="/register"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
-            >
-              Registrarse como Médico
-            </Link>
-          </div>
-        </AnimatedSection>
-
         {/* FAQ Section */}
         <section id="faq" className="container mx-auto px-4 py-20">
           <AnimatedSection delay={500}>
@@ -310,6 +318,10 @@ export const Home = () => {
           </AnimatedSection>
         </section>
       </div>
+
+      <br></br>
+      <br></br>
+      <br></br>
 
       <AnimatedSection delay={200}>
         <LampDemo />

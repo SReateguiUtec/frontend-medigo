@@ -57,9 +57,7 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Gradient with Features */}
       <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-600 via-blue-700 to-purple-700 p-12 flex-col justify-between text-white relative overflow-hidden">
-        {/* Decorative circles */}
         <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
 

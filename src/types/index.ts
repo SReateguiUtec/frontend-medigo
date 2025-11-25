@@ -37,7 +37,7 @@ export interface Cita {
   id: number;
   paciente: Paciente;
   medico: Medico;
-  fechaHora: string; // ISO 8601 ZonedDateTime
+  fechaHora: string;
   estado: EstadoCita;
   precioConsulta: number;
   esPagada: boolean;
@@ -47,15 +47,15 @@ export interface Cita {
 
 export interface CreateCitaRequest {
   medicoId: number;
-  fechaHora: string; // ISO 8601 ZonedDateTime
+  fechaHora: string;
 }
 
-// Backend response format
+// Backend response
 export interface BackendAuthResponse {
-  message: string; // JWT token
+  message: string;
 }
 
-// Frontend AuthResponse (constructed from JWT)
+// Frontend AuthResponse
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

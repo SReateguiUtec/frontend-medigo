@@ -140,7 +140,7 @@ export const SearchDoctors = () => {
               size: pageSize
             };
           } catch (e) {
-            // Si no encuentra, retornamos lista vacía
+            // Si no encuentra retornamos lista vacia
             response = {
               content: [],
               totalPages: 0,
@@ -373,14 +373,12 @@ export const SearchDoctors = () => {
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
-      {/* Loading State */}
       {loading && (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -447,7 +445,6 @@ export const SearchDoctors = () => {
                     )}
                   </div>
 
-                  {/* Always show Ver Perfil button */}
                   <button
                     className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     onClick={() => {
@@ -462,7 +459,6 @@ export const SearchDoctors = () => {
             ))}
           </div>
 
-          {/* Pagination Controls */}
           {isSearching && pageInfo.totalPages > 1 && (
             <div className="flex justify-center items-center gap-4 mt-8">
               <button
@@ -491,7 +487,6 @@ export const SearchDoctors = () => {
         </>
       )}
 
-      {/* No Results */}
       {!loading && doctors.length === 0 && (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />

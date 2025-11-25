@@ -37,7 +37,6 @@ export const MyAppointments = () => {
 
             const data = await citaService.getMyCitas();
             console.log('Appointments loaded:', data);
-            // Sort by date, most recent first
             const sorted = data.sort((a, b) =>
                 new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime()
             );
@@ -46,12 +45,11 @@ export const MyAppointments = () => {
             console.error('Error loading appointments:', err);
             console.error('Error response:', err.response);
 
-            // Manejo específico de errores 403
             if (err.response?.status === 403) {
                 setError('No tienes permiso para acceder a esta sección. Asegúrate de que tu cuenta tenga el rol de paciente.');
             } else {
                 const errorMessage = err.response?.data?.message || err.message || 'Error al cargar las citas';
-                setError(`${errorMessage}. Asegúrate de que el backend esté corriendo y que hayas reiniciado el servidor después de agregar el endpoint.`);
+                setError(errorMessage);
             }
         } finally {
             setLoading(false);
@@ -65,7 +63,6 @@ export const MyAppointments = () => {
 
         try {
             await citaService.cancelCita(citaId);
-            // Reload appointments
             await loadAppointments();
         } catch (err: any) {
             alert(err.response?.data?.message || 'Error al cancelar la cita');
