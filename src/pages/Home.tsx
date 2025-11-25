@@ -8,7 +8,7 @@ import Carousel from '@/components/Carousel';
 import { AnimatedSection } from '@/components/animated-section';
 import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Zap, PictureInPicture2 } from 'lucide-react';
+import { MessageSquare, Zap, PictureInPicture2, DollarSign, ShieldCheck } from 'lucide-react';
 import Timer from '@/components/ui/timer';
 import {
   Accordion,
@@ -31,10 +31,10 @@ export const Home = () => {
           <div className="text-center mb-16">
             <Badge
               variant="secondary"
-              className="mb-8 px-6 py-3 text-base bg-gray-200/60 backdrop-blur-md border-2 border-blue-900 shadow-lg shadow-blue-500/20 text-gray-600"
+              className="mb-8 px-6 py-3 text-base bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md border-2 border-blue-600/30 shadow-lg shadow-blue-500/20 text-blue-900"
             >
               <span className="font-semibold flex items-center gap-2 justify-center">
-                <PictureInPicture2 className="h-4 w-4" />
+                <PictureInPicture2 className="h-4 w-4 animate-pulse" />
                 Plataforma de Videoconsultas
               </span>
             </Badge>
@@ -125,14 +125,14 @@ export const Home = () => {
           <AnimatedSection delay={400}>
             <div className="container mx-auto px-4 py-20">
               <div className="text-center mb-16">
-                <Badge variant="outline" className="mb-4 border-blue-500 text-blue-600">
+                <Badge variant="outline" className="mb-4 border-black-500 text-black-600">
                   Pricing
                 </Badge>
                 <h3 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
                   Precios Transparentes
                 </h3>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Solo cobramos una pequeña comisión por cada consulta exitosa
+                  Solo cobramos una pequeña comisión por cada consulta
                 </p>
               </div>
 
@@ -162,7 +162,7 @@ export const Home = () => {
                       </p>
                     </div>
 
-                    {/* Examples Grid */}
+                    {/* Grid */}
                     <div className="grid md:grid-cols-3 gap-4 mt-8">
                       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 hover:shadow-lg transition-shadow">
                         <div className="text-center">
@@ -199,15 +199,21 @@ export const Home = () => {
                     <div className="mt-8 pt-8 border-t border-gray-200">
                       <div className="grid md:grid-cols-3 gap-6 text-center">
                         <div>
-                          <div className="text-3xl mb-2">🤝</div>
+                          <div className="flex justify-center mb-2">
+                            <DollarSign className="h-8 w-8 text-blue-500" />
+                          </div>
                           <p className="text-sm font-semibold text-gray-900">Sin costos ocultos</p>
                         </div>
                         <div>
-                          <div className="text-3xl mb-2">🔒</div>
+                          <div className="flex justify-center mb-2">
+                            <ShieldCheck className="h-8 w-8 text-green-500" />
+                          </div>
                           <p className="text-sm font-semibold text-gray-900">Pagos seguros</p>
                         </div>
                         <div>
-                          <div className="text-3xl mb-2">⚡</div>
+                          <div className="flex justify-center mb-2">
+                            <Zap className="h-8 w-8 text-purple-500" />
+                          </div>
                           <p className="text-sm font-semibold text-gray-900">Procesamiento instantáneo</p>
                         </div>
                       </div>
@@ -221,9 +227,27 @@ export const Home = () => {
 
         <br></br>
 
+        <AnimatedSection delay={400}>
+          <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300">
+            <div className="flex justify-center mb-4">
+              <MessageSquare className="h-16 w-16 animate-bounce" />
+            </div>
+            <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
+            <p className="text-xl mb-6">
+              Únete a nuestra plataforma y expande tu alcance profesional
+            </p>
+            <Link
+              to="/register"
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
+            >
+              Registrarse como Médico
+            </Link>
+          </div>
+        </AnimatedSection>
+
         {/* FAQ Section */}
         <section id="faq" className="container mx-auto px-4 py-20">
-          <AnimatedSection delay={400}>
+          <AnimatedSection delay={500}>
             <div className="text-center mb-12">
               <Badge variant="outline" className="mb-4">
                 FAQ
@@ -285,26 +309,6 @@ export const Home = () => {
             </Accordion>
           </AnimatedSection>
         </section>
-
-        <br></br>
-
-        <AnimatedSection delay={600}>
-          <div className="bg-blue-600 text-white p-12 rounded-3xl text-center">
-            <div className="flex justify-center mb-4">
-              <MessageSquare className="h-16 w-16 animate-bounce" />
-            </div>
-            <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
-            <p className="text-xl mb-6">
-              Únete a nuestra plataforma y expande tu alcance profesional
-            </p>
-            <Link
-              to="/register"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
-            >
-              Registrarse como Médico
-            </Link>
-          </div>
-        </AnimatedSection>
       </div>
 
       <AnimatedSection delay={200}>

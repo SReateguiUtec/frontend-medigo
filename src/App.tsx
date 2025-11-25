@@ -5,7 +5,7 @@ import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { SearchDoctors } from './pages/patient/SearchDoctors';
 import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
-import { PatientAppointments } from './pages/patient/PatientAppointments';
+import { MyAppointments } from './pages/patient/MyAppointments';
 import { PatientProfile } from './pages/patient/Profile';
 import { Appointments } from './pages/doctor/Appointments';
 import { DoctorProfile } from './pages/doctor/Profile';
@@ -86,7 +86,7 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AuthenticatedLayout>
-                <PatientAppointments />
+                <MyAppointments />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

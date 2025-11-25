@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import type { MedicoSearchResponse } from '../../api/search.service';
 import { User, Mail, Phone, Calendar, Award, ArrowLeft, Stethoscope } from 'lucide-react';
+import { BookAppointmentModal } from '../../components/BookAppointmentModal';
+import type { Medico } from '../../types';
 
 export const DoctorPublicProfile = () => {
     const { doctorId } = useParams<{ doctorId: string }>();
@@ -10,6 +12,7 @@ export const DoctorPublicProfile = () => {
     const [doctor, setDoctor] = useState<MedicoSearchResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (doctorId) {
@@ -216,15 +219,25 @@ export const DoctorPublicProfile = () => {
                         {/* Action Button */}
                         <div className="bg-white rounded-xl shadow-md p-6">
                             <button
-                                onClick={() => {
-                                    // TODO: Navigate to appointment booking
-                                    alert('Funcionalidad de agendar cita próximamente');
-                                }}
-                                className="w-full bg-linear-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold text-lg flex items-center justify-center gap-2"
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold text-lg flex items-center justify-center gap-2"
                             >
                                 <Calendar className="w-6 h-6" />
                                 Agendar Cita
                             </button>
+
+                            {/* Appointment Modal */}
+                            {doctor && (
+                                <BookAppointmentModal
+                                    isOpen={isModalOpen}
+                                    onClose={() => setIsModalOpen(false)}
+                                    doctor={doctor as unknown as Medico}
+                                    onSuccess={() => {
+                                        // Show success message or redirect
+                                        console.log('Appointment created successfully!');
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

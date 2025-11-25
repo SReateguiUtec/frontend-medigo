@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { profileService } from '../../api/profile.service';
+import { useAuth } from '../../context/AuthContext';
 import type { Paciente } from '../../types';
 import { IconUser, IconMail, IconPhone, IconCalendar, IconId, IconEdit, IconCheck, IconX } from '@tabler/icons-react';
 
 export const PatientProfile = () => {
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState<Paciente | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -56,6 +58,10 @@ export const PatientProfile = () => {
       const updated = await profileService.updateProfile(filteredUpdates) as Paciente;
       setProfile(updated);
       setIsEditing(false);
+      // Update the user in AuthContext as well
+      if (user) {
+        updateUser({ ...user, ...updated });
+      }
       setSuccess('Perfil actualizado correctamente');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {

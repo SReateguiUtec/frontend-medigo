@@ -1,3 +1,5 @@
+import { IdCard, ShieldCheck, CalendarCheck } from 'lucide-react';
+
 export default function Grid() {
     return (
         <div id="beneficios" className="py-12 sm:py-16 bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl">
@@ -12,7 +14,7 @@ export default function Grid() {
                         <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
                             <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
                                 <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                                    Consultas en linea 🩺
+                                    Consultas en linea
                                 </p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
                                     Videollamadas seguras con médicos especialistas desde la comodidad de tu hogar
@@ -34,16 +36,12 @@ export default function Grid() {
                         <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-4xl" />
                         <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
                             <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Gestion de citas 📅</p>
+                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Gestion de citas</p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
                                     Agenda y administra tus citas médicas de forma fácil y eficiente                                </p>
                             </div>
-                            <div className="flex flex-1 items-center justify-center px-8 max-lg:pt-10 max-lg:pb-12 sm:px-10 lg:pb-2">
-                                <img
-                                    alt=""
-                                    src="/gestion.png"
-                                    className="w-full max-lg:max-w-xs"
-                                />
+                            <div className="relative min-h-50 w-full grow flex items-center justify-center">
+                                <CalendarCheck className="h-22 w-22 text-black-500" />
                             </div>
                         </div>
                         <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-t-4xl" />
@@ -52,17 +50,13 @@ export default function Grid() {
                         <div className="absolute inset-px rounded-lg bg-white" />
                         <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
                             <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Pagos Seguros 💳</p>
+                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Pagos Seguros</p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
                                     Procesamiento de pagos seguro mediante Stripe (pronto nuevos metodos de pagos)
                                 </p>
                             </div>
-                            <div className="@container flex flex-1 items-center justify-center max-lg:py-6 lg:pb-2">
-                                <img
-                                    alt=""
-                                    src="/pagos-seguros.png"
-                                    className="h-[min(152px,40cqw)] object-cover"
-                                />
+                            <div className="relative min-h-50 w-full grow flex items-center justify-center">
+                                <ShieldCheck className="h-32 w-32 text-black-500" />
                             </div>
                         </div>
                         <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5" />
@@ -78,14 +72,8 @@ export default function Grid() {
                                     Verificacion de identidad de medicos
                                 </p>
                             </div>
-                            <div className="relative min-h-120 w-full grow">
-                                <div className="absolute top-10 right-0 bottom-0 left-10 overflow-hidden rounded-tl-xl">
-                                    <img
-                                        alt=""
-                                        src="/autenticacion.png"
-                                        className="size-full object-cover object-top"
-                                    />
-                                </div>
+                            <div className="relative min-h-120 w-full grow flex items-center justify-center">
+                                <IdCard className="h-72 w-72 text-black-500" />
                             </div>
                         </div>
                         <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-r-4xl" />

@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
+  updateUser: (user: Usuario) => void;
   isAuthenticated: boolean;
 }
 
@@ -26,7 +27,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error('Error loading user from localStorage:', error);
-      // Clear invalid data
       localStorage.removeItem('user');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -48,6 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const updateUser = (updatedUser: Usuario) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -55,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!user,
       }}
     >

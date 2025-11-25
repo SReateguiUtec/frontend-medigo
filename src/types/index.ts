@@ -31,15 +31,23 @@ export interface Especialidad {
   descripcion?: string;
 }
 
+export type EstadoCita = 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
+
 export interface Cita {
   id: number;
   paciente: Paciente;
   medico: Medico;
-  fechaHora: string;
-  motivo: string;
-  estado: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'COMPLETADA';
+  fechaHora: string; // ISO 8601 ZonedDateTime
+  estado: EstadoCita;
+  precioConsulta: number;
   esPagada: boolean;
+  stripeSessionId?: string;
   createdAt: string;
+}
+
+export interface CreateCitaRequest {
+  medicoId: number;
+  fechaHora: string; // ISO 8601 ZonedDateTime
 }
 
 // Backend response format

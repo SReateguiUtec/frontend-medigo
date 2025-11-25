@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { profileService } from '../../api/profile.service';
+import { useAuth } from '../../context/AuthContext';
 import type { Medico } from '../../types';
 import { IconUser, IconMail, IconPhone, IconCalendar, IconId, IconEdit, IconCheck, IconX, IconStethoscope, IconFileText, IconCurrencyDollar } from '@tabler/icons-react';
 
 export const DoctorProfile = () => {
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState<Medico | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,23 @@ export const DoctorProfile = () => {
     }
   };
 
+  const handleActivateAccount = async () => {
+    try {
+      const updated = await profileService.updateAccountStatus('ACTIVADA');
+      setProfile(updated as Medico);
+      // Update the user in AuthContext as well
+      if (user) {
+        updateUser({ ...user, estadoCuenta: 'ACTIVADA' });
+      }
+      setSuccess('Cuenta activada correctamente');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err: any) {
+      console.error('Error activating account:', err);
+      const errorMsg = err.response?.data?.message || 'Error al activar la cuenta';
+      setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -73,6 +92,10 @@ export const DoctorProfile = () => {
       const updated = await profileService.updateProfile(updates) as Medico;
       setProfile(updated);
       setIsEditing(false);
+      // Update the user in AuthContext as well
+      if (user) {
+        updateUser({ ...user, ...updated });
+      }
       setSuccess('Perfil actualizado correctamente');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
