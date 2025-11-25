@@ -88,7 +88,6 @@ export const Sidebar = () => {
                 ))}
             </nav>
 
-            {/* Logout Button */}
             <div className="p-4 border-t border-gray-800">
                 <button
                     onClick={handleLogout}

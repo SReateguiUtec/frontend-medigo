@@ -39,7 +39,10 @@ export const DoctorProfile = () => {
         numeroColegiado: data.numeroColegiado || '',
         bio: data.bio || '',
         precioConsulta: data.precioConsulta?.toString() || '',
-        especialidad: data.especialidades && data.especialidades.length > 0 ? data.especialidades[0].nombre : '',
+        // Handle both array and single specialty cases
+        especialidad: data.especialidades && data.especialidades.length > 0 
+          ? data.especialidades[0].nombre_especialidad 
+          : '',
       });
     } catch (err: any) {
       console.error('Error loading profile:', err);
@@ -64,6 +67,7 @@ export const DoctorProfile = () => {
       if (formData.numeroColegiado) updates.numeroColegiado = formData.numeroColegiado;
       if (formData.bio !== undefined) updates.bio = formData.bio;
       if (formData.precioConsulta) updates.precioConsulta = parseFloat(formData.precioConsulta);
+      // Send specialty as an object with name property
       if (formData.especialidad) updates.especialidad = formData.especialidad;
 
       const updated = await profileService.updateProfile(updates) as Medico;
@@ -78,7 +82,7 @@ export const DoctorProfile = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -87,7 +91,7 @@ export const DoctorProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 pt-24 pb-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-teal-50 pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
@@ -98,14 +102,14 @@ export const DoctorProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-teal-50 pt-24 pb-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Card with Avatar */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 relative">
+          <div className="h-32 bg-linear-to-r from-emerald-500 via-teal-600 to-cyan-600 relative">
             <div className="absolute -bottom-16 left-8">
               <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
                   <IconStethoscope size={48} className="text-white" />
                 </div>
               </div>
@@ -127,7 +131,7 @@ export const DoctorProfile = () => {
                 {profile?.especialidades && profile.especialidades.length > 0 && (
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium border border-emerald-200">
-                      {profile.especialidades[0].nombre}
+                      {profile.especialidades[0].nombre_especialidad}
                     </span>
                   </div>
                 )}
@@ -136,7 +140,7 @@ export const DoctorProfile = () => {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <IconEdit size={20} />
                   Editar Perfil
@@ -264,7 +268,7 @@ export const DoctorProfile = () => {
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Especialidad</p>
                       <p className="text-gray-900 font-medium">
                         {profile.especialidades && profile.especialidades.length > 0
-                          ? profile.especialidades[0].nombre
+                          ? profile.especialidades[0].nombre_especialidad
                           : 'No especificada'}
                       </p>
                     </div>
@@ -399,14 +403,22 @@ export const DoctorProfile = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Especialidad
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="especialidad"
                     value={formData.especialidad}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                    placeholder="Cardiología, Pediatría, etc."
-                  />
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all appearance-none bg-white"
+                  >
+                    <option value="">Seleccionar especialidad...</option>
+                    <option value="Cardiología">Cardiología</option>
+                    <option value="Pediatría">Pediatría</option>
+                    <option value="Traumatología">Traumatología</option>
+                    <option value="Dermatología">Dermatología</option>
+                    <option value="Neurología">Neurología</option>
+                    <option value="Ginecología">Ginecología</option>
+                    <option value="Oftalmología">Oftalmología</option>
+                    <option value="Psiquiatría">Psiquiatría</option>
+                  </select>
                 </div>
               </div>
 
@@ -427,7 +439,7 @@ export const DoctorProfile = () => {
               <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+                  className="flex items-center gap-2 px-8 py-3 bg-linear-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
                 >
                   <IconCheck size={20} />
                   Guardar Cambios

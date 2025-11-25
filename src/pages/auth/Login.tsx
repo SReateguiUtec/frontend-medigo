@@ -58,7 +58,7 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Gradient with Features */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 p-12 flex-col justify-between text-white relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-600 via-blue-700 to-purple-700 p-12 flex-col justify-between text-white relative overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
@@ -84,7 +84,7 @@ export const Login = () => {
           <div className="space-y-6">
             {features.map((feature, index) => (
               <div key={index} className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center shrink-0">
                   {feature.icon}
                 </div>
                 <div>

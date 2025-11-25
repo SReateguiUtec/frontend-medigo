@@ -27,7 +27,7 @@ export interface Medico extends Usuario {
 
 export interface Especialidad {
   id: number;
-  nombre: string;
+  nombre_especialidad: string;
   descripcion?: string;
 }
 

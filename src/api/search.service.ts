@@ -2,7 +2,7 @@ import apiClient from './axios.config';
 
 export interface Especialidad {
     id: number;
-    nombre: string;
+    nombre_especialidad: string;
 }
 
 export interface MedicoSearchResponse {
@@ -48,9 +48,21 @@ export const searchService = {
         return response.data;
     },
 
-    // Filtrar médicos por especialidad
+    // Buscar médico exacto por email
+    getMedicoByEmail: async (email: string): Promise<MedicoSearchResponse> => {
+        const response = await apiClient.get(`/search/medicos/email/${email}`);
+        return response.data;
+    },
+
+    // Filtrar médicos por especialidad (por ID)
     getMedicosByEspecialidad: async (especialidadId: number, page: number = 0, size: number = 10): Promise<PageResponse<MedicoSearchResponse>> => {
         const response = await apiClient.get(`/search/medicos/especialidad/${especialidadId}?page=${page}&size=${size}`);
+        return response.data;
+    },
+
+    // Filtrar médicos por especialidad (por nombre)
+    getMedicosByEspecialidadNombre: async (nombreEspecialidad: string, page: number = 0, size: number = 10): Promise<PageResponse<MedicoSearchResponse>> => {
+        const response = await apiClient.get(`/search/medicos/especialidad/nombre/${encodeURIComponent(nombreEspecialidad)}?page=${page}&size=${size}`);
         return response.data;
     },
 

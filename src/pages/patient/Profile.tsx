@@ -74,7 +74,7 @@ export const PatientProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -85,14 +85,14 @@ export const PatientProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Card with Avatar */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 relative">
+          <div className="h-32 bg-linear-to-r from-blue-500 via-blue-600 to-purple-600 relative">
             <div className="absolute -bottom-16 left-8">
               <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                   <IconUser size={48} className="text-white" />
                 </div>
               </div>
@@ -114,7 +114,7 @@ export const PatientProfile = () => {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <IconEdit size={20} />
                   Editar Perfil
@@ -125,8 +125,8 @@ export const PatientProfile = () => {
             {/* Status Badge */}
             <div className="mt-4">
               <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${profile?.estadoCuenta === 'ACTIVADA'
-                  ? 'bg-green-100 text-green-800 border border-green-200'
-                  : 'bg-red-100 text-red-800 border border-red-200'
+                ? 'bg-green-100 text-green-800 border border-green-200'
+                : 'bg-red-100 text-red-800 border border-red-200'
                 }`}>
                 {profile?.estadoCuenta === 'ACTIVADA' ? '✓ Cuenta Activa' : '⚠ Cuenta Inactiva'}
               </span>
@@ -323,7 +323,7 @@ export const PatientProfile = () => {
               <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+                  className="flex items-center gap-2 px-8 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
                 >
                   <IconCheck size={20} />
                   Guardar Cambios

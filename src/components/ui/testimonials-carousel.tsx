@@ -406,8 +406,8 @@ export function Component() {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <div className="pointer-events-none absolute inset-y-0 left-0 h-full w-2/12 bg-gradient-to-r from-background"></div>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 h-full  w-2/12 bg-gradient-to-l from-background"></div>
+                        <div className="pointer-events-none absolute inset-y-0 left-0 h-full w-2/12 bg-linear-to-r from-background"></div>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 h-full  w-2/12 bg-linear-to-l from-background"></div>
                     </div>
                     <div className="hidden md:block">
                         <CarouselPrevious />

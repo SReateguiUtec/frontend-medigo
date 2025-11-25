@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
-import type { MedicoSearchResponse } from '../../api/search.service';
-import { Search, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope } from 'lucide-react';
 
 // Doctores de demostración
 const showcaseDoctors = [
@@ -15,7 +14,7 @@ const showcaseDoctors = [
     bio: 'Especialista en enfermedades cardiovasculares con más de 15 años de experiencia. Certificado por el Colegio Americano de Cardiología.',
     precioConsulta: 120,
     numeroColegiado: 'CMP-12345',
-    especialidades: [{ id: 1, nombre: 'Cardiología' }],
+    especialidades: [{ id: 1, nombre_especialidad: 'Cardiología' }],
   },
   {
     id: 2,
@@ -26,7 +25,7 @@ const showcaseDoctors = [
     bio: 'Pediatra dedicada al cuidado integral de niños y adolescentes. Experta en desarrollo infantil y vacunación.',
     precioConsulta: 85,
     numeroColegiado: 'CMP-23456',
-    especialidades: [{ id: 2, nombre: 'Pediatría' }],
+    especialidades: [{ id: 2, nombre_especialidad: 'Pediatría' }],
   },
   {
     id: 3,
@@ -37,7 +36,7 @@ const showcaseDoctors = [
     bio: 'Cirujano traumatólogo especializado en lesiones deportivas y cirugía de columna. Atención personalizada.',
     precioConsulta: 150,
     numeroColegiado: 'CMP-34567',
-    especialidades: [{ id: 3, nombre: 'Traumatología' }],
+    especialidades: [{ id: 3, nombre_especialidad: 'Traumatología' }],
   },
   {
     id: 4,
@@ -48,7 +47,7 @@ const showcaseDoctors = [
     bio: 'Dermatóloga con enfoque en tratamientos estéticos y dermatología clínica. Certificada internacionalmente.',
     precioConsulta: 95,
     numeroColegiado: 'CMP-45678',
-    especialidades: [{ id: 4, nombre: 'Dermatología' }],
+    especialidades: [{ id: 4, nombre_especialidad: 'Dermatología' }],
   },
   {
     id: 5,
@@ -59,7 +58,7 @@ const showcaseDoctors = [
     bio: 'Neurólogo especializado en trastornos del sistema nervioso. Experto en migrañas y epilepsia.',
     precioConsulta: 130,
     numeroColegiado: 'CMP-56789',
-    especialidades: [{ id: 5, nombre: 'Neurología' }],
+    especialidades: [{ id: 5, nombre_especialidad: 'Neurología' }],
   },
   {
     id: 6,
@@ -70,13 +69,23 @@ const showcaseDoctors = [
     bio: 'Ginecóloga obstetra con amplia experiencia en salud reproductiva y embarazo de alto riesgo.',
     precioConsulta: 110,
     numeroColegiado: 'CMP-67890',
-    especialidades: [{ id: 6, nombre: 'Ginecología' }],
+    especialidades: [{ id: 6, nombre_especialidad: 'Ginecología' }],
   },
 ];
 
+type FilterType = 'name' | 'email' | 'price' | 'specialty';
+
 export const SearchDoctors = () => {
   const navigate = useNavigate();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('name');
+
+  // Search States
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchEmail, setSearchEmail] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [specialtyId, setSpecialtyId] = useState('');
+
   const [doctors, setDoctors] = useState<any[]>(showcaseDoctors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,31 +99,101 @@ export const SearchDoctors = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async (page: number = 0) => {
-    if (!searchTerm.trim()) {
-      setDoctors(showcaseDoctors);
-      setIsSearching(false);
-      return;
-    }
+    console.log('Performing search with filter:', activeFilter);
+    setLoading(true);
+    setError('');
+    setIsSearching(true);
+    const pageSize = 9;
 
     try {
-      setLoading(true);
-      setError('');
-      setIsSearching(true);
-      // CAMBIO: Usar tamaño 6 para probar la paginación
-      const pageSize = 9;
-      console.log(`Solicitando página ${page} con tamaño ${pageSize}`);
+      let response;
 
-      const response = await searchService.searchMedicosByNombre(searchTerm, page, pageSize);
-      console.log('Respuesta del backend:', response);
+      switch (activeFilter) {
+        case 'name':
+          if (!searchTerm.trim()) {
+            console.log('No search term, showing showcase doctors');
+            setDoctors(showcaseDoctors);
+            setIsSearching(false);
+            setLoading(false);
+            return;
+          }
+          console.log('Searching by name:', searchTerm);
+          response = await searchService.searchMedicosByNombre(searchTerm, page, pageSize);
+          break;
 
-      setDoctors(response.content);
-      setPageInfo({
-        totalPages: response.totalPages,
-        number: response.number,
-        first: response.number === 0,
-        last: response.number === response.totalPages - 1,
-        totalElements: response.totalElements,
-      });
+        case 'email':
+          if (!searchEmail.trim()) {
+            setError('Por favor ingrese un correo electrónico');
+            setLoading(false);
+            return;
+          }
+          console.log('Searching by email:', searchEmail);
+          try {
+            const medico = await searchService.getMedicoByEmail(searchEmail);
+            response = {
+              content: [medico],
+              totalPages: 1,
+              number: 0,
+              totalElements: 1,
+              first: true,
+              last: true,
+              size: pageSize
+            };
+          } catch (e) {
+            // Si no encuentra, retornamos lista vacía
+            response = {
+              content: [],
+              totalPages: 0,
+              number: 0,
+              totalElements: 0,
+              first: true,
+              last: true,
+              size: pageSize
+            };
+          }
+          break;
+
+        case 'price':
+          if (!minPrice || !maxPrice) {
+            setError('Por favor ingrese el rango de precios');
+            setLoading(false);
+            return;
+          }
+          console.log('Searching by price range:', minPrice, '-', maxPrice);
+          response = await searchService.getMedicosByPrecioRange(
+            Number(minPrice),
+            Number(maxPrice),
+            page,
+            pageSize
+          );
+          break;
+
+        case 'specialty':
+          if (!specialtyId) {
+            setError('Por favor seleccione una especialidad');
+            setLoading(false);
+            return;
+          }
+          console.log('Searching by specialty name:', specialtyId);
+          response = await searchService.getMedicosByEspecialidadNombre(
+            specialtyId, // Now this is the specialty name, not ID
+            page,
+            pageSize
+          );
+          break;
+      }
+
+      if (response) {
+        console.log('Search results:', response.content); // Debug log
+        setDoctors(response.content);
+        setPageInfo({
+          totalPages: response.totalPages,
+          number: response.number,
+          first: response.number === 0,
+          last: response.number === response.totalPages - 1,
+          totalElements: response.totalElements,
+        });
+      }
 
       if (page > 0) {
         const resultsElement = document.getElementById('search-results');
@@ -124,9 +203,8 @@ export const SearchDoctors = () => {
       }
     } catch (err: any) {
       console.error('Error searching doctors:', err);
-      setError('Error al buscar médicos');
-      setDoctors(showcaseDoctors);
-      setIsSearching(false);
+      setError('Error al buscar médicos. Intente nuevamente.');
+      setDoctors([]);
     } finally {
       setLoading(false);
     }
@@ -139,25 +217,18 @@ export const SearchDoctors = () => {
   };
 
   const handleDoctorClick = (doctorId: number) => {
-    console.log('Doctor clicked:', doctorId, 'isSearching:', isSearching);
-    // Solo bloquear los doctores de demostración cuando NO estamos buscando
     if (!isSearching) {
       const demoIds = [1, 2, 3, 4, 5, 6];
       if (demoIds.includes(doctorId)) {
-        console.log('Es demo, no navegar');
-        return; // No hacer nada para doctores de demostración
+        return;
       }
     }
-    console.log('Navegando a perfil:', doctorId);
     navigate(`/patient/doctor/${doctorId}`);
   };
 
   const getEspecialidadNombre = (doctor: any): string => {
-    if (doctor.especialidades && doctor.especialidades.length > 0) {
-      const especialidadesArray = Array.isArray(doctor.especialidades)
-        ? doctor.especialidades
-        : Array.from(doctor.especialidades);
-      return especialidadesArray[0].nombre;
+    if (doctor?.especialidades && doctor.especialidades.length > 0) {
+      return doctor.especialidades[0].nombre_especialidad;
     }
     return 'No especificada';
   };
@@ -169,20 +240,129 @@ export const SearchDoctors = () => {
         <p className="mt-2 text-gray-600">Encuentra al especialista que necesitas</p>
       </div>
 
-      {/* Search Bar */}
+      {/* Search Filters */}
       <div className="bg-white rounded-lg shadow p-4">
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-2 mb-4 border-b pb-4">
+          <button
+            onClick={() => { setActiveFilter('name'); setError(''); }}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'name'
+              ? 'bg-blue-100 text-blue-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50'
+              }`}
+          >
+            <Search className="w-4 h-4" />
+            Nombre
+          </button>
+          <button
+            onClick={() => { setActiveFilter('email'); setError(''); }}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'email'
+              ? 'bg-blue-100 text-blue-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50'
+              }`}
+          >
+            <Mail className="w-4 h-4" />
+            Correo
+          </button>
+          <button
+            onClick={() => { setActiveFilter('price'); setError(''); }}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'price'
+              ? 'bg-blue-100 text-blue-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50'
+              }`}
+          >
+            <DollarSign className="w-4 h-4" />
+            Precio
+          </button>
+          <button
+            onClick={() => { setActiveFilter('specialty'); setError(''); }}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'specialty'
+              ? 'bg-blue-100 text-blue-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50'
+              }`}
+          >
+            <Stethoscope className="w-4 h-4" />
+            Especialidad
+          </button>
+        </div>
+
+        {/* Input Fields */}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Buscar por nombre o apellido..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
-            />
+            {activeFilter === 'name' && (
+              <>
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre o apellido..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
+                />
+              </>
+            )}
+
+            {activeFilter === 'email' && (
+              <>
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="email"
+                  placeholder="Buscar por correo electrónico..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
+                />
+              </>
+            )}
+
+            {activeFilter === 'price' && (
+              <div className="flex gap-4 items-center">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">S/</span>
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                  />
+                </div>
+                <span className="text-gray-400">-</span>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">S/</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeFilter === 'specialty' && (
+              <>
+                <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <select
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                  value={specialtyId}
+                  onChange={(e) => setSpecialtyId(e.target.value)}
+                >
+                  <option value="">Seleccionar especialidad...</option>
+                  <option value="Cardiología">Cardiología</option>
+                  <option value="Pediatría">Pediatría</option>
+                  <option value="Traumatología">Traumatología</option>
+                  <option value="Dermatología">Dermatología</option>
+                  <option value="Neurología">Neurología</option>
+                  <option value="Ginecología">Ginecología</option>
+                </select>
+              </>
+            )}
           </div>
+
           <button
             onClick={() => handleSearch(0)}
             disabled={loading}
@@ -191,11 +371,6 @@ export const SearchDoctors = () => {
             {loading ? 'Buscando...' : 'Buscar'}
           </button>
         </div>
-        {!isSearching && (
-          <p className="mt-2 text-sm text-gray-500">
-            Usa la búsqueda para encontrar doctores.
-          </p>
-        )}
       </div>
 
       {/* Error Message */}
@@ -224,7 +399,7 @@ export const SearchDoctors = () => {
                 className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) ? 'cursor-pointer transform hover:-translate-y-1' : ''}`}
               >
                 {/* Doctor Image */}
-                <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <div className="relative h-48 bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   {doctor.rutaFoto ? (
                     <img
                       src={doctor.rutaFoto}
@@ -272,12 +447,16 @@ export const SearchDoctors = () => {
                     )}
                   </div>
 
-                  {/* Solo mostrar botón para doctores reales o resultados de búsqueda */}
-                  {(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) && (
-                    <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                      Ver Perfil
-                    </button>
-                  )}
+                  {/* Always show Ver Perfil button */}
+                  <button
+                    className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    onClick={() => {
+                      console.log('Navigating to doctor profile with ID:', doctor.id);
+                      navigate(`/patient/doctor/${doctor.id}`);
+                    }}
+                  >
+                    Ver Perfil
+                  </button>
                 </div>
               </div>
             ))}
@@ -325,6 +504,7 @@ export const SearchDoctors = () => {
               setSearchTerm('');
               setDoctors(showcaseDoctors);
               setIsSearching(false);
+              setActiveFilter('name');
             }}
             className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
           >
