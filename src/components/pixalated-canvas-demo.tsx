@@ -5,13 +5,13 @@ export default function PixelatedCanvasDemo() {
     return (
         <div className="flex items-center justify-center w-full h-full p-4">
             <PixelatedCanvas
-                src="/dailyco.png"
-                width={350}
+                src="/whereby.png"
+                width={300}
                 height={400}
                 cellSize={4}
                 dotScale={0.9}
                 shape="circle"
-                backgroundColor="#000000"
+                backgroundColor="#FFFFFF"
                 dropoutStrength={0.4}
                 interactive
                 distortionStrength={3}
@@ -24,7 +24,7 @@ export default function PixelatedCanvasDemo() {
                 tintColor="#FFFFFF"
                 tintStrength={0.05}
                 responsive={true}
-                className="rounded-2xl border border-neutral-800 shadow-lg w-full h-full max-w-full"
+                className="rounded-2xl"
             />
         </div>
     );

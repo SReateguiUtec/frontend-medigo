@@ -115,7 +115,7 @@ export const Home = () => {
         <br></br>
 
         <AnimatedSection delay={400}>
-          <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
             <div className="flex justify-center mb-4">
               <MessageSquare className="h-16 w-16 animate-bounce" />
             </div>

@@ -1,5 +1,4 @@
 import { IdCard, ShieldCheck, CalendarCheck } from 'lucide-react';
-import PixelatedCanvasDemo from './pixalated-canvas-demo';
 import StripePixelatedDemo from './stripe-pixelated-demo';
 
 export default function Grid() {
@@ -19,14 +18,16 @@ export default function Grid() {
                                     Consultas en linea
                                 </p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                                    Videollamadas seguras con daily.co, con médicos especialistas desde la comodidad de tu hogar
+                                    Videollamadas seguras con WhereBy, con médicos especialistas desde la comodidad de tu hogar
                                 </p>
                             </div>
                             <div className="relative w-full grow flex items-center justify-center p-6">
                                 <div className="w-full h-full max-h-[450px] flex items-center justify-center">
-                                    <div className="w-full h-full max-w-[350px] max-h-[420px]">
-                                        <PixelatedCanvasDemo />
-                                    </div>
+                                    <img
+                                        src="/medico.png"
+                                        alt="Médico profesional"
+                                        className="w-full h-full object-contain"
+                                    />
                                 </div>
                             </div>
                         </div>
