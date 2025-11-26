@@ -82,11 +82,11 @@ export const Appointments = () => {
     const aptDate = new Date(appointment.fechaHora);
     const now = new Date();
     const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
-    
+
     return (
-      (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') && 
+      (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') &&
       (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
-       aptDate.getTime() < now.getTime())
+        aptDate.getTime() < now.getTime())
     );
   };
 
@@ -233,7 +233,7 @@ export const Appointments = () => {
           onSuccess={() => {
             setIsModalOpen(false);
             setSelectedCita(null);
-            loadAppointments(); // Reload appointments after creating record
+            loadAppointments();
           }}
         />
       )}
