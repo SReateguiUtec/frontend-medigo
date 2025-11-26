@@ -9,6 +9,7 @@ import { MyAppointments } from './pages/patient/MyAppointments';
 import { PatientProfile } from './pages/patient/Profile';
 import { Appointments } from './pages/doctor/Appointments';
 import { DoctorProfile } from './pages/doctor/Profile';
+import { PatientMedicalHistory } from './pages/doctor/PatientMedicalHistory';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { NavbarDemo } from './components/NavbarDemo';
 import { AuthenticatedLayout } from './components/AuthenticatedLayout';
@@ -28,7 +29,6 @@ const HomeRedirect = () => {
   const { isAuthenticated, user } = useAuth();
 
   if (isAuthenticated) {
-    // Redirect based on user role
     if (user?.rol === 'PACIENTE') {
       return <Navigate to="/patient/search" />;
     } else if (user?.rol === 'MEDICO') {
@@ -45,7 +45,6 @@ function AppContent() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Hide navbar on login and register pages
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const showNavbar = !isAuthenticated && !isAuthPage;
 
@@ -97,6 +96,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <Appointments />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/patient/:pacienteId/history"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <PatientMedicalHistory />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

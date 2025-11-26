@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { WorldMapDemo } from '@/components/WorldMapDemo';
 import { EncryptedTextDemoSecond } from '@/components/EncryptedTextDemoSecond';
 import Grid from '@/components/Grid';
-import Carousel from '@/components/Carousel';
+import InfiniteMovingCardsDemo from '@/components/infinite-moving-cards-demo';
 import { AnimatedSection } from '@/components/animated-section';
 import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
@@ -113,35 +113,31 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
-        <br></br>
 
-        <AnimatedSection delay={600}>
-          <Carousel />
+        <AnimatedSection delay={400}>
+          <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
+            <div className="flex justify-center mb-4">
+              <MessageSquare className="h-16 w-16 animate-bounce" />
+            </div>
+            <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
+            <p className="text-xl mb-6">
+              Únete a nuestra plataforma y expande tu alcance profesional
+            </p>
+            <Link
+              to="/register"
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
+            >
+              Registrarse como Médico
+            </Link>
+          </div>
         </AnimatedSection>
 
         <br></br>
         <br></br>
         <br></br>
-        <br></br>
 
-        <AnimatedSection delay={400}>
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <div className="bg-blue-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300">
-              <div className="flex justify-center mb-4">
-                <MessageSquare className="h-16 w-16 animate-bounce" />
-              </div>
-              <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
-              <p className="text-xl mb-6">
-                Únete a nuestra plataforma y expande tu alcance profesional
-              </p>
-              <Link
-                to="/register"
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
-              >
-                Registrarse como Médico
-              </Link>
-            </div>
-          </div>
+        <AnimatedSection delay={600}>
+          <InfiniteMovingCardsDemo />
         </AnimatedSection>
 
         <br></br>

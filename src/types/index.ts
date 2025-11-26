@@ -81,3 +81,18 @@ export interface RegisterMedicoRequest {
   password: string;
   dni: string;
 }
+
+export interface HistorialMedico {
+  id: number;
+  cita: Cita;
+  diagnostico: string;
+  receta?: string;
+  notas?: string;
+  createdAt: string;
+}
+
+export interface CreateHistorialRequest {
+  diagnostico: string;
+  receta?: string;
+  notas?: string;
+}

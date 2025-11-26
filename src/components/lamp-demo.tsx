@@ -16,7 +16,7 @@ export default function LampDemo() {
                 }}
                 className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
             >
-                <h1>MediGO <br /> la vía para tu salud personalizada</h1>
+                <h1>La vía para tu salud personalizada</h1>
             </motion.h1>
         </LampContainer>
     );

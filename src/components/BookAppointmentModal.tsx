@@ -39,16 +39,32 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             const dateTimeString = `${selectedDate}T${selectedTime}:00`;
             const appointmentDate = new Date(dateTimeString);
 
-            if (appointmentDate <= new Date()) {
-                setError('La fecha debe ser en el futuro');
+            // Verificar que la fecha no sea en el pasado
+            const now = new Date();
+
+            // Validar que la fecha/hora seleccionada sea futura
+            if (appointmentDate < now) {
+                setError('La fecha y hora deben ser en el futuro');
                 setLoading(false);
                 return;
             }
 
-            // Convert to ISO string (backend expects ZonedDateTime)
-            const fechaHora = appointmentDate.toISOString();
+            // Formatear la fecha con el offset de zona horaria para enviar al backend
+            // Esto asegura que el backend reciba la hora exacta seleccionada por el usuario
+            const pad = (n: number) => n < 10 ? '0' + n : n;
+            const timezoneOffset = appointmentDate.getTimezoneOffset();
+            const sign = timezoneOffset > 0 ? '-' : '+';
+            const offsetHours = pad(Math.floor(Math.abs(timezoneOffset) / 60));
+            const offsetMinutes = pad(Math.abs(timezoneOffset) % 60);
 
-            // Create appointment
+            const fechaHora = appointmentDate.getFullYear() + '-' +
+                pad(appointmentDate.getMonth() + 1) + '-' +
+                pad(appointmentDate.getDate()) + 'T' +
+                pad(appointmentDate.getHours()) + ':' +
+                pad(appointmentDate.getMinutes()) + ':' +
+                pad(appointmentDate.getSeconds()) +
+                sign + offsetHours + ':' + offsetMinutes;
+
             await citaService.createCita({
                 medicoId: doctor.id,
                 fechaHora
@@ -82,8 +98,11 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     const getMinDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     const getSpecialtyName = () => {
@@ -94,31 +113,41 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/40 via-emerald-900/20 to-teal-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 rounded-t-2xl relative">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-8 rounded-t-3xl relative">
                     <button
                         onClick={handleClose}
                         disabled={loading}
-                        className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full p-2 transition-colors disabled:opacity-50"
+                        className="absolute top-4 right-4 text-white/90 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all disabled:opacity-50"
                     >
                         <X className="w-6 h-6" />
                     </button>
-                    <h2 className="text-2xl font-bold text-white mb-2">Agendar Cita</h2>
-                    <p className="text-white/90">Complete los detalles para agendar su cita médica</p>
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl">
+                            <Calendar className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-bold text-white">Agendar Cita</h2>
+                            <p className="text-white/90 text-sm mt-1">Selecciona fecha y hora para tu consulta</p>
+                        </div>
+                    </div>
+                    <p className="text-white/90">Con {doctor.nombres} {doctor.apellidos}</p>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-8">
                     {/* Success Message */}
                     {success && (
-                        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <h3 className="font-semibold text-green-900">¡Cita agendada exitosamente!</h3>
-                                <p className="text-sm text-green-700 mt-1">
-                                    Recibirá un correo de confirmación con los detalles de su cita.
+                        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 flex items-start gap-4 animate-in fade-in slide-in-from-top-2">
+                            <div className="bg-green-500 rounded-full p-2">
+                                <CheckCircle className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-bold text-green-900 text-lg">¡Cita agendada exitosamente!</h3>
+                                <p className="text-green-700 mt-1">
+                                    Tu cita ha sido registrada. Recibirás una confirmación pronto.
                                 </p>
                             </div>
                         </div>
@@ -126,56 +155,51 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <h3 className="font-semibold text-red-900">Error</h3>
-                                <p className="text-sm text-red-700 mt-1">{error}</p>
+                        <div className="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-2xl p-6 flex items-start gap-4">
+                            <div className="bg-red-500 rounded-full p-2">
+                                <AlertCircle className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-bold text-red-900 text-lg">Error</h3>
+                                <p className="text-red-700 mt-1">{error}</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Doctor Info */}
-                    <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <User className="w-5 h-5 text-emerald-600" />
-                            Información del Médico
-                        </h3>
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Nombre:</span>
-                                <span className="font-medium text-gray-900">
-                                    {doctor.nombres} {doctor.apellidos}
-                                </span>
+                    {/* Doctor Info Card */}
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 mb-8">
+                        <div className="flex items-start gap-4">
+                            <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-3">
+                                <User className="w-8 h-8 text-white" />
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600 flex items-center gap-2">
+                            <div className="flex-1">
+                                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                                    Dr. {doctor.nombres} {doctor.apellidos}
+                                </h3>
+                                <div className="flex items-center gap-2 text-emerald-700 mb-3">
                                     <Stethoscope className="w-4 h-4" />
-                                    Especialidad:
-                                </span>
-                                <span className="font-medium text-gray-900">{getSpecialtyName()}</span>
-                            </div>
-                            {doctor.precioConsulta && (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600 flex items-center gap-2">
-                                        <DollarSign className="w-4 h-4" />
-                                        Precio de consulta:
-                                    </span>
-                                    <span className="font-bold text-emerald-600 text-lg">
-                                        S/ {doctor.precioConsulta.toFixed(2)}
-                                    </span>
+                                    <span className="font-medium">{getSpecialtyName()}</span>
                                 </div>
-                            )}
+                                <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 border border-emerald-200">
+                                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                                    <span className="font-bold text-gray-900">
+                                        S/. {doctor.precioConsulta?.toFixed(2) || '0.00'}
+                                    </span>
+                                    <span className="text-gray-600 text-sm">por consulta</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Appointment Form */}
+                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Date Selection */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-emerald-600" />
-                                Fecha de la cita
+                            <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <div className="bg-emerald-100 rounded-lg p-1.5">
+                                    <Calendar className="w-4 h-4 text-emerald-600" />
+                                </div>
+                                Fecha de la Cita
                             </label>
                             <input
                                 type="date"
@@ -184,18 +208,17 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                 min={getMinDate()}
                                 required
                                 disabled={loading || success}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 disabled:bg-gray-50 disabled:cursor-not-allowed transition-all text-lg font-medium"
                             />
-                            <p className="mt-1 text-sm text-gray-500">
-                                Seleccione una fecha futura para su cita
-                            </p>
                         </div>
 
                         {/* Time Selection */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-emerald-600" />
-                                Hora de la cita
+                            <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <div className="bg-teal-100 rounded-lg p-1.5">
+                                    <Clock className="w-4 h-4 text-teal-600" />
+                                </div>
+                                Hora de la Cita
                             </label>
                             <input
                                 type="time"
@@ -203,56 +226,24 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                 onChange={(e) => setSelectedTime(e.target.value)}
                                 required
                                 disabled={loading || success}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-500 disabled:bg-gray-50 disabled:cursor-not-allowed transition-all text-lg font-medium"
                             />
-                            <p className="mt-1 text-sm text-gray-500">
-                                Seleccione el horario preferido
-                            </p>
                         </div>
 
-                        {/* Summary */}
-                        {selectedDate && selectedTime && (
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                                <h4 className="font-semibold text-emerald-900 mb-2">Resumen de la cita</h4>
-                                <div className="space-y-1 text-sm text-emerald-800">
-                                    <p>
-                                        <strong>Fecha:</strong>{' '}
-                                        {new Date(selectedDate).toLocaleDateString('es-ES', {
-                                            weekday: 'long',
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </p>
-                                    <p>
-                                        <strong>Hora:</strong> {selectedTime}
-                                    </p>
-                                    <p>
-                                        <strong>Médico:</strong> {doctor.nombres} {doctor.apellidos}
-                                    </p>
-                                    {doctor.precioConsulta && (
-                                        <p>
-                                            <strong>Costo:</strong> S/ {doctor.precioConsulta.toFixed(2)}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
                         {/* Action Buttons */}
-                        <div className="flex gap-3 pt-4">
+                        <div className="flex gap-4 pt-6">
                             <button
                                 type="button"
                                 onClick={handleClose}
                                 disabled={loading}
-                                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading || success || !selectedDate || !selectedTime}
-                                className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                disabled={loading || success}
+                                className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                             >
                                 {loading ? (
                                     <>
@@ -262,7 +253,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                 ) : success ? (
                                     <>
                                         <CheckCircle className="w-5 h-5" />
-                                        ¡Agendada!
+                                        ¡Agendado!
                                     </>
                                 ) : (
                                     <>

@@ -1,4 +1,6 @@
 import { IdCard, ShieldCheck, CalendarCheck } from 'lucide-react';
+import PixelatedCanvasDemo from './pixalated-canvas-demo';
+import StripePixelatedDemo from './stripe-pixelated-demo';
 
 export default function Grid() {
     return (
@@ -17,16 +19,14 @@ export default function Grid() {
                                     Consultas en linea
                                 </p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                                    Videollamadas seguras con médicos especialistas desde la comodidad de tu hogar
+                                    Videollamadas seguras con daily.co, con médicos especialistas desde la comodidad de tu hogar
                                 </p>
                             </div>
-                            <div className="@container relative min-h-120 w-full grow max-lg:mx-auto max-lg:max-w-sm">
-                                <div className="absolute inset-x-10 top-10 bottom-4 overflow-hidden">
-                                    <img
-                                        alt=""
-                                        src="/medico.png"
-                                        className="size-full object-cover object-top"
-                                    />
+                            <div className="relative w-full grow flex items-center justify-center p-6">
+                                <div className="w-full h-full max-h-[450px] flex items-center justify-center">
+                                    <div className="w-full h-full max-w-[350px] max-h-[420px]">
+                                        <PixelatedCanvasDemo />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -55,8 +55,9 @@ export default function Grid() {
                                     Procesamiento de pagos seguro mediante Stripe (pronto nuevos metodos de pagos)
                                 </p>
                             </div>
-                            <div className="relative min-h-50 w-full grow flex items-center justify-center">
-                                <ShieldCheck className="h-32 w-32 text-black-500" />
+                            <div className="relative min-h-50 w-full grow flex flex-col items-center justify-center gap-6">
+                                <StripePixelatedDemo />
+                                {/*<ShieldCheck className="h-24 w-24 text-black-500" />*/}
                             </div>
                         </div>
                         <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5" />
