@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios.config';
-import { useVideoCall } from '../../hooks/useVideoCall'; // Importamos el hook
+import { useVideoCall } from '../../hooks/useVideoCall';
 import { CreateMedicalRecordModal } from '../../components/CreateMedicalRecordModal';
 import type { Cita, Medico } from '../../types';
 import { Calendar, Clock, User, Stethoscope, History, FileText, Video, DollarSign, AlertCircle, CheckCircle, XCircle, Mail } from 'lucide-react';
@@ -72,21 +72,24 @@ export const Appointments = () => {
   const handleJoinVideoCall = async (citaId: number) => {
     const result = await joinVideoCall(citaId);
     if (!result.success) {
+      // Show more descriptive error message
       alert(result.message);
     }
   };
 
-  // Verificar si es hora de la cita (dentro de 15 minutos antes o después)
+  // Verificar si es hora de la cita (dentro de 1 hora antes o después, o si ya pasó pero está confirmada)
   const isTimeForAppointment = (appointment: Cita) => {
     const aptDate = new Date(appointment.fechaHora);
     const now = new Date();
-    const fifteenMinutes = 15 * 60 * 1000; // 15 minutos en milisegundos
-
-    // Verificar si la cita está confirmada y es en los próximos 15 minutos o ya pasó
+    const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+    
+    // Verificar si la cita está confirmada y:
+    // 1. Es en la última hora o próxima hora, O
+    // 2. Ya pasó pero está confirmada
     return (
-      appointment.estado === 'CONFIRMADA' &&
-      aptDate.getTime() - now.getTime() <= fifteenMinutes &&
-      aptDate.getTime() + fifteenMinutes > now.getTime()
+      (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') && 
+      (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
+       aptDate.getTime() < now.getTime())
     );
   };
 

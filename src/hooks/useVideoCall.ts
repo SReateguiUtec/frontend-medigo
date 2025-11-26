@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { videoService } from '../api/video.service';
+import type { JoinVideoRoomResponse } from '../api/video.service';
 
 export const useVideoCall = () => {
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,15 @@ export const useVideoCall = () => {
       }
     } catch (err: any) {
       console.error('Error joining video call:', err);
-      const errorMessage = 'Error al unirse a la videollamada: ' + (err.response?.data?.message || err.message);
+      let errorMessage = 'Error al unirse a la videollamada';
+      
+      // Handle specific error cases
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage += ': ' + err.message;
+      }
+      
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {

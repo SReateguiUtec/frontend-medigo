@@ -62,6 +62,7 @@ export const MyAppointments = () => {
     const handleJoinVideoCall = async (citaId: number) => {
         const result = await joinVideoCall(citaId);
         if (!result.success) {
+            // Show more descriptive error message
             alert(result.message);
         }
     };
@@ -114,17 +115,17 @@ export const MyAppointments = () => {
         return aptDate > now && (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA');
     };
 
-    // Verificar si es hora de la cita (dentro de 15 minutos antes o después)
+    // Verificar si es hora de la cita (dentro de 1 hora antes o después, o si ya pasó pero está confirmada)
     const isTimeForAppointment = (appointment: Cita) => {
         const aptDate = new Date(appointment.fechaHora);
         const now = new Date();
-        const fifteenMinutes = 15 * 60 * 1000; // 15 minutos en milisegundos
-
-        // Verificar si la cita está confirmada y es en los próximos 15 minutos o ya pasó
+        const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+    
+        // Verificar si la cita está confirmada O si es pendiente pero dentro del horario
         return (
-            appointment.estado === 'CONFIRMADA' &&
-            aptDate.getTime() - now.getTime() <= fifteenMinutes &&
-            aptDate.getTime() + fifteenMinutes > now.getTime()
+          (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') && 
+          (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
+           aptDate.getTime() < now.getTime())
         );
     };
 
