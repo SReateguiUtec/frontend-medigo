@@ -1,14 +1,18 @@
-# 🏥 MediGo - Plataforma de Telemedicina
+# MediGO - Plataforma de Telemedicina
 
-**MediGo** es una plataforma web moderna que conecta pacientes con médicos profesionales a través de la tecnología, facilitando consultas médicas en línea, gestión de citas y seguimiento de historiales médicos.
+<div align="center">
+  <img src="public/modelo3.png" alt="MediGO Logo" width="400" height="350">
+</div>
+<br></br>
 
-![MediGo](https://img.shields.io/badge/React-19.2.0-blue)
+**MediGO** es una plataforma web moderna que conecta pacientes con médicos profesionales a través de la tecnología, facilitando consultas médicas en línea, gestión de citas y seguimiento de historiales médicos.
+
+![MediGO](https://img.shields.io/badge/React-19.2.0-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue)
 ![Vite](https://img.shields.io/badge/Vite-7.2.2-purple)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.17-cyan)
 
 ## Características Principales
-
 
 ### Para Pacientes 👥
 - 🔍 **Búsqueda Avanzada de Médicos** - Filtra por especialidad, precio, nombre o email
