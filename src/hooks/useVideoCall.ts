@@ -13,9 +13,12 @@ export const useVideoCall = () => {
       
       const response = await videoService.joinVideoRoom(citaId);
       
-      if (response.success && response.roomUrl && response.token) {
-        // Redirigir a la sala de video con el token
-        const videoUrl = `${response.roomUrl}?t=${response.token}`;
+      if (response.success && response.roomUrl) {
+        // Redirigir a la sala de video
+        // For Whereby, we don't need to append a token
+        const videoUrl = response.token 
+          ? `${response.roomUrl}?t=${response.token}` 
+          : response.roomUrl;
         window.open(videoUrl, '_blank');
         return { success: true, message: 'Conectando a la videollamada...' };
       } else {

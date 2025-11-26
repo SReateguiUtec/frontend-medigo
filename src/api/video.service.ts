@@ -3,7 +3,7 @@ import apiClient from './axios.config';
 export interface JoinVideoRoomResponse {
   success: boolean;
   roomUrl: string;
-  token: string;
+  token: string | null;  // Made token optional for Whereby
   roomName: string;
   isDoctor: boolean;
   message: string;

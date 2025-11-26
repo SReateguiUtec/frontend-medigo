@@ -83,9 +83,6 @@ export const Appointments = () => {
     const now = new Date();
     const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
     
-    // Verificar si la cita está confirmada y:
-    // 1. Es en la última hora o próxima hora, O
-    // 2. Ya pasó pero está confirmada
     return (
       (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') && 
       (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
