@@ -5,7 +5,7 @@ export default function InfiniteMovingCardsDemo() {
     return (
         <div id="testimonios" className="py-16 px-4">
             <div className="max-w-7xl mx-auto mb-12">
-                <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-4">
+                <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-800 text-center mb-4">
                     Testimonios
                 </h2>
                 <p className="text-center text-gray-600 text-lg max-w-2xl mx-auto">

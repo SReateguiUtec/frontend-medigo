@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
-import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope } from 'lucide-react';
+import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown } from 'lucide-react';
+import { Listbox, Transition } from '@headlessui/react';
 
 // Doctores de demostración
 const showcaseDoctors = [
@@ -79,7 +80,6 @@ export const SearchDoctors = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterType>('name');
 
-  // Search States
   const [searchTerm, setSearchTerm] = useState('');
   const [searchEmail, setSearchEmail] = useState('');
   const [minPrice, setMinPrice] = useState('');
@@ -344,22 +344,72 @@ export const SearchDoctors = () => {
             )}
 
             {activeFilter === 'specialty' && (
-              <>
-                <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                  value={specialtyId}
-                  onChange={(e) => setSpecialtyId(e.target.value)}
-                >
-                  <option value="">Seleccionar especialidad...</option>
-                  <option value="Cardiología">Cardiología</option>
-                  <option value="Pediatría">Pediatría</option>
-                  <option value="Traumatología">Traumatología</option>
-                  <option value="Dermatología">Dermatología</option>
-                  <option value="Neurología">Neurología</option>
-                  <option value="Ginecología">Ginecología</option>
-                </select>
-              </>
+              <Listbox value={specialtyId} onChange={setSpecialtyId}>
+                <div className="relative w-full">
+                  <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white py-2.5 pl-10 pr-10 text-left border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-gray-400">
+                    <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                    <span className={`block truncate ${!specialtyId ? 'text-gray-400' : 'text-gray-900'}`}>
+                      {specialtyId || 'Seleccionar especialidad...'}
+                    </span>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </Listbox.Button>
+                  <Transition
+                    as="div"
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute z-10 mt-2 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Listbox.Option
+                        value=""
+                        className={({ active }) =>
+                          `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
+                          }`
+                        }
+                      >
+                        {({ selected }) => (
+                          <>
+                            <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                              Seleccionar especialidad...
+                            </span>
+                            {selected && (
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                                <Check className="h-5 w-5" aria-hidden="true" />
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Listbox.Option>
+
+                      {['Cardiología', 'Pediatría', 'Traumatología', 'Dermatología', 'Neurología', 'Ginecología'].map((specialty) => (
+                        <Listbox.Option
+                          key={specialty}
+                          value={specialty}
+                          className={({ active }) =>
+                            `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
+                            }`
+                          }
+                        >
+                          {({ selected }) => (
+                            <>
+                              <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                {specialty}
+                              </span>
+                              {selected && (
+                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                                  <Check className="h-5 w-5" aria-hidden="true" />
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              </Listbox>
             )}
           </div>
 

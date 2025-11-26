@@ -14,7 +14,7 @@ export default function LampDemo() {
                     duration: 0.8,
                     ease: "easeInOut",
                 }}
-                className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+                className="mt-4 sm:mt-6 md:mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-2 sm:py-3 md:py-4 bg-clip-text text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium tracking-tight text-transparent leading-tight"
             >
                 <h1>La vía para tu salud personalizada</h1>
             </motion.h1>

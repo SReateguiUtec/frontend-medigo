@@ -6,7 +6,7 @@ export default function Grid() {
         <div id="beneficios" className="py-12 sm:py-16 bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl">
             <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                 <h2 className="text-center text-base/7 font-semibold text-indigo-600">Tu salud en tus manos</h2>
-                <p className="mx-auto mt-2 max-w-lg text-center text-4xl font-semibold tracking-tight text-balance text-gray-950 sm:text-5xl">
+                <p className="mx-auto mt-2 max-w-lg text-center text-4xl font-extrabold tracking-tight text-gray-800 sm:text-5xl">
                     Tus medicos favoritos en tu hogar!
                 </p>
                 <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
@@ -53,7 +53,7 @@ export default function Grid() {
                             <div className="px-8 pt-8 sm:px-10 sm:pt-10">
                                 <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Pagos Seguros</p>
                                 <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                                    Procesamiento de pagos seguro mediante Stripe (pronto nuevos metodos de pagos)
+                                    Procesamiento de pagos seguro mediante Stripe
                                 </p>
                             </div>
                             <div className="relative min-h-50 w-full grow flex flex-col items-center justify-center gap-6">
@@ -75,7 +75,7 @@ export default function Grid() {
                                 </p>
                             </div>
                             <div className="relative min-h-120 w-full grow flex items-center justify-center">
-                                <IdCard className="h-72 w-72 text-black-500" />
+                                <IdCard className="h-60 w-65 text-black-500" />
                             </div>
                         </div>
                         <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-r-4xl" />

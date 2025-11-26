@@ -113,6 +113,7 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
+        <br></br>
 
         <AnimatedSection delay={400}>
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
@@ -135,6 +136,7 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
+        <br></br>
 
         <AnimatedSection delay={600}>
           <InfiniteMovingCardsDemo />
@@ -142,7 +144,7 @@ export const Home = () => {
 
         <br></br>
         <br></br>
-        <br></br>
+
 
         {/* Pricing Section */}
         <section id="pricing">
@@ -152,7 +154,7 @@ export const Home = () => {
                 <Badge variant="outline" className="mb-4 border-black-500 text-black-600">
                   Pricing
                 </Badge>
-                <h3 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+                <h3 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
                   Precios Transparentes
                 </h3>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -256,7 +258,7 @@ export const Home = () => {
               <Badge variant="outline" className="mb-4">
                 FAQ
               </Badge>
-              <h3 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-black mb-4">
+              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-800 mb-4">
                 Preguntas Frecuentes
               </h3>
             </div>

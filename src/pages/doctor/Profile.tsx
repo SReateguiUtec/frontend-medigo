@@ -3,6 +3,8 @@ import { profileService } from '../../api/profile.service';
 import { useAuth } from '../../context/AuthContext';
 import type { Medico } from '../../types';
 import { IconUser, IconMail, IconPhone, IconCalendar, IconId, IconEdit, IconCheck, IconX, IconStethoscope, IconFileText, IconCurrencyDollar } from '@tabler/icons-react';
+import { Listbox, Transition } from '@headlessui/react';
+import { Check, ChevronDown } from 'lucide-react';
 
 export const DoctorProfile = () => {
   const { user, updateUser } = useAuth();
@@ -42,8 +44,8 @@ export const DoctorProfile = () => {
         bio: data.bio || '',
         precioConsulta: data.precioConsulta?.toString() || '',
         // Handle both array and single specialty cases
-        especialidad: data.especialidades && data.especialidades.length > 0 
-          ? data.especialidades[0].nombre_especialidad 
+        especialidad: data.especialidades && data.especialidades.length > 0
+          ? data.especialidades[0].nombre_especialidad
           : '',
       });
     } catch (err: any) {
@@ -426,22 +428,71 @@ export const DoctorProfile = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Especialidad
                   </label>
-                  <select
-                    name="especialidad"
-                    value={formData.especialidad}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all appearance-none bg-white"
-                  >
-                    <option value="">Seleccionar especialidad...</option>
-                    <option value="Cardiología">Cardiología</option>
-                    <option value="Pediatría">Pediatría</option>
-                    <option value="Traumatología">Traumatología</option>
-                    <option value="Dermatología">Dermatología</option>
-                    <option value="Neurología">Neurología</option>
-                    <option value="Ginecología">Ginecología</option>
-                    <option value="Oftalmología">Oftalmología</option>
-                    <option value="Psiquiatría">Psiquiatría</option>
-                  </select>
+                  <Listbox value={formData.especialidad} onChange={(value) => setFormData({ ...formData, especialidad: value })}>
+                    <div className="relative">
+                      <Listbox.Button className="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all hover:border-gray-400">
+                        <span className={`block truncate ${!formData.especialidad ? 'text-gray-400' : 'text-gray-900'}`}>
+                          {formData.especialidad || 'Seleccionar especialidad...'}
+                        </span>
+                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </span>
+                      </Listbox.Button>
+                      <Transition
+                        as="div"
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <Listbox.Options className="absolute z-10 mt-2 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <Listbox.Option
+                            value=""
+                            className={({ active }) =>
+                              `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-emerald-50 text-emerald-900' : 'text-gray-900'
+                              }`
+                            }
+                          >
+                            {({ selected }) => (
+                              <>
+                                <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                  Seleccionar especialidad...
+                                </span>
+                                {selected && (
+                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                                    <Check className="h-5 w-5" aria-hidden="true" />
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </Listbox.Option>
+
+                          {['Cardiología', 'Pediatría', 'Traumatología', 'Dermatología', 'Neurología', 'Ginecología', 'Oftalmología', 'Psiquiatría'].map((specialty) => (
+                            <Listbox.Option
+                              key={specialty}
+                              value={specialty}
+                              className={({ active }) =>
+                                `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-emerald-50 text-emerald-900' : 'text-gray-900'
+                                }`
+                              }
+                            >
+                              {({ selected }) => (
+                                <>
+                                  <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                    {specialty}
+                                  </span>
+                                  {selected && (
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                                      <Check className="h-5 w-5" aria-hidden="true" />
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Transition>
+                    </div>
+                  </Listbox>
                 </div>
               </div>
 
