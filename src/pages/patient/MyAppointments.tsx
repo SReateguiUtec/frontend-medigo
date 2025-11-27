@@ -5,15 +5,17 @@ import { useVideoCall } from '../../hooks/useVideoCall'; // Importamos el hook
 import type { Cita } from '../../types';
 import { Calendar, Clock, User, Stethoscope, DollarSign, XCircle, CheckCircle, AlertCircle, ArrowLeft, Video } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { PaymentButton } from '../../components/PaymentButton';
 
 export const MyAppointments = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { loading: videoLoading, joinVideoCall } = useVideoCall(); // Usamos el hook
+    const { joinVideoCall } = useVideoCall(); // Usamos el hook
     const [appointments, setAppointments] = useState<Cita[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+    const [joiningCallId, setJoiningCallId] = useState<number | null>(null); // Estado para tracking de loading por cita
 
     useEffect(() => {
         loadAppointments();
@@ -60,7 +62,10 @@ export const MyAppointments = () => {
 
     // Función para unirse a la videollamada
     const handleJoinVideoCall = async (citaId: number) => {
+        setJoiningCallId(citaId); // Marcar esta cita como "cargando"
         const result = await joinVideoCall(citaId);
+        setJoiningCallId(null); // Quitar el loading
+
         if (!result.success) {
             // Show more descriptive error message
             alert(result.message);
@@ -120,12 +125,12 @@ export const MyAppointments = () => {
         const aptDate = new Date(appointment.fechaHora);
         const now = new Date();
         const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
-    
+
         // Verificar si la cita está confirmada O si es pendiente pero dentro del horario
         return (
-          (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') && 
-          (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
-           aptDate.getTime() < now.getTime())
+            (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') &&
+            (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
+                aptDate.getTime() < now.getTime())
         );
     };
 
@@ -268,11 +273,21 @@ export const MyAppointments = () => {
                                         </div>
 
                                         <div className="flex items-center gap-4 mt-4">
-                                            {appointment.esPagada && (
+                                            {appointment.esPagada ? (
                                                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
                                                     <DollarSign className="w-3.5 h-3.5" />
                                                     Pago confirmado
                                                 </span>
+                                            ) : (
+                                                (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA') && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
+                                                            <DollarSign className="w-3.5 h-3.5" />
+                                                            Pago pendiente
+                                                        </span>
+                                                        <PaymentButton citaId={appointment.id} className="text-xs" />
+                                                    </div>
+                                                )
                                             )}
                                         </div>
                                     </div>
@@ -287,11 +302,11 @@ export const MyAppointments = () => {
                                         {isTimeForAppointment(appointment) && (
                                             <button
                                                 onClick={() => handleJoinVideoCall(appointment.id)}
-                                                disabled={videoLoading}
+                                                disabled={joiningCallId === appointment.id}
                                                 className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Video className="w-4 h-4" />
-                                                {videoLoading ? 'Conectando...' : 'Unirse ahora'}
+                                                {joiningCallId === appointment.id ? 'Conectando...' : 'Unirse ahora'}
                                             </button>
                                         )}
 

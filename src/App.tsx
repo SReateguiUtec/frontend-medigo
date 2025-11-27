@@ -14,6 +14,8 @@ import { AdminDashboard } from './pages/admin/Dashboard';
 import { NavbarDemo } from './components/NavbarDemo';
 import { AuthenticatedLayout } from './components/AuthenticatedLayout';
 import { Footer } from './components/Footer';
+import { PaymentSuccessPage } from './pages/payment/PaymentSuccess';
+import { PaymentCancelPage } from './pages/payment/PaymentCancel';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -140,6 +142,10 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+
+        {/* Payment routes */}
+        <Route path="/payment/success" element={<PaymentSuccessPage />} />
+        <Route path="/payment/cancel" element={<PaymentCancelPage />} />
       </Routes>
 
       {/* Show footer only for unauthenticated users and not on auth pages */}
