@@ -18,4 +18,21 @@ export const profileService = {
     });
     return response.data;
   },
+
+  async uploadProfilePhoto(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axiosInstance.post('/profile/me/photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  async deleteProfilePhoto() {
+    const response = await axiosInstance.delete('/profile/me/photo');
+    return response.data;
+  },
 };

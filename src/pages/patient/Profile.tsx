@@ -3,6 +3,7 @@ import { profileService } from '../../api/profile.service';
 import { useAuth } from '../../context/AuthContext';
 import type { Paciente } from '../../types';
 import { IconUser, IconMail, IconPhone, IconCalendar, IconId, IconEdit, IconCheck, IconX } from '@tabler/icons-react';
+import { ProfilePhotoUpload } from '../../components/ProfilePhotoUpload';
 
 export const PatientProfile = () => {
   const { user, updateUser } = useAuth();
@@ -43,6 +44,26 @@ export const PatientProfile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePhotoUpdate = async (file: File) => {
+    const updated = await profileService.uploadProfilePhoto(file) as Paciente;
+    setProfile(updated);
+    if (user) {
+      updateUser({ ...user, ...updated });
+    }
+    setSuccess('Foto actualizada correctamente');
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
+  const handlePhotoDelete = async () => {
+    const updated = await profileService.deleteProfilePhoto() as Paciente;
+    setProfile(updated);
+    if (user) {
+      updateUser({ ...user, ...updated });
+    }
+    setSuccess('Foto eliminada correctamente');
+    setTimeout(() => setSuccess(''), 3000);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,46 +117,47 @@ export const PatientProfile = () => {
         {/* Header Card with Avatar */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
           <div className="h-32 bg-linear-to-r from-blue-500 via-blue-600 to-purple-600 relative">
-            <div className="absolute -bottom-16 left-8">
-              <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
-                <div className="w-full h-full rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                  <IconUser size={48} className="text-white" />
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="pt-20 pb-6 px-8">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                  {profile?.nombres} {profile?.apellidos}
-                </h1>
-                <p className="text-gray-500 flex items-center gap-2">
-                  <IconMail size={18} />
-                  {profile?.email}
-                </p>
-              </div>
+          <div className="-mt-16 pb-6 px-8">
+            {/* Profile Photo Upload */}
+            <div className="mb-6">
+              <ProfilePhotoUpload
+                currentPhotoUrl={profile?.rutaFoto}
+                onPhotoUpdate={handlePhotoUpdate}
+                onPhotoDelete={handlePhotoDelete}
+              />
+            </div>
 
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                {profile?.nombres} {profile?.apellidos}
+              </h1>
+              <p className="text-gray-500 flex items-center gap-2 justify-center mb-4">
+                <IconMail size={18} />
+                {profile?.email}
+              </p>
+
+              {/* Edit Button */}
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mx-auto"
                 >
                   <IconEdit size={20} />
                   Editar Perfil
                 </button>
               )}
-            </div>
 
-            {/* Status Badge */}
-            <div className="mt-4">
-              <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${profile?.estadoCuenta === 'ACTIVADA'
-                ? 'bg-green-100 text-green-800 border border-green-200'
-                : 'bg-red-100 text-red-800 border border-red-200'
-                }`}>
-                {profile?.estadoCuenta === 'ACTIVADA' ? '✓ Cuenta Activa' : '⚠ Cuenta Inactiva'}
-              </span>
+              {/* Status Badge */}
+              <div className="mt-4">
+                <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${profile?.estadoCuenta === 'ACTIVADA'
+                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
+                  {profile?.estadoCuenta === 'ACTIVADA' ? '✓ Cuenta Activa' : '⚠ Cuenta Inactiva'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
