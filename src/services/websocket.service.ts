@@ -5,10 +5,10 @@ class WebSocketService {
     private client: Client | null = null;
     private connected: boolean = false;
 
-    connect(token: string, onMessageReceived: (message: any) => void): Promise<void> {
+    connect(token: string, userId: number, onMessageReceived: (message: any) => void): Promise<void> {
         return new Promise((resolve, reject) => {
             this.client = new Client({
-                webSocketFactory: () => new SockJS('/api/ws'),
+                webSocketFactory: () => new SockJS('http://localhost:8080/ws'),  // Direct connection to backend
                 connectHeaders: {
                     Authorization: `Bearer ${token}`
                 },
@@ -21,14 +21,21 @@ class WebSocketService {
             });
 
             this.client.onConnect = () => {
-                console.log('WebSocket Connected');
+                console.log('✅ WebSocket Connected');
                 this.connected = true;
 
-                this.client?.subscribe('/user/queue/messages', (message) => {
+                // Suscribirse al tópico específico del usuario
+                const topic = `/topic/chat.${userId}`;
+                console.log(`📡 Subscribing to topic: ${topic}`);
+
+                this.client?.subscribe(topic, (message) => {
+                    console.log(`📨 Message received on ${topic}:`, message.body);
                     const messageData = JSON.parse(message.body);
+                    console.log('📨 Parsed message data:', messageData);
                     onMessageReceived(messageData);
                 });
 
+                console.log(`✅ Successfully subscribed to ${topic}`);
                 resolve();
             };
 

@@ -82,10 +82,11 @@ export const Home = () => {
             <Card className="border-2 border-purple-200/20 dark:border-purple-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-purple-500/10 transform hover:-translate-y-2 transition-all duration-300">
               <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 mb-2">
-                  &lt;20m
+                  &lt;1s
                 </div>
                 <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Tiempo de Respuesta
+                  Tiempo de respuesta <br></br>
+                  Chat Instantáneo con tus médicos
                 </div>
               </CardContent>
             </Card>

@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { messageService } from '../../api/message.service';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import type { Message } from '../../types/message';
-import { ArrowLeft, Send, User } from 'lucide-react';
+import { ArrowLeft, Send, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ConfirmationModal } from '../../components/ConfirmationModal';
 
 export const Chat = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -15,19 +16,83 @@ export const Chat = () => {
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [otherUserName, setOtherUserName] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // WebSocket hook
-    const { connected, sendMessage: sendViaWebSocket } = useWebSocket((message: Message) => {
-        // Solo agregar si es de/para este chat
-        if (
-            (message.senderId.toString() === userId && message.receiverId === user?.id) ||
-            (message.receiverId.toString() === userId && message.senderId === user?.id)
-        ) {
-            setMessages(prev => [...prev, message]);
-            scrollToBottom();
+    const handleDeleteClick = () => {
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!userId) return;
+
+        try {
+            await messageService.deleteConversation(Number(userId));
+            // Navigate back to messages list
+            navigate('/messages');
+        } catch (err) {
+            console.error('Error deleting conversation:', err);
+            alert('Error al eliminar la conversación');
         }
-    });
+    };
+
+    // WebSocket hook
+    const handleMessageReceived = useCallback((message: Message) => {
+        console.log('🎯 handleMessageReceived called with:', message);
+        const currentUserId = user?.id;
+        const targetUserId = Number(userId);
+
+        console.log('👤 Current user ID:', currentUserId);
+        console.log('👤 Target user ID:', targetUserId);
+        console.log('📧 Message senderId:', message.senderId, 'receiverId:', message.receiverId);
+
+        const isFromTargetToCurrent = (Number(message.senderId) === targetUserId && Number(message.receiverId) === currentUserId);
+        const isFromCurrentToTarget = (Number(message.receiverId) === targetUserId && Number(message.senderId) === currentUserId);
+
+        console.log('🔍 isFromTargetToCurrent:', isFromTargetToCurrent);
+        console.log('🔍 isFromCurrentToTarget:', isFromCurrentToTarget);
+
+        if (isFromTargetToCurrent || isFromCurrentToTarget) {
+            console.log('✅ Message matches conversation, checking for duplicates');
+
+            // Evitar duplicados: verificar si el mensaje ya existe
+            setMessages(prev => {
+                console.log('📦 Current messages count:', prev.length);
+                console.log('🆕 New message ID:', message.id, 'Type:', typeof message.id);
+                console.log('🆕 New message content:', message.content);
+
+                const messageExists = prev.some(m => {
+                    const sameId = Number(m.id) === Number(message.id);
+                    const sameContent = m.content === message.content &&
+                        Number(m.senderId) === Number(message.senderId) &&
+                        Number(m.receiverId) === Number(message.receiverId);
+                    const timeDiff = Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime());
+
+                    if (sameId) {
+                        console.log(`🔍 Found duplicate by ID: ${m.id} === ${message.id}`);
+                    }
+                    if (sameContent && timeDiff < 1000) {
+                        console.log(`🔍 Found duplicate by content and time: ${m.content} (${timeDiff}ms diff)`);
+                    }
+
+                    return sameId || (sameContent && timeDiff < 1000);
+                });
+
+                if (messageExists) {
+                    console.log('⚠️ Message already exists, skipping');
+                    return prev;
+                }
+
+                console.log('➕ Adding new message');
+                return [...prev, message];
+            });
+            scrollToBottom();
+        } else {
+            console.log('❌ Message does not match this conversation, ignoring');
+        }
+    }, [user?.id, userId]);
+
+    const { connected, sendMessage: sendViaWebSocket } = useWebSocket(handleMessageReceived);
 
     useEffect(() => {
         if (userId) {
@@ -48,7 +113,8 @@ export const Chat = () => {
             // Obtener nombre del otro usuario del primer mensaje
             if (data.length > 0) {
                 const firstMessage = data[0];
-                const otherName = firstMessage.senderId === user?.id
+                const isMyMessage = Number(firstMessage.senderId) === Number(user?.id);
+                const otherName = isMyMessage
                     ? firstMessage.receiverName
                     : firstMessage.senderName;
                 setOtherUserName(otherName);
@@ -72,16 +138,16 @@ export const Chat = () => {
         try {
             setSending(true);
 
-            // Enviar vía API REST (fallback si WebSocket falla)
+            // Enviar vía API REST
             const message = await messageService.sendMessage({
                 receiverId: Number(userId),
                 content: newMessage.trim()
             });
 
-            // Agregar mensaje localmente
-            setMessages(prev => [...prev, message]);
+            // NO agregar mensaje localmente - llegará por WebSocket
+            // Esto evita duplicados
             setNewMessage('');
-            scrollToBottom();
+            // scrollToBottom(); // Se llamará cuando llegue por WebSocket
 
         } catch (err) {
             console.error('Error sending message:', err);
@@ -96,7 +162,7 @@ export const Chat = () => {
         return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     };
 
-    if (loading) {
+    if (loading || !user) {
         return (
             <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
                 <div className="text-center">
@@ -129,6 +195,13 @@ export const Chat = () => {
                             {connected ? '● En línea' : '○ Desconectado'}
                         </p>
                     </div>
+                    <button
+                        onClick={handleDeleteClick}
+                        className="p-2 text-gray-500 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
+                        title="Eliminar conversación"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
@@ -141,7 +214,9 @@ export const Chat = () => {
                         </div>
                     ) : (
                         messages.map((message) => {
-                            const isOwn = message.senderId === user?.id;
+                            const isOwn = Number(message.senderId) === Number(user?.id);
+
+
                             return (
                                 <div
                                     key={message.id}
@@ -149,8 +224,8 @@ export const Chat = () => {
                                 >
                                     <div
                                         className={`max-w-[70%] rounded-2xl px-4 py-2 ${isOwn
-                                                ? 'bg-emerald-600 text-white'
-                                                : 'bg-white border border-gray-200 text-gray-900'
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-white border border-gray-200 text-gray-900'
                                             }`}
                                     >
                                         <p className="text-sm break-words">{message.content}</p>
@@ -192,6 +267,16 @@ export const Chat = () => {
                     </form>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Eliminar conversación"
+                message={`¿Estás seguro de que quieres eliminar esta conversación con ${otherUserName}? Esta acción no se puede deshacer.`}
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+            />
         </div>
     );
 };

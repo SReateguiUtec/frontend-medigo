@@ -1,8 +1,7 @@
-// JWT utility functions
-
 export interface JWTPayload {
     sub: string; // email
     roles: string[]; // e.g., ["ROLE_PACIENTE", "ROLE_MEDICO"]
+    userId?: number;
     iat: number;
     exp: number;
 }

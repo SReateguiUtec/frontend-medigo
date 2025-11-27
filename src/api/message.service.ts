@@ -23,5 +23,10 @@ export const messageService = {
     // Marcar mensaje como leído
     markAsRead: async (messageId: number): Promise<void> => {
         await axiosInstance.patch(`/messages/${messageId}/read`);
+    },
+
+    // Eliminar conversación con un usuario
+    deleteConversation: async (userId: number): Promise<void> => {
+        await axiosInstance.delete(`/messages/conversation/${userId}`);
     }
 };

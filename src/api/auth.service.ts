@@ -15,7 +15,7 @@ export const authService = {
 
     // Construct user object from JWT payload
     const usuario: Usuario = {
-      id: 0, // Backend doesn't provide ID in JWT
+      id: payload.userId || 0,
       nombres: '', // Backend doesn't provide names in JWT
       apellidos: '',
       email: payload.sub,
@@ -45,7 +45,7 @@ export const authService = {
 
     // Construct user object from JWT payload and registration data
     const usuario: Usuario = {
-      id: 0,
+      id: payload.userId || 0,
       nombres: data.nombres,
       apellidos: data.apellidos,
       email: payload.sub,
@@ -75,7 +75,7 @@ export const authService = {
 
     // Construct user object from JWT payload and registration data
     const usuario: Usuario = {
-      id: 0,
+      id: payload.userId || 0,
       nombres: data.nombres,
       apellidos: data.apellidos,
       email: payload.sub,
