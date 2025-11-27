@@ -11,6 +11,7 @@ import { Messages } from './pages/patient/Messages';
 import { Chat } from './pages/patient/Chat';
 import { Appointments } from './pages/doctor/Appointments';
 import { DoctorProfile } from './pages/doctor/Profile';
+import DoctorSchedule from './pages/doctor/DoctorSchedule';
 import { PatientMedicalHistory } from './pages/doctor/PatientMedicalHistory';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { NavbarDemo } from './components/NavbarDemo';
@@ -101,6 +102,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <Appointments />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/schedule"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <DoctorSchedule />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, Clock, DollarSign, User, Stethoscope, AlertCircle, CheckCircle } from 'lucide-react';
 import { citaService } from '../api/cita.service';
 import { paymentService } from '../api/payment.service';
+import { horarioService } from '../services/horario.service';
+import type { SlotDisponible } from '../services/horario.service';
 import type { Medico } from '../types';
 
 interface BookAppointmentModalProps {
@@ -20,8 +22,40 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [loading, setLoading] = useState(false);
+    const [slotsLoading, setSlotsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [availableSlots, setAvailableSlots] = useState<SlotDisponible[]>([]);
+
+    // Fetch available slots when date is selected
+    useEffect(() => {
+        const fetchAvailableSlots = async () => {
+            if (!selectedDate || !doctor.id) return;
+            
+            try {
+                setSlotsLoading(true);
+                setError('');
+                
+                // Validate date format (should be YYYY-MM-DD)
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!dateRegex.test(selectedDate)) {
+                    throw new Error('Formato de fecha inválido');
+                }
+                
+                const slots = await horarioService.getSlotsDisponibles(doctor.id, selectedDate);
+                // Show only available slots that are in the future
+                setAvailableSlots(slots.filter(slot => slot.disponible && isFutureSlot(slot.fechaHora)));
+            } catch (err: any) {
+                console.error('Error fetching available slots:', err);
+                setError('Error al obtener los horarios disponibles. Por favor intente nuevamente.');
+                setAvailableSlots([]);
+            } finally {
+                setSlotsLoading(false);
+            }
+        };
+
+        fetchAvailableSlots();
+    }, [selectedDate, doctor.id]);
 
     if (!isOpen) return null;
 
@@ -97,6 +131,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             setSelectedTime('');
             setError('');
             setSuccess(false);
+            setAvailableSlots([]);
             onClose();
         }
     };
@@ -114,6 +149,19 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             return doctor.especialidades[0].nombre_especialidad;
         }
         return 'No especificada';
+    };
+
+    // Format time from datetime string
+    const formatTime = (dateTimeString: string) => {
+        const date = new Date(dateTimeString);
+        return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Check if a time slot is in the future
+    const isFutureSlot = (slotDateTime: string) => {
+        const slotDate = new Date(slotDateTime);
+        const now = new Date();
+        return slotDate > now;
     };
 
     return (
@@ -208,7 +256,10 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                             <input
                                 type="date"
                                 value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedDate(e.target.value);
+                                    setSelectedTime('');
+                                }}
                                 min={getMinDate()}
                                 required
                                 disabled={loading || success}
@@ -224,14 +275,41 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                 </div>
                                 Hora de la Cita
                             </label>
-                            <input
-                                type="time"
-                                value={selectedTime}
-                                onChange={(e) => setSelectedTime(e.target.value)}
-                                required
-                                disabled={loading || success}
-                                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-500 disabled:bg-gray-50 disabled:cursor-not-allowed transition-all text-lg font-medium"
-                            />
+                            
+                            {slotsLoading ? (
+                                <div className="flex items-center justify-center py-4">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500 mr-2"></div>
+                                    <span className="text-gray-500">Cargando horarios disponibles...</span>
+                                </div>
+                            ) : selectedDate ? (
+                                availableSlots.length > 0 ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                        {availableSlots.map((slot, index) => (
+                                            <button
+                                                key={index}
+                                                type="button"
+                                                onClick={() => setSelectedTime(formatTime(slot.fechaHora))}
+                                                className={`px-3 py-2 rounded-lg border-2 text-center font-medium transition-all ${
+                                                    selectedTime === formatTime(slot.fechaHora)
+                                                        ? 'border-emerald-500 bg-emerald-500 text-white'
+                                                        : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50'
+                                                }`}
+                                            >
+                                                {formatTime(slot.fechaHora)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-4 text-gray-500">
+                                        No hay horarios disponibles para esta fecha
+                                    </div>
+                                )
+                            ) : (
+                                <div className="text-center py-4 text-gray-500">
+                                    Seleccione una fecha para ver los horarios disponibles
+                                </div>
+                            )}
+
                         </div>
 
                         {/* Action Buttons */}
@@ -246,7 +324,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading || success}
+                                disabled={loading || success || !selectedDate || !selectedTime}
                                 className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                             >
                                 {loading ? (

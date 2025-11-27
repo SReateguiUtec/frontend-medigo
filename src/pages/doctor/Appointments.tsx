@@ -91,15 +91,16 @@ export const Appointments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gray-50/50 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Mis Citas</h1>
-            <p className="text-gray-500 text-sm">Gestiona tus consultas programadas</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Mis Citas</h1>
+            <p className="text-gray-500">Gestiona tus consultas médicas programadas</p>
           </div>
           <div className="bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-600">
-            Total: {appointments.length}
+            Total: {appointments.filter(cita => cita.esPagada).length} citas confirmadas
           </div>
         </div>
 
@@ -109,7 +110,9 @@ export const Appointments = () => {
           </div>
         ) : (
           <div className="grid gap-4">
-            {appointments.map((cita) => (
+            {appointments
+              .filter(cita => cita.esPagada) // Only show paid appointments
+              .map((cita) => (
               <div key={cita.id} className="group bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-emerald-100 transition-all duration-300">
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   {/* Left Section - Date Box */}
@@ -205,16 +208,16 @@ export const Appointments = () => {
           </div>
         )}
 
-        {!loading && appointments.length === 0 && (
+        {!loading && appointments.filter(cita => cita.esPagada).length === 0 && (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-12 text-center">
             <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Calendar className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No tienes citas programadas
+              No tienes citas confirmadas
             </h3>
             <p className="text-gray-500">
-              Las citas agendadas aparecerán aquí.
+              Las citas se mostrarán aquí después de que el paciente haya realizado el pago.
             </p>
           </div>
         )}
