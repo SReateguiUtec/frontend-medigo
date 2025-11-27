@@ -7,6 +7,8 @@ import { SearchDoctors } from './pages/patient/SearchDoctors';
 import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
 import { MyAppointments } from './pages/patient/MyAppointments';
 import { PatientProfile } from './pages/patient/Profile';
+import { Messages } from './pages/patient/Messages';
+import { Chat } from './pages/patient/Chat';
 import { Appointments } from './pages/doctor/Appointments';
 import { DoctorProfile } from './pages/doctor/Profile';
 import { PatientMedicalHistory } from './pages/doctor/PatientMedicalHistory';
@@ -129,6 +131,26 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <PatientProfile />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <Messages />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages/chat/:userId"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <Chat />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

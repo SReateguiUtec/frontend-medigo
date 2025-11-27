@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import type { MedicoSearchResponse } from '../../api/search.service';
-import { User, Mail, Phone, Calendar, Award, ArrowLeft, Stethoscope } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Award, ArrowLeft, Stethoscope, MessageCircle } from 'lucide-react';
 import { BookAppointmentModal } from '../../components/BookAppointmentModal';
 import type { Medico } from '../../types';
 
@@ -211,15 +211,27 @@ export const DoctorPublicProfile = () => {
                     </div>
 
                     <div className="space-y-6">
-                        {/* Action Button */}
+                        {/* Action Buttons */}
                         <div className="bg-white rounded-xl shadow-md p-6">
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold text-lg flex items-center justify-center gap-2"
-                            >
-                                <Calendar className="w-6 h-6" />
-                                Agendar Cita
-                            </button>
+                            <div className="space-y-3">
+                                {/* Send Message Button */}
+                                <button
+                                    onClick={() => navigate(`/messages/chat/${doctor.id}`)}
+                                    className="w-full bg-white border-2 border-emerald-600 text-emerald-600 py-4 rounded-xl hover:bg-emerald-50 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5 font-semibold text-lg flex items-center justify-center gap-2"
+                                >
+                                    <MessageCircle className="w-6 h-6" />
+                                    Enviar Mensaje
+                                </button>
+
+                                {/* Book Appointment Button */}
+                                <button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold text-lg flex items-center justify-center gap-2"
+                                >
+                                    <Calendar className="w-6 h-6" />
+                                    Agendar Cita
+                                </button>
+                            </div>
 
                             {/* Appointment Modal */}
                             {doctor && (
