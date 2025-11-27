@@ -102,17 +102,21 @@ export const MyAppointments = () => {
         }
     };
 
-    const filteredAppointments = appointments.filter(apt => {
-        const aptDate = new Date(apt.fechaHora);
-        const now = new Date();
+    const filteredAppointments = appointments
+        // Primero filtrar solo citas pagadas
+        .filter(apt => apt.esPagada === true)
+        // Luego aplicar filtros de fecha
+        .filter(apt => {
+            const aptDate = new Date(apt.fechaHora);
+            const now = new Date();
 
-        if (filter === 'upcoming') {
-            return aptDate >= now && apt.estado !== 'CANCELADA' && apt.estado !== 'COMPLETADA';
-        } else if (filter === 'past') {
-            return aptDate < now || apt.estado === 'COMPLETADA' || apt.estado === 'CANCELADA';
-        }
-        return true;
-    });
+            if (filter === 'upcoming') {
+                return aptDate >= now && apt.estado !== 'CANCELADA' && apt.estado !== 'COMPLETADA';
+            } else if (filter === 'past') {
+                return aptDate < now || apt.estado === 'COMPLETADA' || apt.estado === 'CANCELADA';
+            }
+            return true;
+        });
 
     const canCancel = (appointment: Cita) => {
         const aptDate = new Date(appointment.fechaHora);

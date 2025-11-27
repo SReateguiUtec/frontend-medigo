@@ -1,84 +1,92 @@
-import { IdCard, ShieldCheck, CalendarCheck } from 'lucide-react';
-import StripePixelatedDemo from './stripe-pixelated-demo';
+import { IdCard, CalendarCheck, DollarSign } from 'lucide-react';
 
 export default function Grid() {
     return (
-        <div id="beneficios" className="py-12 sm:py-16 bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl">
+        <div id="beneficios" className="py-12 sm:py-16 scroll-mt-32">
             <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                 <h2 className="text-center text-base/7 font-semibold text-indigo-600">Tu salud en tus manos</h2>
                 <p className="mx-auto mt-2 max-w-lg text-center text-4xl font-extrabold tracking-tight text-gray-800 sm:text-5xl">
                     Tus medicos favoritos en tu hogar!
                 </p>
-                <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
-                    <div className="relative lg:row-span-2">
-                        <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-4xl" />
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-                            <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                <div className="mt-10 grid gap-6 sm:mt-16 md:grid-cols-2 lg:grid-cols-2">
+                    {/* Consultas en linea */}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+                        <div className="relative h-full bg-gradient-to-br from-blue-50 to-white rounded-3xl border border-blue-100 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden min-h-[400px] flex flex-col">
+                            <div className="px-8 pt-8 pb-4">
+                                <p className="text-2xl font-bold tracking-tight text-gray-900">
                                     Consultas en linea
                                 </p>
-                                <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
+                                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
                                     Videollamadas seguras con WhereBy, con médicos especialistas desde la comodidad de tu hogar
                                 </p>
                             </div>
-                            <div className="relative w-full grow flex items-center justify-center p-6">
-                                <div className="w-full h-full max-h-[450px] flex items-center justify-center">
+                            <div className="flex-1 flex items-center justify-center p-6">
+                                <div className="w-full max-w-[280px] transform group-hover:scale-105 transition-transform duration-300">
                                     <img
                                         src="/medico.png"
                                         alt="Médico profesional"
-                                        className="w-full h-full object-contain"
+                                        className="w-full h-full object-contain drop-shadow-2xl"
                                     />
                                 </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 lg:rounded-l-4xl" />
                     </div>
-                    <div className="relative max-lg:row-start-1">
-                        <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-4xl" />
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
-                            <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Gestion de citas</p>
-                                <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                                    Agenda y administra tus citas médicas de forma fácil y eficiente                                </p>
+
+                    {/* Gestion de citas */}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+                        <div className="relative h-full bg-gradient-to-br from-purple-50 to-white rounded-3xl border border-purple-100 shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[400px] flex flex-col">
+                            <div className="px-8 pt-8 pb-4">
+                                <p className="text-2xl font-bold tracking-tight text-gray-900">Gestion de citas</p>
+                                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                                    Agenda y administra tus citas médicas de forma fácil y eficiente
+                                </p>
                             </div>
-                            <div className="relative min-h-50 w-full grow flex items-center justify-center">
-                                <CalendarCheck className="h-22 w-22 text-black-500" />
+                            <div className="flex-1 flex items-center justify-center pb-8">
+                                <div className="p-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                                    <CalendarCheck className="h-24 w-24 text-purple-600" />
+                                </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-t-4xl" />
                     </div>
-                    <div className="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
-                        <div className="absolute inset-px rounded-lg bg-white" />
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
-                            <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Pagos Seguros</p>
-                                <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
+
+                    {/* Pagos Seguros */}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+                        <div className="relative h-full bg-gradient-to-br from-green-50 to-white rounded-3xl border border-green-100 shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[400px] flex flex-col">
+                            <div className="px-8 pt-8 pb-4">
+                                <p className="text-2xl font-bold tracking-tight text-gray-900">Pagos Seguros</p>
+                                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
                                     Procesamiento de pagos seguro mediante Stripe
                                 </p>
                             </div>
-                            <div className="relative min-h-50 w-full grow flex flex-col items-center justify-center gap-6">
-                                <StripePixelatedDemo />
-                                {/*<ShieldCheck className="h-24 w-24 text-black-500" />*/}
+                            <div className="flex-1 flex items-center justify-center pb-8">
+                                <div className="p-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                                    <DollarSign className="h-24 w-24 text-green-600" />
+                                </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5" />
                     </div>
-                    <div className="relative lg:row-span-2">
-                        <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-b-4xl lg:rounded-r-4xl" />
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
-                            <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
-                                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+
+                    {/* Autenticacion de medicos */}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+                        <div className="relative h-full bg-gradient-to-br from-orange-50 to-white rounded-3xl border border-orange-100 shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[400px] flex flex-col">
+                            <div className="px-8 pt-8 pb-4">
+                                <p className="text-2xl font-bold tracking-tight text-gray-900">
                                     Autenticacion de medicos
                                 </p>
-                                <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
+                                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
                                     Verificacion de identidad de medicos
                                 </p>
                             </div>
-                            <div className="relative min-h-120 w-full grow flex items-center justify-center">
-                                <IdCard className="h-60 w-65 text-black-500" />
+                            <div className="flex-1 flex items-center justify-center pb-8">
+                                <div className="p-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 shadow-lg">
+                                    <IdCard className="h-24 w-24 text-orange-600" />
+                                </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-r-4xl" />
                     </div>
                 </div>
             </div>

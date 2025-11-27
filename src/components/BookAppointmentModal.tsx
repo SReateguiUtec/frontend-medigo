@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, DollarSign, User, Stethoscope, AlertCircle, CheckCircle } from 'lucide-react';
 import { citaService } from '../api/cita.service';
+import { paymentService } from '../api/payment.service';
 import type { Medico } from '../types';
 
 interface BookAppointmentModalProps {
@@ -50,7 +51,6 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             }
 
             // Formatear la fecha con el offset de zona horaria para enviar al backend
-            // Esto asegura que el backend reciba la hora exacta seleccionada por el usuario
             const pad = (n: number) => n < 10 ? '0' + n : n;
             const timezoneOffset = appointmentDate.getTimezoneOffset();
             const sign = timezoneOffset > 0 ? '-' : '+';
@@ -65,24 +65,28 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 pad(appointmentDate.getSeconds()) +
                 sign + offsetHours + ':' + offsetMinutes;
 
-            await citaService.createCita({
+            // Crear cita pendiente (sin pagar)
+            const cita = await citaService.createCita({
                 medicoId: doctor.id,
                 fechaHora
             });
 
-            setSuccess(true);
-            setTimeout(() => {
-                onSuccess?.();
-                onClose();
-                setSuccess(false);
-                setSelectedDate('');
-                setSelectedTime('');
-            }, 2000);
+            // Redirigir a Stripe Checkout con el ID de la cita
+            const { url } = await paymentService.createCheckoutSession(cita.id);
+
+            // Guardar info en sessionStorage para la página de éxito
+            sessionStorage.setItem('pendingAppointment', JSON.stringify({
+                citaId: cita.id,
+                doctorName: `${doctor.nombres} ${doctor.apellidos}`,
+                fechaHora: selectedDate + ' ' + selectedTime
+            }));
+
+            // Redirigir a Stripe
+            window.location.href = url;
 
         } catch (err: any) {
             console.error('Error creating appointment:', err);
-            setError(err.response?.data?.message || 'Error al agendar la cita. Por favor intente nuevamente.');
-        } finally {
+            setError(err.response?.data?.message || 'Error al procesar la solicitud. Por favor intente nuevamente.');
             setLoading(false);
         }
     };
@@ -257,8 +261,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                     </>
                                 ) : (
                                     <>
-                                        <Calendar className="w-5 h-5" />
-                                        Confirmar Cita
+                                        <DollarSign className="w-5 h-5" />
+                                        Proceder al Pago
                                     </>
                                 )}
                             </button>

@@ -1,10 +1,10 @@
 import LampDemo from '@/components/lamp-demo';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { WorldMapDemo } from '@/components/WorldMapDemo';
 import { EncryptedTextDemoSecond } from '@/components/EncryptedTextDemoSecond';
 import Grid from '@/components/Grid';
 import InfiniteMovingCardsDemo from '@/components/infinite-moving-cards-demo';
+import { Ruler } from '@/components/ruler';
 import { AnimatedSection } from '@/components/animated-section';
 import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ export const Home = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <br></br>
       <br></br>
       <br></br>
@@ -61,10 +61,9 @@ export const Home = () => {
         </AnimatedSection>
 
         <AnimatedSection delay={200}>
-          <WorldMapDemo />
+          <Ruler />
         </AnimatedSection>
 
-        <br></br>
         <br></br>
         <br></br>
 
@@ -113,7 +112,6 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
-        <br></br>
 
         <AnimatedSection delay={400}>
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
@@ -137,14 +135,22 @@ export const Home = () => {
         <br></br>
         <br></br>
         <br></br>
+        <br></br>
+        <br></br>
 
         <AnimatedSection delay={600}>
-          <InfiniteMovingCardsDemo />
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4">
+              Testimonios
+            </Badge>
+            <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-800 mb-4">
+              Lo que dicen nuestros usuarios
+            </h3>
+            <InfiniteMovingCardsDemo />
+          </div>
         </AnimatedSection>
 
         <br></br>
-        <br></br>
-
 
         {/* Pricing Section */}
         <section id="pricing">
