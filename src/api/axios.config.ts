@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Usa variable de entorno o fallback a '/api' para desarrollo
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -30,7 +33,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post('/api/auth/refresh', {
+        const response = await axios.post(`${BASE_URL}/auth/refresh`, {
           refreshToken,
         });
 
