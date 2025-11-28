@@ -6,6 +6,7 @@ import type { Message } from '../../types/message';
 import { ArrowLeft, Send, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { ErrorModal } from '../../components/ErrorModal';
 
 export const Chat = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -15,6 +16,7 @@ export const Chat = () => {
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
     const [otherUserName, setOtherUserName] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,7 @@ export const Chat = () => {
             navigate('/messages');
         } catch (err) {
             console.error('Error deleting conversation:', err);
-            alert('Error al eliminar la conversación');
+            setError('Error al eliminar la conversación');
         }
     };
 
@@ -138,20 +140,16 @@ export const Chat = () => {
         try {
             setSending(true);
 
-            // Enviar vía API REST
-            const message = await messageService.sendMessage({
-                receiverId: Number(userId),
-                content: newMessage.trim()
-            });
+            // Enviar vía WebSocket
+            sendViaWebSocket(Number(userId), newMessage.trim());
 
-            // NO agregar mensaje localmente - llegará por WebSocket
             // Esto evita duplicados
             setNewMessage('');
             // scrollToBottom(); // Se llamará cuando llegue por WebSocket
 
         } catch (err) {
             console.error('Error sending message:', err);
-            alert('Error al enviar mensaje');
+            setError('Error al enviar mensaje');
         } finally {
             setSending(false);
         }
@@ -204,6 +202,8 @@ export const Chat = () => {
                     </button>
                 </div>
             </div>
+
+
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-6">
@@ -276,6 +276,13 @@ export const Chat = () => {
                 message={`¿Estás seguro de que quieres eliminar esta conversación con ${otherUserName}? Esta acción no se puede deshacer.`}
                 confirmText="Eliminar"
                 cancelText="Cancelar"
+            />
+
+            {/* Error Modal with Blur */}
+            <ErrorModal
+                isOpen={!!error}
+                onClose={() => setError('')}
+                message={error}
             />
         </div>
     );

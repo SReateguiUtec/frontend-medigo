@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { citaService } from '../../api/cita.service';
-import { useVideoCall } from '../../hooks/useVideoCall'; // Importamos el hook
+import { useVideoCall } from '../../hooks/useVideoCall';
+import { ErrorModal } from '../../components/ErrorModal';
 import type { Cita } from '../../types';
-import { Calendar, Clock, User, Stethoscope, DollarSign, XCircle, CheckCircle, AlertCircle, ArrowLeft, Video } from 'lucide-react';
+import { Calendar, Video, DollarSign, AlertCircle, CheckCircle, XCircle, ArrowLeft, Stethoscope } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { PaymentButton } from '../../components/PaymentButton';
 
@@ -56,7 +57,7 @@ export const MyAppointments = () => {
             loadAppointments();
         } catch (err: any) {
             console.error('Error cancelling appointment:', err);
-            alert(err.response?.data?.message || 'Error al cancelar la cita');
+            setError(err.response?.data?.message || 'Error al cancelar la cita');
         }
     };
 
@@ -68,7 +69,7 @@ export const MyAppointments = () => {
 
         if (!result.success) {
             // Show more descriptive error message
-            alert(result.message);
+            setError(result.message);
         }
     };
 
@@ -374,6 +375,13 @@ export const MyAppointments = () => {
                     </div>
                 )}
             </div>
+
+            {/* Error Modal with Blur */}
+            <ErrorModal
+                isOpen={!!error}
+                onClose={() => setError('')}
+                message={error}
+            />
         </div>
     );
 };

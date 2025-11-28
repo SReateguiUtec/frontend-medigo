@@ -3,12 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, Calendar, User, Clock } from 'lucide-react';
 import { paymentService } from '../api/payment.service';
 
+interface PendingAppointment {
+    citaId: number;
+    doctorName: string;
+    fechaHora: string;
+}
+
 export const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [appointmentInfo, setAppointmentInfo] = useState<any>(null);
+    const [appointmentInfo, setAppointmentInfo] = useState<PendingAppointment | null>(null);
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -22,7 +28,7 @@ export const PaymentSuccess = () => {
                 }
 
                 // Verificar el estado del pago
-                const paymentStatus = await paymentService.getPaymentStatus(sessionId);
+                await paymentService.getPaymentStatus(sessionId);
 
                 // Obtener info de la cita desde sessionStorage
                 const pendingAppointment = sessionStorage.getItem('pendingAppointment');

@@ -1,6 +1,11 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
+// Obtener URL del WebSocket desde variable de entorno
+// Desarrollo: usa localhost
+// Producción: usa la URL de tu backend en AWS
+const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws';
+
 class WebSocketService {
     private client: Client | null = null;
     private connected: boolean = false;
@@ -8,7 +13,7 @@ class WebSocketService {
     connect(token: string, userId: number, onMessageReceived: (message: any) => void): Promise<void> {
         return new Promise((resolve, reject) => {
             this.client = new Client({
-                webSocketFactory: () => new SockJS('http://localhost:8080/ws'),  // Direct connection to backend
+                webSocketFactory: () => new SockJS(WS_URL),
                 connectHeaders: {
                     Authorization: `Bearer ${token}`
                 },

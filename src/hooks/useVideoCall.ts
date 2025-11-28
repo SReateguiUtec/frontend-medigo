@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { videoService } from '../api/video.service';
-import type { JoinVideoRoomResponse } from '../api/video.service';
 
 export const useVideoCall = () => {
   const [loading, setLoading] = useState(false);
@@ -10,14 +9,14 @@ export const useVideoCall = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await videoService.joinVideoRoom(citaId);
-      
+
       if (response.success && response.roomUrl) {
         // Redirigir a la sala de video
         // For Whereby, we don't need to append a token
-        const videoUrl = response.token 
-          ? `${response.roomUrl}?t=${response.token}` 
+        const videoUrl = response.token
+          ? `${response.roomUrl}?t=${response.token}`
           : response.roomUrl;
         window.open(videoUrl, '_blank');
         return { success: true, message: 'Conectando a la videollamada...' };
@@ -29,14 +28,14 @@ export const useVideoCall = () => {
     } catch (err: any) {
       console.error('Error joining video call:', err);
       let errorMessage = 'Error al unirse a la videollamada';
-      
+
       // Handle specific error cases
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       } else if (err.message) {
         errorMessage += ': ' + err.message;
       }
-      
+
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {

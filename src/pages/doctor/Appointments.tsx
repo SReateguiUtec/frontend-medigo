@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios.config';
 import { useVideoCall } from '../../hooks/useVideoCall';
 import { CreateMedicalRecordModal } from '../../components/CreateMedicalRecordModal';
-import type { Cita, Medico } from '../../types';
-import { Calendar, Clock, User, Stethoscope, History, FileText, Video, DollarSign, AlertCircle, CheckCircle, XCircle, Mail } from 'lucide-react';
+import { ErrorModal } from '../../components/ErrorModal';
+import type { Cita } from '../../types';
+import { Calendar, History, FileText, Video, DollarSign, AlertCircle, CheckCircle, XCircle, Mail } from 'lucide-react';
 
 export const Appointments = () => {
   const navigate = useNavigate();
   const { loading: videoLoading, joinVideoCall } = useVideoCall(); // Usamos el hook
   const [appointments, setAppointments] = useState<Cita[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [selectedCita, setSelectedCita] = useState<Cita | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -88,7 +90,7 @@ export const Appointments = () => {
     const result = await joinVideoCall(citaId);
     if (!result.success) {
       // Show more descriptive error message
-      alert(result.message);
+      setError(result.message);
     }
   };
 
@@ -118,6 +120,14 @@ export const Appointments = () => {
             Total: {appointments.filter(cita => cita.esPagada).length} citas confirmadas
           </div>
         </div>
+
+        {/* Error Notification */}
+        {error && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg shadow-sm">
+            <p className="font-medium">Error</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -283,6 +293,13 @@ export const Appointments = () => {
           }}
         />
       )}
+
+      {/* Error Modal with Blur */}
+      <ErrorModal
+        isOpen={!!error}
+        onClose={() => setError('')}
+        message={error}
+      />
     </div>
   );
 };

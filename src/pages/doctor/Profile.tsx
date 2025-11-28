@@ -192,13 +192,22 @@ export const DoctorProfile = () => {
               )}
 
               {/* Status Badge */}
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col items-center gap-2">
                 <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${profile?.estadoCuenta === 'ACTIVADA'
                   ? 'bg-green-100 text-green-800 border border-green-200'
                   : 'bg-red-100 text-red-800 border border-red-200'
                   }`}>
                   {profile?.estadoCuenta === 'ACTIVADA' ? '✓ Cuenta Activa' : '⚠ Cuenta Inactiva'}
                 </span>
+
+                {profile?.estadoCuenta !== 'ACTIVADA' && !isEditing && (
+                  <button
+                    onClick={handleActivateAccount}
+                    className="text-sm text-emerald-600 hover:text-emerald-700 font-medium underline decoration-2 underline-offset-2 hover:decoration-emerald-700 transition-colors cursor-pointer"
+                  >
+                    Activar mi cuenta ahora
+                  </button>
+                )}
               </div>
             </div>
           </div>

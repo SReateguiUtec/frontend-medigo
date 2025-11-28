@@ -16,8 +16,7 @@ interface BookAppointmentModalProps {
 export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     isOpen,
     onClose,
-    doctor,
-    onSuccess
+    doctor
 }) => {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
@@ -31,17 +30,17 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     useEffect(() => {
         const fetchAvailableSlots = async () => {
             if (!selectedDate || !doctor.id) return;
-            
+
             try {
                 setSlotsLoading(true);
                 setError('');
-                
+
                 // Validate date format (should be YYYY-MM-DD)
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateRegex.test(selectedDate)) {
                     throw new Error('Formato de fecha inválido');
                 }
-                
+
                 const slots = await horarioService.getSlotsDisponibles(doctor.id, selectedDate);
                 // Show only available slots that are in the future
                 setAvailableSlots(slots.filter(slot => slot.disponible && isFutureSlot(slot.fechaHora)));
@@ -275,7 +274,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                 </div>
                                 Hora de la Cita
                             </label>
-                            
+
                             {slotsLoading ? (
                                 <div className="flex items-center justify-center py-4">
                                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500 mr-2"></div>
@@ -289,11 +288,10 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                                                 key={index}
                                                 type="button"
                                                 onClick={() => setSelectedTime(formatTime(slot.fechaHora))}
-                                                className={`px-3 py-2 rounded-lg border-2 text-center font-medium transition-all ${
-                                                    selectedTime === formatTime(slot.fechaHora)
-                                                        ? 'border-emerald-500 bg-emerald-500 text-white'
-                                                        : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50'
-                                                }`}
+                                                className={`px-3 py-2 rounded-lg border-2 text-center font-medium transition-all ${selectedTime === formatTime(slot.fechaHora)
+                                                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                                                    : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50'
+                                                    }`}
                                             >
                                                 {formatTime(slot.fechaHora)}
                                             </button>

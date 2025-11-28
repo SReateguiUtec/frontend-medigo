@@ -56,10 +56,7 @@ export const Footer = () => {
                         <h4 className="text-white font-semibold mb-4">Contacto</h4>
                         <ul className="space-y-2">
                             <li className="text-sm">
-                                medigo-peru@medigo.com
-                            </li>
-                            <li className="text-sm">
-                                +51 999 888 777
+                                medigoperu@gmail.com
                             </li>
                             <li className="text-sm">
                                 Lima, Perú
