@@ -6,6 +6,7 @@ import { Register } from './pages/auth/Register';
 import { SearchDoctors } from './pages/patient/SearchDoctors';
 import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
 import { MyAppointments } from './pages/patient/MyAppointments';
+import { MyMedicalHistory } from './pages/patient/MyMedicalHistory';
 import { PatientProfile } from './pages/patient/Profile';
 import { Messages } from './pages/patient/Messages';
 import { Chat } from './pages/patient/Chat';
@@ -92,6 +93,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <MyAppointments />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/medical-history"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <MyMedicalHistory />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

@@ -72,7 +72,22 @@ export const MyAppointments = () => {
         }
     };
 
-    const getStatusColor = (estado: string) => {
+    // Verificar si la cita ya pasó
+    const isPastAppointment = (appointment: Cita) => {
+        const aptDate = new Date(appointment.fechaHora);
+        const now = new Date();
+        const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+
+        // La cita es pasada si ya pasó más de 1 hora desde su hora programada
+        return now.getTime() > (aptDate.getTime() + oneHour);
+    };
+
+    const getStatusColor = (estado: string, isPast: boolean) => {
+        // Si la cita ya pasó, mostrar en gris independientemente del estado
+        if (isPast) {
+            return 'bg-gray-100 text-gray-600 border-gray-300';
+        }
+
         switch (estado) {
             case 'PENDIENTE':
                 return 'bg-amber-50 text-amber-700 border-amber-200';
@@ -116,6 +131,23 @@ export const MyAppointments = () => {
                 return aptDate < now || apt.estado === 'COMPLETADA' || apt.estado === 'CANCELADA';
             }
             return true;
+        })
+        // Ordenar: activas primero (por fecha ascendente), luego pasadas (por fecha descendente)
+        .sort((a, b) => {
+            const isPastA = isPastAppointment(a);
+            const isPastB = isPastAppointment(b);
+
+            // Si una es pasada y la otra no, la activa va primero
+            if (isPastA && !isPastB) return 1;
+            if (!isPastA && isPastB) return -1;
+
+            // Si ambas son activas, ordenar por fecha ascendente (más cercana primero)
+            if (!isPastA && !isPastB) {
+                return new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime();
+            }
+
+            // Si ambas son pasadas, ordenar por fecha descendente (más reciente primero)
+            return new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime();
         });
 
     const canCancel = (appointment: Cita) => {
@@ -233,100 +265,112 @@ export const MyAppointments = () => {
                     </div>
                 ) : (
                     <div className="grid gap-4">
-                        {filteredAppointments.map((appointment) => (
-                            <div
-                                key={appointment.id}
-                                className="group bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-emerald-100 transition-all duration-300"
-                            >
-                                <div className="flex flex-col lg:flex-row gap-6 items-center">
-                                    {/* Left Section - Date Box */}
-                                    <div className="hidden sm:flex flex-col items-center justify-center w-20 h-20 bg-emerald-50 rounded-2xl border border-emerald-100 shrink-0">
-                                        <span className="text-emerald-600 text-xs font-semibold uppercase tracking-wider">
-                                            {new Date(appointment.fechaHora).toLocaleDateString('es-ES', { month: 'short' })}
-                                        </span>
-                                        <span className="text-2xl font-bold text-gray-900">
-                                            {new Date(appointment.fechaHora).getDate()}
-                                        </span>
-                                        <span className="text-emerald-600/70 text-xs">
-                                            {new Date(appointment.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </div>
+                        {filteredAppointments.map((appointment) => {
+                            const isPast = isPastAppointment(appointment);
+                            return (
+                                <div
+                                    key={appointment.id}
+                                    className={`group bg-white rounded-2xl border p-5 transition-all duration-300 ${isPast
+                                        ? 'border-gray-200 opacity-75 hover:shadow-md'
+                                        : 'border-gray-100 hover:shadow-lg hover:border-emerald-100'
+                                        }`}
+                                >
+                                    <div className="flex flex-col lg:flex-row gap-6 items-center">
+                                        {/* Left Section - Date Box */}
+                                        <div className={`hidden sm:flex flex-col items-center justify-center w-20 h-20 rounded-2xl border shrink-0 ${isPast
+                                            ? 'bg-gray-100 border-gray-200'
+                                            : 'bg-emerald-50 border-emerald-100'
+                                            }`}>
+                                            <span className={`text-xs font-semibold uppercase tracking-wider ${isPast ? 'text-gray-500' : 'text-emerald-600'
+                                                }`}>
+                                                {new Date(appointment.fechaHora).toLocaleDateString('es-ES', { month: 'short' })}
+                                            </span>
+                                            <span className="text-2xl font-bold text-gray-900">
+                                                {new Date(appointment.fechaHora).getDate()}
+                                            </span>
+                                            <span className={`text-xs ${isPast ? 'text-gray-400' : 'text-emerald-600/70'
+                                                }`}>
+                                                {new Date(appointment.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
 
-                                    {/* Middle Section - Info */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between gap-4 mb-2">
-                                            <div>
-                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                                                    Dr. {appointment.medico.nombres} {appointment.medico.apellidos}
-                                                </h3>
-                                                <p className="text-gray-500 text-sm flex items-center gap-1.5">
-                                                    <Stethoscope className="w-3.5 h-3.5" />
-                                                    {appointment.medico.especialidades?.[0]?.nombre_especialidad || 'Especialista'}
-                                                </p>
+                                        {/* Middle Section - Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-4 mb-2">
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                                                        Dr. {appointment.medico.nombres} {appointment.medico.apellidos}
+                                                    </h3>
+                                                    <p className="text-gray-500 text-sm flex items-center gap-1.5">
+                                                        <Stethoscope className="w-3.5 h-3.5" />
+                                                        {appointment.medico.especialidades?.[0]?.nombre_especialidad || 'Especialista'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Mobile Date (visible only on small screens) */}
+                                            <div className="sm:hidden flex items-center gap-2 text-sm text-gray-600 mb-3 bg-gray-50 p-2 rounded-lg">
+                                                <Calendar className="w-4 h-4" />
+                                                {new Date(appointment.fechaHora).toLocaleDateString('es-ES', {
+                                                    weekday: 'long',
+                                                    day: 'numeric',
+                                                    month: 'long'
+                                                })} • {new Date(appointment.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+
+                                            <div className="flex items-center gap-4 mt-4">
+                                                {appointment.esPagada ? (
+                                                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                                                        <DollarSign className="w-3.5 h-3.5" />
+                                                        Pago confirmado
+                                                    </span>
+                                                ) : (
+                                                    (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA') && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
+                                                                <DollarSign className="w-3.5 h-3.5" />
+                                                                Pago pendiente
+                                                            </span>
+                                                            <PaymentButton citaId={appointment.id} className="text-xs" />
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
                                         </div>
 
-                                        {/* Mobile Date (visible only on small screens) */}
-                                        <div className="sm:hidden flex items-center gap-2 text-sm text-gray-600 mb-3 bg-gray-50 p-2 rounded-lg">
-                                            <Calendar className="w-4 h-4" />
-                                            {new Date(appointment.fechaHora).toLocaleDateString('es-ES', {
-                                                weekday: 'long',
-                                                day: 'numeric',
-                                                month: 'long'
-                                            })} • {new Date(appointment.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
+                                        {/* Right Section - Actions */}
+                                        <div className="flex flex-row lg:flex-col gap-3 justify-end lg:justify-center lg:border-l lg:border-gray-100 lg:pl-6 items-center min-w-[180px]">
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(appointment.estado, isPast)} w-fit`}>
+                                                {getStatusIcon(appointment.estado)}
+                                                {isPast ? 'PASADA' : appointment.estado}
+                                            </span>
 
-                                        <div className="flex items-center gap-4 mt-4">
-                                            {appointment.esPagada ? (
-                                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
-                                                    <DollarSign className="w-3.5 h-3.5" />
-                                                    Pago confirmado
-                                                </span>
-                                            ) : (
-                                                (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA') && (
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
-                                                            <DollarSign className="w-3.5 h-3.5" />
-                                                            Pago pendiente
-                                                        </span>
-                                                        <PaymentButton citaId={appointment.id} className="text-xs" />
-                                                    </div>
-                                                )
+                                            {/* Solo mostrar botón de videollamada si NO es una cita pasada */}
+                                            {!isPast && isTimeForAppointment(appointment) && (
+                                                <button
+                                                    onClick={() => handleJoinVideoCall(appointment.id)}
+                                                    disabled={joiningCallId === appointment.id}
+                                                    className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <Video className="w-4 h-4" />
+                                                    {joiningCallId === appointment.id ? 'Conectando...' : 'Unirse ahora'}
+                                                </button>
+                                            )}
+
+                                            {canCancel(appointment) && (
+                                                <button
+                                                    onClick={() => handleCancelAppointment(appointment.id)}
+                                                    className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all text-sm font-medium"
+                                                >
+                                                    <XCircle className="w-4 h-4" />
+                                                    Cancelar
+                                                </button>
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Right Section - Actions */}
-                                    <div className="flex flex-row lg:flex-col gap-3 justify-end lg:justify-center lg:border-l lg:border-gray-100 lg:pl-6 items-center min-w-[180px]">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(appointment.estado)} w-fit`}>
-                                            {getStatusIcon(appointment.estado)}
-                                            {appointment.estado}
-                                        </span>
-
-                                        {isTimeForAppointment(appointment) && (
-                                            <button
-                                                onClick={() => handleJoinVideoCall(appointment.id)}
-                                                disabled={joiningCallId === appointment.id}
-                                                className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                <Video className="w-4 h-4" />
-                                                {joiningCallId === appointment.id ? 'Conectando...' : 'Unirse ahora'}
-                                            </button>
-                                        )}
-
-                                        {canCancel(appointment) && (
-                                            <button
-                                                onClick={() => handleCancelAppointment(appointment.id)}
-                                                className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all text-sm font-medium"
-                                            >
-                                                <XCircle className="w-4 h-4" />
-                                                Cancelar
-                                            </button>
-                                        )}
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

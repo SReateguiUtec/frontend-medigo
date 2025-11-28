@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Search, Calendar, User, MessageCircle, Clock } from 'lucide-react';
+import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText } from 'lucide-react';
 
 export const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -35,6 +35,11 @@ export const Sidebar = () => {
             name: 'Mis Citas',
             path: '/patient/appointments',
             icon: <Calendar className="w-5 h-5" />
+        }] : []),
+        ...(isPaciente ? [{
+            name: 'Historial Médico',
+            path: '/patient/medical-history',
+            icon: <FileText className="w-5 h-5" />
         }] : []),
         {
             name: 'Mensajes',

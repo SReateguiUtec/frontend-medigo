@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown } from 'lucide-react';
@@ -86,7 +86,7 @@ export const SearchDoctors = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [specialtyId, setSpecialtyId] = useState('');
 
-  const [doctors, setDoctors] = useState<any[]>(showcaseDoctors);
+  const [allDoctors, setAllDoctors] = useState<any[]>(showcaseDoctors); // Todos los doctores disponibles
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pageInfo, setPageInfo] = useState({
@@ -97,6 +97,24 @@ export const SearchDoctors = () => {
     totalElements: 0,
   });
   const [isSearching, setIsSearching] = useState(false);
+
+  // Filtrado en tiempo real usando useMemo
+  const filteredDoctors = useMemo(() => {
+    if (activeFilter !== 'name' || !searchTerm.trim()) {
+      return allDoctors;
+    }
+
+    const term = searchTerm.toLowerCase();
+    return allDoctors.filter(doctor => {
+      const fullName = `${doctor.nombres} ${doctor.apellidos}`.toLowerCase();
+      const nombres = doctor.nombres.toLowerCase();
+      const apellidos = doctor.apellidos.toLowerCase();
+
+      return fullName.includes(term) ||
+        nombres.includes(term) ||
+        apellidos.includes(term);
+    });
+  }, [allDoctors, searchTerm, activeFilter]);
 
   const handleSearch = async (page: number = 0) => {
     console.log('Performing search with filter:', activeFilter);
@@ -112,7 +130,7 @@ export const SearchDoctors = () => {
         case 'name':
           if (!searchTerm.trim()) {
             console.log('No search term, showing showcase doctors');
-            setDoctors(showcaseDoctors);
+            setAllDoctors(showcaseDoctors);
             setIsSearching(false);
             setLoading(false);
             return;
@@ -185,7 +203,7 @@ export const SearchDoctors = () => {
 
       if (response) {
         console.log('Search results:', response.content); // Debug log
-        setDoctors(response.content);
+        setAllDoctors(response.content);
         setPageInfo({
           totalPages: response.totalPages,
           number: response.number,
@@ -204,7 +222,7 @@ export const SearchDoctors = () => {
     } catch (err: any) {
       console.error('Error searching doctors:', err);
       setError('Error al buscar médicos. Intente nuevamente.');
-      setDoctors([]);
+      setAllDoctors([]);
     } finally {
       setLoading(false);
     }
@@ -437,10 +455,10 @@ export const SearchDoctors = () => {
       )}
 
       {/* Doctors Grid */}
-      {!loading && doctors.length > 0 && (
+      {!loading && filteredDoctors.length > 0 && (
         <>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {doctors.map((doctor) => (
+            {filteredDoctors.map((doctor) => (
               <div
                 key={doctor.id}
                 onClick={() => handleDoctorClick(doctor.id)}
@@ -495,15 +513,18 @@ export const SearchDoctors = () => {
                     )}
                   </div>
 
-                  <button
-                    className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    onClick={() => {
-                      console.log('Navigating to doctor profile with ID:', doctor.id);
-                      navigate(`/patient/doctor/${doctor.id}`);
-                    }}
-                  >
-                    Ver Perfil
-                  </button>
+                  {/* Solo mostrar botón si NO es un doctor de demostración */}
+                  {(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) && (
+                    <button
+                      className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      onClick={() => {
+                        console.log('Navigating to doctor profile with ID:', doctor.id);
+                        navigate(`/patient/doctor/${doctor.id}`);
+                      }}
+                    >
+                      Ver Perfil
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -537,7 +558,7 @@ export const SearchDoctors = () => {
         </>
       )}
 
-      {!loading && doctors.length === 0 && (
+      {!loading && filteredDoctors.length === 0 && (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 text-lg mb-2">No se encontraron médicos</p>
@@ -547,7 +568,7 @@ export const SearchDoctors = () => {
           <button
             onClick={() => {
               setSearchTerm('');
-              setDoctors(showcaseDoctors);
+              setAllDoctors(showcaseDoctors);
               setIsSearching(false);
               setActiveFilter('name');
             }}

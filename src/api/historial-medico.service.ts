@@ -22,6 +22,12 @@ class HistorialMedicoService {
         return response.data;
     }
 
+    // Nuevo método para que los pacientes obtengan su propio historial
+    async getMyHistory(): Promise<HistorialMedico[]> {
+        const response = await axiosInstance.get('/historial-medico/mi-historial');
+        return response.data;
+    }
+
     async create(citaId: number, data: CreateHistorialRequest): Promise<HistorialMedico> {
         const response = await axiosInstance.post(
             `/historial-medico/cita/${citaId}`,
