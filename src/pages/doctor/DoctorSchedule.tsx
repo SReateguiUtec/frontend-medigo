@@ -87,7 +87,7 @@ export default function DoctorSchedule() {
         } catch (error: any) {
             console.error('Error loading schedules:', error);
             let errorMessage = 'Error al cargar horarios';
-            
+
             if (error.response) {
                 if (error.response.status === 403) {
                     errorMessage = 'Acceso denegado. No tienes permiso para ver estos horarios.';
@@ -101,7 +101,7 @@ export default function DoctorSchedule() {
             } else {
                 errorMessage = error.message || 'Error desconocido';
             }
-            
+
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -131,7 +131,7 @@ export default function DoctorSchedule() {
             });
 
             setSuccess('Horario agregado exitosamente');
-            
+
             // Clear success message after 3 seconds
             setTimeout(() => {
                 setSuccess(null);
@@ -139,12 +139,18 @@ export default function DoctorSchedule() {
         } catch (error: any) {
             console.error('Error adding schedule:', error);
             let errorMessage = 'Error al agregar horario';
-            
+
             if (error.response) {
-                if (error.response.status === 403) {
+                if (error.response.status === 400 && error.response.data?.message) {
+                    // Mostrar mensaje de validación del backend (ej: horario duplicado)
+                    errorMessage = error.response.data.message;
+                } else if (error.response.status === 403) {
                     errorMessage = 'Acceso denegado. No tienes permiso para crear este horario.';
                 } else if (error.response.status === 401) {
                     errorMessage = 'No estás autenticado. Por favor inicia sesión nuevamente.';
+                } else if (error.response.data?.message) {
+                    // Cualquier otro error con mensaje del servidor
+                    errorMessage = error.response.data.message;
                 } else {
                     errorMessage = `Error del servidor: ${error.response.status}`;
                 }
@@ -153,7 +159,7 @@ export default function DoctorSchedule() {
             } else {
                 errorMessage = error.message || 'Error desconocido';
             }
-            
+
             setError(errorMessage);
         } finally {
             setSaving(false);
@@ -173,7 +179,7 @@ export default function DoctorSchedule() {
             await horarioService.deleteHorario(user.id, horarioToDelete);
             await loadHorarios();
             setSuccess('Horario eliminado exitosamente');
-            
+
             // Clear success message after 3 seconds
             setTimeout(() => {
                 setSuccess(null);
@@ -181,7 +187,7 @@ export default function DoctorSchedule() {
         } catch (error: any) {
             console.error('Error deleting schedule:', error);
             let errorMessage = 'Error al eliminar horario';
-            
+
             if (error.response) {
                 if (error.response.status === 403) {
                     errorMessage = 'Acceso denegado. No tienes permiso para eliminar este horario.';
@@ -195,7 +201,7 @@ export default function DoctorSchedule() {
             } else {
                 errorMessage = error.message || 'Error desconocido';
             }
-            
+
             setError(errorMessage);
         } finally {
             setHorarioToDelete(null);
@@ -363,8 +369,8 @@ export default function DoctorSchedule() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${horario.activo
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-gray-100 text-gray-800'
                                                         }`}>
                                                         {horario.activo ? 'Activo' : 'Inactivo'}
                                                     </span>
@@ -386,7 +392,7 @@ export default function DoctorSchedule() {
                     </div>
                 </div>
             </div>
-            
+
             {/* Confirmation Modal */}
             <ConfirmationModal
                 isOpen={horarioToDelete !== null}
