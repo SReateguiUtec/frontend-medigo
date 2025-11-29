@@ -18,6 +18,7 @@ export const Chat = () => {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
     const [otherUserName, setOtherUserName] = useState('');
+    const [otherUserProfilePicture, setOtherUserProfilePicture] = useState<string | undefined>(undefined);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -44,25 +45,12 @@ export const Chat = () => {
         const currentUserId = user?.id;
         const targetUserId = Number(userId);
 
-        console.log('👤 Current user ID:', currentUserId);
-        console.log('👤 Target user ID:', targetUserId);
-        console.log('📧 Message senderId:', message.senderId, 'receiverId:', message.receiverId);
-
         const isFromTargetToCurrent = (Number(message.senderId) === targetUserId && Number(message.receiverId) === currentUserId);
         const isFromCurrentToTarget = (Number(message.receiverId) === targetUserId && Number(message.senderId) === currentUserId);
 
-        console.log('🔍 isFromTargetToCurrent:', isFromTargetToCurrent);
-        console.log('🔍 isFromCurrentToTarget:', isFromCurrentToTarget);
-
         if (isFromTargetToCurrent || isFromCurrentToTarget) {
-            console.log('✅ Message matches conversation, checking for duplicates');
-
             // Evitar duplicados: verificar si el mensaje ya existe
             setMessages(prev => {
-                console.log('📦 Current messages count:', prev.length);
-                console.log('🆕 New message ID:', message.id, 'Type:', typeof message.id);
-                console.log('🆕 New message content:', message.content);
-
                 const messageExists = prev.some(m => {
                     const sameId = Number(m.id) === Number(message.id);
                     const sameContent = m.content === message.content &&
@@ -70,27 +58,16 @@ export const Chat = () => {
                         Number(m.receiverId) === Number(message.receiverId);
                     const timeDiff = Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime());
 
-                    if (sameId) {
-                        console.log(`🔍 Found duplicate by ID: ${m.id} === ${message.id}`);
-                    }
-                    if (sameContent && timeDiff < 1000) {
-                        console.log(`🔍 Found duplicate by content and time: ${m.content} (${timeDiff}ms diff)`);
-                    }
-
                     return sameId || (sameContent && timeDiff < 1000);
                 });
 
                 if (messageExists) {
-                    console.log('⚠️ Message already exists, skipping');
                     return prev;
                 }
 
-                console.log('➕ Adding new message');
                 return [...prev, message];
             });
             scrollToBottom();
-        } else {
-            console.log('❌ Message does not match this conversation, ignoring');
         }
     }, [user?.id, userId]);
 
@@ -107,29 +84,51 @@ export const Chat = () => {
     }, [messages]);
 
     const loadMessages = async () => {
+        if (!userId) return;
+
         try {
             setLoading(true);
+            console.log('🔄 Loading messages for conversation:', userId);
+
             const data = await messageService.getConversation(Number(userId));
+            console.log('📥 Messages received:', data);
+
+            if (!Array.isArray(data)) {
+                console.error('❌ Data received is not an array:', data);
+                setMessages([]);
+                return;
+            }
+
             setMessages(data);
 
-            // Obtener nombre del otro usuario del primer mensaje
+            // Obtener nombre y foto del otro usuario del primer mensaje
             if (data.length > 0) {
                 const firstMessage = data[0];
                 const isMyMessage = Number(firstMessage.senderId) === Number(user?.id);
+
                 const otherName = isMyMessage
                     ? firstMessage.receiverName
                     : firstMessage.senderName;
-                setOtherUserName(otherName);
+                setOtherUserName(otherName || 'Usuario');
+
+                // Uso seguro de propiedades que podrían no existir si el backend no se actualizó
+                const otherPic = isMyMessage
+                    ? (firstMessage as any).receiverProfilePicture
+                    : (firstMessage as any).senderProfilePicture;
+
+                console.log('🖼️ Profile picture found:', otherPic);
+                setOtherUserProfilePicture(otherPic);
             }
         } catch (err) {
-            console.error('Error loading messages:', err);
+            console.error('❌ Error loading messages:', err);
+            setError('No se pudieron cargar los mensajes. Por favor intenta de nuevo.');
         } finally {
             setLoading(false);
         }
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -183,8 +182,30 @@ export const Chat = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </button>
 
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white">
-                        <User className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 shrink-0 relative">
+                        {otherUserProfilePicture ? (
+                            <>
+                                <img
+                                    src={otherUserProfilePicture.startsWith('http')
+                                        ? otherUserProfilePicture
+                                        : `http://localhost:8080${otherUserProfilePicture}`}
+                                    alt={otherUserName}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                        const fallback = document.getElementById('fallback-icon');
+                                        if (fallback) fallback.style.display = 'flex';
+                                    }}
+                                />
+                                <div id="fallback-icon" className="hidden absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 items-center justify-center text-white">
+                                    <User className="w-5 h-5" />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white">
+                                <User className="w-5 h-5" />
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex-1">
@@ -203,8 +224,6 @@ export const Chat = () => {
                 </div>
             </div>
 
-
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-6">
                 <div className="max-w-4xl mx-auto space-y-4">
@@ -215,7 +234,6 @@ export const Chat = () => {
                     ) : (
                         messages.map((message) => {
                             const isOwn = Number(message.senderId) === Number(user?.id);
-
 
                             return (
                                 <div

@@ -105,35 +105,42 @@ export const Home = () => {
 
         <br></br>
         <br></br>
-
-        <AnimatedSection delay={400}>
-          <Grid />
-        </AnimatedSection>
-
-        <br></br>
-        <br></br>
         <br></br>
 
         <AnimatedSection delay={400}>
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-12 rounded-3xl text-center shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300 max-w-7xl mx-auto">
-            <div className="flex justify-center mb-4">
-              <MessageSquare className="h-16 w-16 animate-bounce" />
+          <div className="relative max-w-7xl mx-auto">
+            {/* Subtle gradient glow effect behind the card */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
+
+            {/* Glassmorphism card */}
+            <div className="relative backdrop-blur-xl bg-white/10 border-2 border-blue-200/30 p-12 rounded-3xl text-center shadow-xl hover:shadow-2xl hover:border-blue-300/50 transition-all duration-300">
+              <div className="flex justify-center mb-4">
+                <MessageSquare className="h-16 w-16 text-blue-600 animate-bounce" />
+              </div>
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                ¿Eres médico?
+              </h2>
+              <p className="text-xl mb-8 text-gray-700 max-w-2xl mx-auto">
+                Únete a nuestra plataforma y expande tu alcance profesional
+              </p>
+              <Link
+                to="/register?role=MEDICO"
+                className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Registrarse como Médico
+              </Link>
             </div>
-            <h2 className="text-3xl font-bold mb-4">¿Eres médico?</h2>
-            <p className="text-xl mb-6">
-              Únete a nuestra plataforma y expande tu alcance profesional
-            </p>
-            <Link
-              to="/register"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
-            >
-              Registrarse como Médico
-            </Link>
           </div>
         </AnimatedSection>
 
         <br></br>
-        <br></br>
+
+        <section id="beneficios">
+          <AnimatedSection delay={400}>
+            <Grid />
+          </AnimatedSection>
+        </section>
+
         <br></br>
         <br></br>
         <br></br>
@@ -259,7 +266,7 @@ export const Home = () => {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="container mx-auto px-4 py-20">
+        <section id="faq" className="container mx-auto px-4 py-15">
           <AnimatedSection delay={500}>
             <div className="text-center mb-12">
               <Badge variant="outline" className="mb-4">

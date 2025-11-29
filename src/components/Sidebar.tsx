@@ -1,9 +1,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText } from 'lucide-react';
 
 export const Sidebar = () => {
     const { user, logout } = useAuth();
+    const { unreadCount, clearUnreadCount } = useNotification();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -71,8 +73,16 @@ export const Sidebar = () => {
             {/* User Info */}
             <div className="p-6 border-b border-gray-800">
                 <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {user?.nombres?.charAt(0) || user?.email?.charAt(0).toUpperCase()}
+                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+                        {user?.rutaFoto ? (
+                            <img
+                                src={user.rutaFoto.startsWith('http') ? user.rutaFoto : `http://localhost:8080${user.rutaFoto}`}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            user?.nombres?.charAt(0) || user?.email?.charAt(0).toUpperCase()
+                        )}
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">
@@ -92,13 +102,24 @@ export const Sidebar = () => {
                     <Link
                         key={item.path}
                         to={item.path}
-                        className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)
+                        onClick={() => {
+                            if (item.path === '/messages') {
+                                clearUnreadCount();
+                            }
+                        }}
+                        className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors relative ${isActive(item.path)
                             ? 'bg-blue-600 text-white'
                             : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                             }`}
                     >
                         <span className="text-xl">{item.icon}</span>
                         <span className="font-medium">{item.name}</span>
+
+                        {item.path === '/messages' && unreadCount > 0 && (
+                            <span className="absolute right-4 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                {unreadCount > 99 ? '99+' : unreadCount}
+                            </span>
+                        )}
                     </Link>
                 ))}
             </nav>

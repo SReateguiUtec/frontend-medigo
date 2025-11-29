@@ -2,6 +2,9 @@ export interface JWTPayload {
     sub: string; // email
     roles: string[]; // e.g., ["ROLE_PACIENTE", "ROLE_MEDICO"]
     userId?: number;
+    nombres?: string;
+    apellidos?: string;
+    rutaFoto?: string;
     iat: number;
     exp: number;
 }

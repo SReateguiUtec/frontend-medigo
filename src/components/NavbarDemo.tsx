@@ -35,9 +35,16 @@ export function NavbarDemo() {
                 <nav className={`shadow-lg border px-6 py-3 transition-colors duration-300 ${isMobileMenuOpen ? 'rounded-3xl bg-white border-gray-200' : 'rounded-full bg-white/30 backdrop-blur-xl border-white/20'}`}>
                     <div className="flex items-center justify-between w-full">
                         {/* Logo */}
-                        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                        <a
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer"
+                        >
                             <img src="/logo-navbar.png" alt="MediGO" className="h-12 w-auto scale-[2.8] object-contain ml-5" />
-                        </Link>
+                        </a>
 
                         {/* Desktop Navigation - Centered */}
                         <div className="hidden md:flex items-center gap-8 absolute left-1/2 transform -translate-x-1/2">

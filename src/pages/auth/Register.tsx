@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authService } from '../../api/auth.service';
-import { ArrowLeft, Activity, Users, Stethoscope, Check, Shield } from 'lucide-react';
+import { ArrowLeft, Activity, Users, Stethoscope, Check, Shield, CheckCircle } from 'lucide-react';
 
 export const Register = () => {
-  const [userType, setUserType] = useState<'PACIENTE' | 'MEDICO'>('PACIENTE');
+  const [searchParams] = useSearchParams();
+  const [userType, setUserType] = useState<'PACIENTE' | 'MEDICO'>(
+    searchParams.get('role') === 'MEDICO' ? 'MEDICO' : 'PACIENTE'
+  );
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -13,6 +16,7 @@ export const Register = () => {
     dni: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -38,7 +42,14 @@ export const Register = () => {
           dni: formData.dni,
         });
       }
-      navigate('/login');
+
+      // Show success message
+      setSuccess(true);
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse');
     } finally {
@@ -143,6 +154,13 @@ export const Register = () => {
             {error && (
               <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-500/10 border border-green-500/50 text-green-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...</span>
               </div>
             )}
 

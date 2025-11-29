@@ -16,13 +16,14 @@ export const authService = {
     // Construct user object from JWT payload
     const usuario: Usuario = {
       id: payload.userId || 0,
-      nombres: '', // Backend doesn't provide names in JWT
-      apellidos: '',
+      nombres: payload.nombres || '',
+      apellidos: payload.apellidos || '',
       email: payload.sub,
       edad: 0,
       telefono: '',
       rol: extractRole(payload.roles),
       estadoCuenta: 'ACTIVADA',
+      rutaFoto: payload.rutaFoto,
       createdAt: new Date().toISOString(),
     };
 

@@ -27,7 +27,7 @@ export const Messages = () => {
 
     const handleDeleteConfirm = async () => {
         if (!conversationToDelete) return;
-        
+
         try {
             await messageService.deleteConversation(conversationToDelete.userId);
             // Refresh the conversations list
@@ -130,7 +130,7 @@ export const Messages = () => {
                     ) : (
                         <div className="space-y-2">
                             {conversations.map((conversation) => (
-                                <div 
+                                <div
                                     key={conversation.userId}
                                     className="w-full bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md hover:border-emerald-100 transition-all group flex items-center gap-4"
                                 >
@@ -140,8 +140,31 @@ export const Messages = () => {
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Avatar */}
-                                            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold shrink-0">
-                                                <User className="w-6 h-6" />
+                                            <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100">
+                                                {conversation.profilePicture ? (
+                                                    <img
+                                                        src={conversation.profilePicture.startsWith('http')
+                                                            ? conversation.profilePicture
+                                                            : `http://localhost:8080${conversation.profilePicture}`}
+                                                        alt={conversation.userName}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            // Fallback to icon on error
+                                                            e.currentTarget.style.display = 'none';
+                                                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
+                                                        <User className="w-6 h-6" />
+                                                    </div>
+                                                )}
+                                                {/* Fallback icon container (hidden by default if image exists) */}
+                                                {conversation.profilePicture && (
+                                                    <div className="hidden w-full h-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
+                                                        <User className="w-6 h-6" />
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Content */}
@@ -170,7 +193,7 @@ export const Messages = () => {
                                             </div>
                                         </div>
                                     </button>
-                                    
+
                                     {/* Delete button */}
                                     <button
                                         onClick={(e) => {
@@ -188,7 +211,7 @@ export const Messages = () => {
                     )}
                 </div>
             </div>
-            
+
             <ConfirmationModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}

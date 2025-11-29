@@ -7,6 +7,7 @@ import {
     ArrowLeft, FileText, Calendar, Stethoscope, Pill, ClipboardList,
     Activity, TrendingUp, Search, Filter, Clock
 } from 'lucide-react';
+import { MedicalAIChat } from '../../components/MedicalAIChat';
 
 export const MyMedicalHistory = () => {
     const navigate = useNavigate();
@@ -187,6 +188,11 @@ export const MyMedicalHistory = () => {
                                 <p className="text-3xl font-bold text-gray-900">{stats.thisYear}</p>
                                 <p className="text-sm text-gray-500 mt-1">Este Año</p>
                             </div>
+                        </div>
+
+                        {/* AI Assistant Section */}
+                        <div className="mb-8">
+                            <MedicalAIChat />
                         </div>
 
                         {/* Search and Filters */}

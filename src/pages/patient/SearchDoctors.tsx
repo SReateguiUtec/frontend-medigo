@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown } from 'lucide-react';
@@ -100,6 +100,10 @@ export const SearchDoctors = () => {
 
   // Filtrado en tiempo real usando useMemo
   const filteredDoctors = useMemo(() => {
+    // Si estamos buscando en el backend, confiamos en los resultados del backend
+    // y solo aplicamos filtrado local si es necesario para una experiencia más fluida
+    // mientras llega la nueva respuesta del backend.
+
     if (activeFilter !== 'name' || !searchTerm.trim()) {
       return allDoctors;
     }
@@ -110,11 +114,24 @@ export const SearchDoctors = () => {
       const nombres = doctor.nombres.toLowerCase();
       const apellidos = doctor.apellidos.toLowerCase();
 
+      // Verificamos si es un doctor de demo (ids 1-6) para filtrar localmente
+      // Si son resultados del backend, generalmente ya vienen filtrados, pero esto no hace daño
       return fullName.includes(term) ||
         nombres.includes(term) ||
         apellidos.includes(term);
     });
   }, [allDoctors, searchTerm, activeFilter]);
+
+  // Debounce para búsqueda automática
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (activeFilter === 'name') {
+        handleSearch(0);
+      }
+    }, 200); // Esperar 300ms para una respuesta más rápida
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, activeFilter]);
 
   const handleSearch = async (page: number = 0) => {
     console.log('Performing search with filter:', activeFilter);

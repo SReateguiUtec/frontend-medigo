@@ -8,6 +8,8 @@ export interface Message {
     content: string;
     isRead: boolean;
     createdAt: string;
+    senderProfilePicture?: string;
+    receiverProfilePicture?: string;
 }
 
 export interface Conversation {
@@ -17,6 +19,7 @@ export interface Conversation {
     lastMessage: string | null;
     lastMessageTime: string | null;
     unreadCount: number;
+    profilePicture?: string;
 }
 
 export interface SendMessageRequest {
