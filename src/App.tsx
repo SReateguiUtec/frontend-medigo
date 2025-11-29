@@ -4,11 +4,14 @@ import { NotificationProvider } from './context/NotificationContext';
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
+import { PatientHome } from './pages/patient/PatientHome';
 import { SearchDoctors } from './pages/patient/SearchDoctors';
 import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
 import { MyAppointments } from './pages/patient/MyAppointments';
 import { MyMedicalHistory } from './pages/patient/MyMedicalHistory';
 import { PatientProfile } from './pages/patient/Profile';
+import { MedicalChatPage } from './pages/patient/MedicalChatPage';
+import { PrescriptionsPage } from './pages/patient/PrescriptionsPage';
 import { Messages } from './pages/patient/Messages';
 import { Chat } from './pages/patient/Chat';
 import { Appointments } from './pages/doctor/Appointments';
@@ -38,7 +41,7 @@ const HomeRedirect = () => {
 
   if (isAuthenticated) {
     if (user?.rol === 'PACIENTE') {
-      return <Navigate to="/patient/search" />;
+      return <Navigate to="/patient/home" />;
     } else if (user?.rol === 'MEDICO') {
       return <Navigate to="/doctor/appointments" />;
     } else if (user?.rol === 'ADMIN') {
@@ -68,6 +71,16 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
 
         {/* Protected routes with AuthenticatedLayout */}
+        <Route
+          path="/patient/home"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <PatientHome />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/patient/search"
           element={
@@ -99,11 +112,31 @@ function AppContent() {
           }
         />
         <Route
-          path="/patient/medical-history"
+          path="/patient/historial-medico"
           element={
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <MyMedicalHistory />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/ai-chat"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout noPadding>
+                <MedicalChatPage />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/prescriptions"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <PrescriptionsPage />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

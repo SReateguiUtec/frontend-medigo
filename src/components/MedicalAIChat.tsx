@@ -11,7 +11,11 @@ interface Message {
     timestamp: Date;
 }
 
-export const MedicalAIChat = () => {
+interface MedicalAIChatProps {
+    isFullScreen?: boolean;
+}
+
+export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState('');
     const [loading, setLoading] = useState(false);
@@ -117,7 +121,7 @@ export const MedicalAIChat = () => {
 
     if (!termsAccepted) {
         return (
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <div className={`bg-white p-8 text-center ${isFullScreen ? 'h-full flex flex-col justify-center' : 'rounded-xl shadow-lg'}`}>
                 <Sparkles className="w-16 h-16 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Asistente de IA Médica</h3>
                 <p className="text-gray-600 mb-6">
@@ -125,7 +129,7 @@ export const MedicalAIChat = () => {
                 </p>
                 <button
                     onClick={() => setShowTerms(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg mx-auto"
                 >
                     Comenzar
                 </button>
@@ -139,7 +143,7 @@ export const MedicalAIChat = () => {
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-[600px]">
+        <div className={`bg-white overflow-hidden flex flex-col ${isFullScreen ? 'h-full shadow-none rounded-none' : 'h-[600px] rounded-xl shadow-lg'}`}>
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
                 <div className="flex items-center justify-between">
@@ -148,7 +152,7 @@ export const MedicalAIChat = () => {
                             <Bot className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg">Asistente Médico IA</h3>
+                            <h3 className="font-bold text-lg">MediGIA</h3>
                             <p className="text-sm text-white/80">Pregunta sobre tu historial</p>
                         </div>
                     </div>
@@ -166,10 +170,9 @@ export const MedicalAIChat = () => {
                 </div>
             </div>
 
-            {/* Disclaimer */}
             <div className="bg-yellow-50 border-b border-yellow-200 p-3">
-                <div className="flex items-start gap-2">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
                     <p className="text-xs text-yellow-800">
                         <strong>Importante:</strong> Esta información es solo educativa. No reemplaza la consulta médica profesional.
                     </p>
