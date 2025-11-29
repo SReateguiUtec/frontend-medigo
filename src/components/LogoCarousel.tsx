@@ -1,5 +1,4 @@
 import { type SVGProps } from "react";
-import { GradientHeading } from "@/components/ui/gradient-heading";
 import { LogoCarousel } from "@/components/ui/logo-carousel";
 
 const TypeScriptIcon = (props: SVGProps<SVGSVGElement>) => (

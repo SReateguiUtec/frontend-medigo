@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { EncryptedTextDemoSecond } from '@/components/EncryptedTextDemoSecond';
 import Grid from '@/components/Grid';
 import InfiniteMovingCardsDemo from '@/components/infinite-moving-cards-demo';
-import { Ruler } from '@/components/ruler';
 import { AnimatedSection } from '@/components/animated-section';
 import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';

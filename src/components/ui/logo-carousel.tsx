@@ -5,7 +5,6 @@ import React, {
     useEffect,
     useMemo,
     useState,
-    type SVGProps,
 } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 

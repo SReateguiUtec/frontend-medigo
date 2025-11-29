@@ -1,4 +1,4 @@
-import { Mail, MapPin, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 export const Footer = () => {
     const currentYear = new Date().getFullYear();
