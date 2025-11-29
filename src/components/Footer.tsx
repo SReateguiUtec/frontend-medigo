@@ -61,13 +61,11 @@ export const Footer = () => {
                         <h4 className="text-white font-semibold mb-4 text-base">Contacto</h4>
                         <ul className="space-y-3">
                             <li className="flex items-center gap-2 text-sm text-gray-400">
-                                <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
                                 <a href="mailto:medigoperu@gmail.com" className="hover:text-blue-400 transition-colors duration-200">
                                     medigoperu@gmail.com
                                 </a>
                             </li>
                             <li className="flex items-center gap-2 text-sm text-gray-400">
-                                <MapPin className="w-4 h-4 text-blue-400 flex-shrink-0" />
                                 <span>Lima, Perú</span>
                             </li>
                         </ul>

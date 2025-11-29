@@ -22,16 +22,21 @@ export default {
       },
       animation: {
         marquee: "marquee var(--duration) linear infinite",
+        "marquee-reverse": "marquee-reverse var(--duration) linear infinite",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
       },
       keyframes: {
         marquee: {
           from: { transform: "translateX(0)" },
-          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "marquee-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
         },
         "marquee-vertical": {
           from: { transform: "translateY(0)" },
-          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+          to: { transform: "translateY(-50%)" },
         },
       },
     },

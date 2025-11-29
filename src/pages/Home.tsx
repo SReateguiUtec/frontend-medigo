@@ -16,6 +16,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { LogoCarouselDemo } from '@/components/LogoCarousel';
+import DemoOne from '@/components/slider-demo';
 
 export const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -26,7 +28,7 @@ export const Home = () => {
       <br></br>
       <br></br>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-15">
         <AnimatedSection>
           <div className="text-center mb-16">
             <Badge
@@ -60,15 +62,10 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
-        <AnimatedSection delay={200}>
-          <Ruler />
-        </AnimatedSection>
-
-        <br></br>
-        <br></br>
+        <LogoCarouselDemo />
 
         <AnimatedSection delay={200}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-6xl mx-auto">
             <Card className="border-2 border-blue-200/20 dark:border-blue-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2 transition-all duration-300">
               <CardContent className="pt-5 pb-5 text-center">
                 <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 mb-2">
@@ -105,8 +102,9 @@ export const Home = () => {
 
         <br></br>
         <br></br>
-        <br></br>
-
+        <div className="max-w-7xl mx-auto">
+          <DemoOne />
+        </div>
         <AnimatedSection delay={400}>
           <div className="relative max-w-7xl mx-auto">
             {/* Subtle gradient glow effect behind the card */}
@@ -133,8 +131,6 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
-        <br></br>
-
         <section id="beneficios">
           <AnimatedSection delay={400}>
             <Grid />
@@ -157,8 +153,6 @@ export const Home = () => {
             <InfiniteMovingCardsDemo />
           </div>
         </AnimatedSection>
-
-        <br></br>
 
         {/* Pricing Section */}
         <section id="pricing">

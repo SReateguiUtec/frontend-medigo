@@ -93,13 +93,6 @@ export const Login = () => {
             ))}
           </div>
         </div>
-
-        {/* Pagination dots */}
-        <div className="relative z-10 flex gap-2">
-          <div className="w-2 h-2 bg-white rounded-full"></div>
-          <div className="w-2 h-2 bg-white/40 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/40 rounded-full"></div>
-        </div>
       </div>
 
       {/* Right Panel - Dark Form */}

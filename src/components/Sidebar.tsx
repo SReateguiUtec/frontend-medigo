@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText } from 'lucide-react';
+import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText, Activity } from 'lucide-react';
 
 export const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -66,8 +66,14 @@ export const Sidebar = () => {
         <div className="h-screen w-64 bg-gray-900 text-gray-100 flex flex-col fixed left-0 top-0">
             {/* Header */}
             <div className="p-6 border-b border-gray-800">
-                <h1 className="text-2xl font-bold text-white">MediGO</h1>
-                <p className="text-sm text-gray-400 mt-1">Tu panel de control</p>
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-white">MediGO</h1>
+                    </div>
+                </div>
             </div>
 
             {/* User Info */}
