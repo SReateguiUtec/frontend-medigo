@@ -81,32 +81,32 @@ export default function DemoOne() {
                 <div className=" pointer-events-none w-[12vw] h-[103%] absolute inset-[0_auto_0_0] z-10 bg-[linear-gradient(90deg,_var(--background)_35%,_transparent)]" />
                 <div className="pointer-events-none bg-[linear-gradient(270deg,_var(--background)_35%,_transparent)] w-[15vw] h-[103%] absolute inset-[0_0_0_auto] z-10" />
 
-                <ScrollXCarouselWrap className="flex-4/5 flex space-x-8 [&>*:first-child]:ml-8">
+                <ScrollXCarouselWrap className="flex-4/5 flex space-x-8 [&>*:first-child]:ml-8" xRange={['-0%', '-85%']}>
                     {SLIDES.map((slide) => (
                         <CardHoverReveal
                             key={slide.id}
                             className="min-w-[70vw] md:min-w-[38vw] shadow-xl border xl:min-w-[30vw] rounded-xl"
                         >
                             {slide.isCTA ? (
-                                <div className="size-full aspect-square bg-linear-to-br from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden flex flex-col items-center justify-center p-8 text-center">
+                                <div className="size-full bg-linear-to-br from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden flex flex-col items-center justify-center p-6 md:p-8 text-center">
                                     {/* Animated background circles */}
                                     <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
                                     <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-700"></div>
 
                                     {/* Content */}
-                                    <div className="relative z-10 space-y-6">
+                                    <div className="relative z-10 space-y-4 md:space-y-6">
                                         {/* Icon */}
-                                        <div className="mx-auto w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                                            <svg className="w-8 h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </div>
 
-                                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight">
+                                        <h2 className="text-2xl md:text-5xl font-bold text-white mb-3 leading-tight">
                                             {slide.title}
                                         </h2>
 
-                                        <p className="text-lg text-white/90 mb-6 max-w-md leading-relaxed">
+                                        <p className="text-sm md:text-lg text-white/90 mb-6 max-w-md leading-relaxed">
                                             {slide.description}
                                         </p>
 
