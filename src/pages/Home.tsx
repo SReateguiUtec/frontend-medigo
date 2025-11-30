@@ -43,16 +43,16 @@ export const Home = () => {
             <EncryptedTextDemoSecond />
             <br></br>
             {!isAuthenticated && (
-              <div className="flex justify-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto sm:max-w-none">
                 <Link
                   to="/register"
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
+                  className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 sm:px-8 rounded-xl text-base sm:text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-blue-500/25 text-center"
                 >
                   Comenzar Ahora
                 </Link>
                 <Link
                   to="/login"
-                  className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition"
+                  className="w-full sm:w-auto bg-white text-blue-600 border-2 border-blue-600 px-6 py-3 sm:px-8 rounded-xl text-base sm:text-lg font-semibold hover:bg-blue-50 transition shadow-lg hover:shadow-blue-500/10 text-center"
                 >
                   Iniciar Sesión
                 </Link>
