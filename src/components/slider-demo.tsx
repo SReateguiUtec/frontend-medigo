@@ -18,7 +18,7 @@ const SLIDES = [
             'Especialistas en el diagnóstico y tratamiento de enfermedades del corazón y sistema cardiovascular. Atención integral para tu salud cardíaca.',
         services: ['Electrocardiograma', 'Ecocardiograma', 'Holter'],
         imageUrl:
-            'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?q=80&w=2487&auto=format&fit=crop',
+            '/cardiologo1.jpg',
     },
     {
         id: 'slide-2',
@@ -45,7 +45,7 @@ const SLIDES = [
             'Tratamiento de lesiones del sistema musculoesquelético, fracturas y problemas ortopédicos. Recuperación y rehabilitación integral.',
         services: ['Fracturas', 'Lesiones deportivas', 'Cirugía ortopédica'],
         imageUrl:
-            'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?q=80&w=2464&auto=format&fit=crop',
+            '/traumatologo.jpg',
     },
     {
         id: 'slide-5',
@@ -63,7 +63,7 @@ const SLIDES = [
             'Apoyo profesional para tu salud mental y bienestar emocional. Terapia personalizada para superar desafíos y mejorar tu calidad de vida.',
         services: ['Terapia individual', 'Terapia familiar', 'Manejo de ansiedad'],
         imageUrl:
-            '/psicologa.jpg',
+            '/psicologia.jpg',
     },
     {
         id: 'slide-cta',
@@ -85,7 +85,7 @@ export default function DemoOne() {
                     {SLIDES.map((slide) => (
                         <CardHoverReveal
                             key={slide.id}
-                            className="min-w-[70vw] md:min-w-[38vw] shadow-xl border xl:min-w-[30vw] rounded-xl"
+                            className="min-w-[70vw] md:min-w-[38vw] shadow-xl xl:min-w-[30vw] rounded-xl"
                         >
                             {slide.isCTA ? (
                                 <div className="size-full bg-linear-to-br from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden flex flex-col items-center justify-center p-6 md:p-8 text-center">
@@ -151,8 +151,7 @@ export default function DemoOne() {
                                                 {slide.services?.map((service) => (
                                                     <Badge
                                                         key={service}
-                                                        className="capitalize rounded-full"
-                                                        variant={'secondary'}
+                                                        className="capitalize rounded-full bg-white/20 text-white border-white/30 hover:bg-white/30"
                                                     >
                                                         {service}
                                                     </Badge>
