@@ -318,10 +318,6 @@ export const MedicalImageViewer = ({ image, onClose, canAnnotate = false }: Medi
         });
     };
 
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
     const handleReset = () => {
         setZoom(1);
         setRotation(0);
