@@ -60,8 +60,6 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
-        <LogoCarouselDemo />
-
         <AnimatedSection delay={100}>
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-light tracking-tight text-gray-800">
@@ -70,7 +68,8 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
-        <br></br>
+        <LogoCarouselDemo />
+
         <br></br>
 
         <AnimatedSection delay={400}>
@@ -99,6 +98,7 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
+        <br></br>
         <br></br>
         <br></br>
         <br></br>
