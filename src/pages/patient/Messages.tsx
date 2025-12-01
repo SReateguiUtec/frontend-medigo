@@ -5,6 +5,7 @@ import type { Conversation } from '../../types/message';
 import { MessageCircle, ArrowLeft, User, Clock, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { getImageUrl } from '../../utils/url.helper';
 
 export const Messages = () => {
     const navigate = useNavigate();
@@ -143,9 +144,7 @@ export const Messages = () => {
                                             <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100">
                                                 {conversation.profilePicture ? (
                                                     <img
-                                                        src={conversation.profilePicture.startsWith('http')
-                                                            ? conversation.profilePicture
-                                                            : `http://localhost:8080${conversation.profilePicture}`}
+                                                        src={getImageUrl(conversation.profilePicture)}
                                                         alt={conversation.userName}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {

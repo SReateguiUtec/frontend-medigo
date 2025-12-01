@@ -1,13 +1,16 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText, Activity, Home } from 'lucide-react';
+import { LogOut, Search, Calendar, User, MessageCircle, Clock, FileText, Activity, Home, Menu, X } from 'lucide-react';
+import { getImageUrl } from '../utils/url.helper';
+import { useState } from 'react';
 
 export const Sidebar = () => {
     const { user, logout } = useAuth();
     const { unreadCount, clearUnreadCount } = useNotification();
     const location = useLocation();
     const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -67,84 +70,108 @@ export const Sidebar = () => {
 
     const isActive = (path: string) => location.pathname === path;
 
+    const handleNavClick = (path: string) => {
+        if (path === '/messages') {
+            clearUnreadCount();
+        }
+        setIsOpen(false);
+    };
+
     return (
-        <div className="h-screen w-64 bg-gray-900 text-gray-100 flex flex-col fixed left-0 top-0">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-800">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                        <Activity className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-white">MediGO</h1>
-                        <p className="text-xs text-gray-400">Panel de Control</p>
+        <>
+            {/* Mobile Hamburger Button */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-900 text-white rounded-lg shadow-lg hover:bg-gray-800 transition-colors"
+                aria-label="Toggle menu"
+            >
+                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* Overlay for mobile */}
+            {isOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <div className={`h-screen w-64 bg-gray-900 text-gray-100 flex flex-col fixed left-0 top-0 z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                } md:translate-x-0`}>
+                {/* Header */}
+                <div className="p-6 border-b border-gray-800">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                            <Activity className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">MediGO</h1>
+                            <p className="text-xs text-gray-400">Panel de Control</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* User Info */}
-            <div className="p-6 border-b border-gray-800">
-                <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden">
-                        {user?.rutaFoto ? (
-                            <img
-                                src={user.rutaFoto.startsWith('http') ? user.rutaFoto : `http://localhost:8080${user.rutaFoto}`}
-                                alt="Profile"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            user?.nombres?.charAt(0) || user?.email?.charAt(0).toUpperCase()
-                        )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                            {user?.nombres || user?.email}
-                        </p>
-                        <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-600 text-white">
-                            {user?.rol}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                {navigationItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => {
-                            if (item.path === '/messages') {
-                                clearUnreadCount();
-                            }
-                        }}
-                        className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors relative ${isActive(item.path)
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                            }`}
-                    >
-                        <span className="text-xl">{item.icon}</span>
-                        <span className="font-medium">{item.name}</span>
-
-                        {item.path === '/messages' && unreadCount > 0 && (
-                            <span className="absolute right-4 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
-                                {unreadCount > 99 ? '99+' : unreadCount}
+                {/* User Info */}
+                <div className="p-6 border-b border-gray-800">
+                    <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+                            {user?.rutaFoto ? (
+                                <img
+                                    src={getImageUrl(user.rutaFoto)}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                user?.nombres?.charAt(0) || user?.email?.charAt(0).toUpperCase()
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">
+                                {user?.nombres || user?.email}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-600 text-white">
+                                {user?.rol}
                             </span>
-                        )}
-                    </Link>
-                ))}
-            </nav>
+                        </div>
+                    </div>
+                </div>
 
-            <div className="p-4 border-t border-gray-800">
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
-                >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium">Cerrar Sesión</span>
-                </button>
+                {/* Navigation */}
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                    {navigationItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => handleNavClick(item.path)}
+                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors relative ${isActive(item.path)
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                }`}
+                        >
+                            <span className="text-xl">{item.icon}</span>
+                            <span className="font-medium">{item.name}</span>
+
+                            {item.path === '/messages' && unreadCount > 0 && (
+                                <span className="absolute right-4 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
+                            )}
+                        </Link>
+                    ))}
+                </nav>
+
+                <div className="p-4 border-t border-gray-800">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
+                    >
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Cerrar Sesión</span>
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

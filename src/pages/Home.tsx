@@ -5,9 +5,8 @@ import { EncryptedTextDemoSecond } from '@/components/EncryptedTextDemoSecond';
 import Grid from '@/components/Grid';
 import InfiniteMovingCardsDemo from '@/components/infinite-moving-cards-demo';
 import { AnimatedSection } from '@/components/animated-section';
-import { Card, CardContent } from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Zap, PictureInPicture2, DollarSign, ShieldCheck } from 'lucide-react';
+import { MessageSquare, Zap, PictureInPicture2, DollarSign, ShieldCheck, Sparkles, MessageCircle } from 'lucide-react';
 import Timer from '@/components/ui/timer';
 import {
   Accordion,
@@ -22,7 +21,7 @@ export const Home = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50">
       <br></br>
       <br></br>
       <br></br>
@@ -32,7 +31,7 @@ export const Home = () => {
           <div className="text-center mb-16">
             <Badge
               variant="secondary"
-              className="mb-8 px-6 py-3 text-base bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md border-2 border-blue-600/30 shadow-lg shadow-blue-500/20 text-blue-900"
+              className="mb-8 px-6 py-3 text-base bg-linear-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md border-2 border-blue-600/30 shadow-lg shadow-blue-500/20 text-blue-900"
             >
               <span className="font-semibold flex items-center gap-2 justify-center">
                 <PictureInPicture2 className="h-4 w-4 animate-pulse" />
@@ -61,68 +60,30 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
+        <LogoCarouselDemo />
+
         <AnimatedSection delay={100}>
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-800">
-              La experiencia de muchos <br></br>
-              a tu servicio.
+            <h2 className="text-3xl md:text-4xl font-light tracking-tight text-gray-800">
+              La experiencia de muchos a <span className="font-semibold"> tu servicio.</span>
             </h2>
           </div>
         </AnimatedSection>
 
-        <LogoCarouselDemo />
-
-        <AnimatedSection delay={200}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-6xl mx-auto">
-            <Card className="border-2 border-blue-200/20 dark:border-blue-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-5 pb-5 text-center">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 mb-2">
-                  24/7
-                </div>
-                <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Disponibilidad Total
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-purple-200/20 dark:border-purple-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-purple-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-5 pb-5 text-center">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 mb-2">
-                  4.9/5
-                </div>
-                <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Calificación promedio de nuestros pacientes
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-indigo-200/20 dark:border-indigo-800/20 backdrop-blur-md bg-white/5 dark:bg-slate-900/5 hover:shadow-2xl hover:shadow-indigo-500/10 transform hover:-translate-y-2 transition-all duration-300">
-              <CardContent className="pt-5 pb-5 text-center">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-400 dark:to-indigo-600 mb-2">
-                  100%
-                </div>
-                <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Seguridad Garantizada
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </AnimatedSection>
-
         <br></br>
         <br></br>
-        <div className="max-w-7xl mx-auto">
-          <DemoOne />
-        </div>
+
         <AnimatedSection delay={400}>
           <div className="relative max-w-7xl mx-auto">
             {/* Subtle gradient glow effect behind the card */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
 
             {/* Glassmorphism card */}
             <div className="relative backdrop-blur-xl bg-white/10 border-2 border-blue-200/30 p-12 rounded-3xl text-center shadow-xl hover:shadow-2xl hover:border-blue-300/50 transition-all duration-300">
               <div className="flex justify-center mb-4">
                 <MessageSquare className="h-16 w-16 text-blue-600 animate-bounce" />
               </div>
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h2 className="text-4xl font-bold mb-4 bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 ¿Eres médico?
               </h2>
               <p className="text-xl mb-8 text-gray-700 max-w-2xl mx-auto">
@@ -130,7 +91,7 @@ export const Home = () => {
               </p>
               <Link
                 to="/register?role=MEDICO"
-                className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="inline-block bg-linear-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Registrarse como Médico
               </Link>
@@ -138,6 +99,31 @@ export const Home = () => {
           </div>
         </AnimatedSection>
 
+        <br></br>
+        <br></br>
+        <br></br>
+
+        <section id="servicios">
+          <AnimatedSection delay={200}>
+            <div className="text-center mb-8 mt-6">
+              <Badge variant="outline" className="mb-4">
+                Servicios
+              </Badge>
+              <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+                Estas son nuestras especialidades
+              </h3>
+            </div>
+          </AnimatedSection>
+        </section>
+
+        <br></br>
+        <br></br>
+        <div className="max-w-7xl mx-auto">
+          <DemoOne />
+        </div>
+
+        <br></br>
+        <br></br>
         <section id="beneficios">
           <AnimatedSection delay={400}>
             <Grid />
@@ -146,15 +132,13 @@ export const Home = () => {
 
         <br></br>
         <br></br>
-        <br></br>
-        <br></br>
 
         <AnimatedSection delay={600}>
           <div className="text-center mb-8">
             <Badge variant="outline" className="mb-4">
               Testimonios
             </Badge>
-            <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-800 mb-4">
+            <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
               Lo que dicen nuestros usuarios
             </h3>
             <InfiniteMovingCardsDemo />
@@ -169,7 +153,7 @@ export const Home = () => {
                 <Badge variant="outline" className="mb-4 border-black-500 text-black-600">
                   Pricing
                 </Badge>
-                <h3 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+                <h3 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">
                   Precios Transparentes
                 </h3>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -181,7 +165,7 @@ export const Home = () => {
                 {/* Main Pricing Card */}
                 <div className="relative">
                   {/* Animated gradient background */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur-2xl opacity-20 animate-pulse"></div>
+                  <div className="absolute inset-0 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur-2xl opacity-20 animate-pulse"></div>
 
                   <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-12 border border-blue-100 shadow-2xl">
                     <div className="text-center mb-8">
@@ -192,7 +176,7 @@ export const Home = () => {
                           target={5}
                           duration={4}
                           suffix="%"
-                          className="relative text-8xl md:text-9xl font-black bg-gradient-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+                          className="relative text-8xl md:text-9xl font-black bg-linear-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent"
                         />
                       </div>
                       <h4 className="text-3xl font-bold text-gray-900 mb-3">
@@ -205,31 +189,28 @@ export const Home = () => {
 
                     {/* Grid */}
                     <div className="grid md:grid-cols-3 gap-4 mt-8">
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 hover:shadow-lg transition-shadow">
+                      <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 hover:shadow-lg transition-shadow">
                         <div className="text-center">
-                          <p className="text-sm text-blue-600 font-semibold mb-2">Consulta Básica</p>
                           <p className="text-3xl font-bold text-gray-900 mb-1">S/100</p>
-                          <div className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent my-3"></div>
+                          <div className="h-px bg-linear-to-r from-transparent via-blue-300 to-transparent my-3"></div>
                           <p className="text-sm text-gray-500">Comisión</p>
                           <p className="text-2xl font-bold text-blue-600">S/5</p>
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200 hover:shadow-lg transition-shadow transform md:scale-105">
+                      <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200 hover:shadow-lg transition-shadow transform md:scale-105">
                         <div className="text-center">
-                          <p className="text-sm text-indigo-600 font-semibold mb-2">Consulta Estándar</p>
                           <p className="text-3xl font-bold text-gray-900 mb-1">S/150</p>
-                          <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-transparent my-3"></div>
+                          <div className="h-px bg-linear-to-r from-transparent via-indigo-300 to-transparent my-3"></div>
                           <p className="text-sm text-gray-500">Comisión</p>
                           <p className="text-2xl font-bold text-indigo-600">S/7.50</p>
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 hover:shadow-lg transition-shadow">
+                      <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 hover:shadow-lg transition-shadow">
                         <div className="text-center">
-                          <p className="text-sm text-purple-600 font-semibold mb-2">Consulta Premium</p>
                           <p className="text-3xl font-bold text-gray-900 mb-1">S/200</p>
-                          <div className="h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent my-3"></div>
+                          <div className="h-px bg-linear-to-r from-transparent via-purple-300 to-transparent my-3"></div>
                           <p className="text-sm text-gray-500">Comisión</p>
                           <p className="text-2xl font-bold text-purple-600">S/10</p>
                         </div>
@@ -266,6 +247,50 @@ export const Home = () => {
           </AnimatedSection>
         </section>
 
+        {/* ALMA Section */}
+        <section className="container mx-auto px-4 py-20">
+          <AnimatedSection delay={500}>
+            {/* Section Title */}
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="mb-4">
+                Inteligencia Artificial
+              </Badge>
+              <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+                Tu alma también es importante
+              </h3>
+            </div>
+
+            <div className="max-w-3xl mx-auto">
+
+              {/* Feature Badges */}
+              <div className="flex flex-wrap gap-4 justify-center mb-12">
+                <div className="px-6 py-3 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-full border border-blue-200 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-700">IA potenciada por Gemini</span>
+                </div>
+                <div className="px-6 py-3 bg-linear-to-r from-indigo-500/10 to-purple-500/10 rounded-full border border-indigo-200 flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-indigo-600" />
+                  <span className="text-sm font-semibold text-indigo-700">Asistencia 24/7</span>
+                </div>
+                <div className="px-6 py-3 bg-linear-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-200 flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-purple-600" />
+                  <span className="text-sm font-semibold text-purple-700">Respuestas Instantáneas</span>
+                </div>
+              </div>
+
+              {/* Description Text */}
+              <div className="text-center space-y-3">
+                <p className="text-xl md:text-2xl text-gray-700 font-medium">
+                  Por cierto, te presentamos a <span className="font-bold text-indigo-600">A.L.M.A</span>
+                </p>
+                <p className="text-lg md:text-xl text-gray-600">
+                  <strong className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-600">Asistente en Línea de Médica Avanzada.</strong>
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
+        </section>
+
         {/* FAQ Section */}
         <section id="faq" className="container mx-auto px-4 py-15">
           <AnimatedSection delay={500}>
@@ -273,7 +298,7 @@ export const Home = () => {
               <Badge variant="outline" className="mb-4">
                 FAQ
               </Badge>
-              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-800 mb-4">
+              <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
                 Preguntas Frecuentes
               </h3>
             </div>
@@ -329,8 +354,8 @@ export const Home = () => {
               </AccordionItem>
             </Accordion>
           </AnimatedSection>
-        </section>
-      </div>
+        </section >
+      </div >
 
       <br></br>
       <br></br>
@@ -339,6 +364,6 @@ export const Home = () => {
       <AnimatedSection delay={200}>
         <LampDemo />
       </AnimatedSection>
-    </div>
+    </div >
   );
 };

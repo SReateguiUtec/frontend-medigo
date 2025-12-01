@@ -18,6 +18,7 @@ export function NavbarDemo() {
     const navItems = [
         // for non-authenticated users
         ...(!isAuthenticated ? [
+            { name: "Servicios", link: "/#servicios" },
             { name: "Beneficios", link: "/#beneficios" },
             { name: "Testimonios", link: "/#testimonios" },
             { name: "Pricing", link: "/#pricing" },
@@ -58,7 +59,7 @@ export function NavbarDemo() {
                                             const id = item.link.replace('/#', '');
                                             document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
                                         }}
-                                        className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                                        className="text-base font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
                                     >
                                         {item.name}
                                     </a>
@@ -66,7 +67,7 @@ export function NavbarDemo() {
                                     <Link
                                         key={idx}
                                         to={item.link}
-                                        className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                                        className="text-base font-medium text-gray-600 hover:text-gray-900 transition-colors"
                                     >
                                         {item.name}
                                     </Link>
@@ -131,7 +132,7 @@ export function NavbarDemo() {
                                                 document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
                                                 setIsMobileMenuOpen(false);
                                             }}
-                                            className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-white/40 py-2.5 px-4 rounded-lg transition-all cursor-pointer"
+                                            className="text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-white/40 py-2.5 px-4 rounded-lg transition-all cursor-pointer"
                                         >
                                             {item.name}
                                         </a>
@@ -140,7 +141,7 @@ export function NavbarDemo() {
                                             key={idx}
                                             to={item.link}
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-white/40 py-2.5 px-4 rounded-lg transition-all"
+                                            className="text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-white/40 py-2.5 px-4 rounded-lg transition-all"
                                         >
                                             {item.name}
                                         </Link>

@@ -9,8 +9,8 @@ export const AuthenticatedLayout = ({ children, noPadding = false }: Authenticat
     return (
         <div className="flex h-screen bg-gray-50">
             <Sidebar />
-            <main className="flex-1 ml-64 overflow-y-auto">
-                <div className={noPadding ? 'h-full' : 'p-8'}>
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto transition-all duration-300">
+                <div className={noPadding ? 'h-full' : 'p-4 md:p-8'}>
                     {children}
                 </div>
             </main>

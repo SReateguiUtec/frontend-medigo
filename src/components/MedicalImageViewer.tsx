@@ -38,7 +38,7 @@ export const MedicalImageViewer = ({ image, onClose, canAnnotate = false }: Medi
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showControls, setShowControls] = useState(true);
 
-    // Annotation state
+
     const [currentTool, setCurrentTool] = useState<AnnotationTool>('none');
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [currentAnnotation, setCurrentAnnotation] = useState<Annotation | null>(null);

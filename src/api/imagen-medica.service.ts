@@ -1,6 +1,5 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/imagenes-medicas';
+import apiClient from './axios.config';
+import { getBackendBaseUrl } from '../utils/url.helper';
 
 export interface ImagenMedica {
     id: number;
@@ -24,67 +23,51 @@ export const imagenMedicaService = {
             formData.append('description', description);
         }
 
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.post(`${API_URL}/upload`, formData, {
+        const response = await apiClient.post('/imagenes-medicas/upload', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'multipart/form-data'
             }
         });
         return response.data;
     },
 
     getImageUrl: async (id: number): Promise<string> => {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`${API_URL}/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+        const response = await apiClient.get(`/imagenes-medicas/${id}`, {
             responseType: 'blob'
         });
         return URL.createObjectURL(response.data);
     },
 
     getImageMetadata: async (id: number): Promise<ImagenMedica> => {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`${API_URL}/metadata/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await apiClient.get(`/imagenes-medicas/metadata/${id}`);
         return response.data;
     },
 
     getImagesByHistorial: async (historialId: number): Promise<ImagenMedica[]> => {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`${API_URL}/historial/${historialId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await apiClient.get(`/imagenes-medicas/historial/${historialId}`);
         return response.data;
     },
 
     updateAnnotations: async (id: number, annotations: string): Promise<ImagenMedica> => {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.put(`${API_URL}/${id}/annotations`,
-            { annotations },
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }
+        const response = await apiClient.put(`/imagenes-medicas/${id}/annotations`,
+            { annotations }
         );
         return response.data;
     },
 
     deleteImage: async (id: number): Promise<void> => {
-        const token = localStorage.getItem('accessToken');
-        await axios.delete(`${API_URL}/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        await apiClient.delete(`/imagenes-medicas/${id}`);
+    },
+
+    /**
+     * Construye la URL completa de una imagen médica
+     */
+    buildImageUrl: (filePath: string): string => {
+        if (!filePath) return '';
+        if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+            return filePath;
+        }
+        const path = filePath.startsWith('/') ? filePath : `/${filePath}`;
+        return `${getBackendBaseUrl()}${path}`;
     }
 };

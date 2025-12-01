@@ -147,8 +147,8 @@ export const DoctorProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-teal-50 pt-24 pb-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-linear-to-br from-emerald-50 via-white to-teal-50 rounded-3xl">
+      <div className="max-w-4xl mx-auto p-4 md:p-6">
         {/* Header Card with Avatar */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
           <div className="h-32 bg-linear-to-r from-emerald-500 via-teal-600 to-cyan-600 relative">
@@ -417,7 +417,11 @@ export const DoctorProfile = () => {
                     value={formData.dni}
                     onChange={handleChange}
                     maxLength={8}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    disabled={!!profile?.dni}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none transition-all ${profile?.dni
+                      ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'
+                      : 'border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
+                      }`}
                     placeholder="12345678"
                   />
                 </div>
@@ -431,7 +435,11 @@ export const DoctorProfile = () => {
                     name="numeroColegiado"
                     value={formData.numeroColegiado}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    disabled={!!profile?.numeroColegiado}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none transition-all ${profile?.numeroColegiado
+                      ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'
+                      : 'border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
+                      }`}
                     placeholder="CMP-12345"
                   />
                 </div>

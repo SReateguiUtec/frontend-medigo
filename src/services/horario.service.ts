@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '../api/axios.config';
 
 export interface HorarioMedico {
     id: number;
@@ -21,47 +21,31 @@ export interface SlotDisponible {
     disponible: boolean;
 }
 
-const API_URL = '/api/medicos';
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('accessToken');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
 export const horarioService = {
     // Obtener horarios de un médico
     getHorarios: async (medicoId: number): Promise<HorarioMedico[]> => {
-        const response = await axios.get(`${API_URL}/${medicoId}/horarios`, {
-            headers: getAuthHeaders()
-        });
+        const response = await apiClient.get(`/medicos/${medicoId}/horarios`);
         return response.data;
     },
 
     // Crear nuevo horario
     createHorario: async (medicoId: number, horario: CreateHorarioRequest): Promise<HorarioMedico> => {
-        const response = await axios.post(
-            `${API_URL}/${medicoId}/horarios`,
-            horario,
-            {
-                headers: getAuthHeaders()
-            }
+        const response = await apiClient.post(
+            `/medicos/${medicoId}/horarios`,
+            horario
         );
         return response.data;
     },
 
     // Eliminar horario
     deleteHorario: async (medicoId: number, horarioId: number): Promise<void> => {
-        await axios.delete(`${API_URL}/${medicoId}/horarios/${horarioId}`, {
-            headers: getAuthHeaders()
-        });
+        await apiClient.delete(`/medicos/${medicoId}/horarios/${horarioId}`);
     },
 
     // Obtener slots disponibles para una fecha
     getSlotsDisponibles: async (medicoId: number, fecha: string): Promise<SlotDisponible[]> => {
-        const response = await axios.get(`${API_URL}/${medicoId}/slots-disponibles`, {
-            params: { fecha },
-            headers: getAuthHeaders()
+        const response = await apiClient.get(`/medicos/${medicoId}/slots-disponibles`, {
+            params: { fecha }
         });
         return response.data;
     }

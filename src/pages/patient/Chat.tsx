@@ -7,6 +7,7 @@ import { ArrowLeft, Send, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { ErrorModal } from '../../components/ErrorModal';
+import { getImageUrl } from '../../utils/url.helper';
 
 export const Chat = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -31,7 +32,6 @@ export const Chat = () => {
 
         try {
             await messageService.deleteConversation(Number(userId));
-            // Navigate back to messages list
             navigate('/messages');
         } catch (err) {
             console.error('Error deleting conversation:', err);
@@ -186,9 +186,7 @@ export const Chat = () => {
                         {otherUserProfilePicture ? (
                             <>
                                 <img
-                                    src={otherUserProfilePicture.startsWith('http')
-                                        ? otherUserProfilePicture
-                                        : `http://localhost:8080${otherUserProfilePicture}`}
+                                    src={getImageUrl(otherUserProfilePicture)}
                                     alt={otherUserName}
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
