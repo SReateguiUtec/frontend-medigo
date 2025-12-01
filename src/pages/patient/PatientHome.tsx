@@ -152,14 +152,9 @@ export const PatientHome = () => {
             icon: FileText,
             path: '/patient/historial-medico',
             color: 'emerald'
-        },
-        {
-            title: 'Mis Recetas',
-            icon: Pill,
-            path: '/patient/prescriptions',
-            color: 'orange'
         }
     ];
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -210,43 +205,53 @@ export const PatientHome = () => {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Health Dashboard */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Heart className="w-5 h-5 text-red-500" />
-                                <h2 className="text-xl font-bold text-gray-900">Dashboard de Salud</h2>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {healthMetrics.map((metric, index) => (
-                                    <Card key={index} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                        <CardContent className="pt-5 pb-5">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${metric.label === 'Presión Arterial' ? 'bg-red-50' :
-                                                    metric.label === 'Peso' ? 'bg-blue-50' :
-                                                        metric.label === 'Glucosa' ? 'bg-purple-50' :
-                                                            'bg-orange-50'
-                                                    }`}>
-                                                    <metric.icon className={`w-6 h-6 ${metric.label === 'Presión Arterial' ? 'text-red-600' :
-                                                        metric.label === 'Peso' ? 'text-blue-600' :
-                                                            metric.label === 'Glucosa' ? 'text-purple-600' :
-                                                                'text-orange-600'
-                                                        }`} />
+                        <Card className="bg-white border border-gray-200 shadow-sm">
+                            <CardContent className="pt-6 pb-6">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <Heart className="w-5 h-5 text-red-500" />
+                                    <h2 className="text-xl font-bold text-gray-900">Dashboard de Salud</h2>
+                                </div>
+                                <div className="space-y-4">
+                                    {healthMetrics.map((metric, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                                        >
+                                            {/* Icon */}
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${metric.label === 'Presión Arterial' ? 'bg-red-100' :
+                                                metric.label === 'Peso' ? 'bg-blue-100' :
+                                                    metric.label === 'Glucosa' ? 'bg-purple-100' :
+                                                        'bg-orange-100'
+                                                }`}>
+                                                <metric.icon className={`w-6 h-6 ${metric.label === 'Presión Arterial' ? 'text-red-600' :
+                                                    metric.label === 'Peso' ? 'text-blue-600' :
+                                                        metric.label === 'Glucosa' ? 'text-purple-600' :
+                                                            'text-orange-600'
+                                                    }`} />
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-gray-900 mb-1">{metric.label}</p>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
+                                                    <span className="text-sm text-gray-500">{metric.unit}</span>
                                                 </div>
+                                            </div>
+
+                                            {/* Status and Change */}
+                                            <div className="flex flex-col items-end gap-2 shrink-0">
                                                 <span className="text-xs text-gray-500">{metric.change}</span>
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">
+                                                    <CheckCircle className="w-3 h-3" />
+                                                    {metric.status}
+                                                </span>
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-2">{metric.label}</p>
-                                            <div className="flex items-baseline gap-2 mb-2">
-                                                <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
-                                                <span className="text-sm text-gray-500">{metric.unit}</span>
-                                            </div>
-                                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">
-                                                <CheckCircle className="w-3 h-3" />
-                                                {metric.status}
-                                            </span>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Quick Actions */}
                         <div>

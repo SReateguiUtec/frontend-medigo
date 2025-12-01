@@ -168,7 +168,7 @@ export const PatientMedicalHistory = () => {
                                     )}
                                 </div>
 
-                                {/* Footer with creation date and edit button */}
+                                {/* Footer with creation date and action buttons */}
                                 <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
                                     <p className="text-sm text-gray-500">
                                         Registro creado el {new Date(historial.createdAt).toLocaleDateString('es-ES', {
@@ -179,13 +179,22 @@ export const PatientMedicalHistory = () => {
                                             minute: '2-digit'
                                         })}
                                     </p>
-                                    <button
-                                        onClick={() => handleEditRecord(historial)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        Editar
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => navigate(`/doctor/historial-medico/${historial.id}`)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-blue-600 text-white rounded-lg hover:from-emerald-700 hover:to-blue-700 transition-all text-sm font-medium shadow-md hover:shadow-lg"
+                                        >
+                                            <FileText className="w-4 h-4" />
+                                            Ver Imágenes Médicas
+                                        </button>
+                                        <button
+                                            onClick={() => handleEditRecord(historial)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                            Editar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}

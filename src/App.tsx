@@ -9,9 +9,9 @@ import { SearchDoctors } from './pages/patient/SearchDoctors';
 import { DoctorPublicProfile } from './pages/patient/DoctorPublicProfile';
 import { MyAppointments } from './pages/patient/MyAppointments';
 import { MyMedicalHistory } from './pages/patient/MyMedicalHistory';
+import { HistorialMedicoPage } from './pages/patient/HistorialMedicoPage';
 import { PatientProfile } from './pages/patient/Profile';
 import { MedicalChatPage } from './pages/patient/MedicalChatPage';
-import { PrescriptionsPage } from './pages/patient/PrescriptionsPage';
 import { Messages } from './pages/patient/Messages';
 import { Chat } from './pages/patient/Chat';
 import { Appointments } from './pages/doctor/Appointments';
@@ -122,21 +122,21 @@ function AppContent() {
           }
         />
         <Route
-          path="/patient/ai-chat"
+          path="/patient/historial-medico/:id"
           element={
             <ProtectedRoute>
-              <AuthenticatedLayout noPadding>
-                <MedicalChatPage />
+              <AuthenticatedLayout>
+                <HistorialMedicoPage />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/patient/prescriptions"
+          path="/patient/ai-chat"
           element={
             <ProtectedRoute>
-              <AuthenticatedLayout>
-                <PrescriptionsPage />
+              <AuthenticatedLayout noPadding>
+                <MedicalChatPage />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }
@@ -167,6 +167,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout>
                 <PatientMedicalHistory />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/historial-medico/:id"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <HistorialMedicoPage />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

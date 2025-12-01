@@ -322,6 +322,17 @@ export const MyMedicalHistory = () => {
                                                 </p>
                                             </div>
                                         )}
+
+                                        {/* Ver Detalles Button */}
+                                        <div className="pt-4 border-t border-gray-100">
+                                            <button
+                                                onClick={() => navigate(`/patient/historial-medico/${historial.id}`)}
+                                                className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-blue-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                            >
+                                                <FileText className="w-5 h-5" />
+                                                Ver Detalles e Imágenes Médicas
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
