@@ -26,7 +26,6 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     const [success, setSuccess] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<SlotDisponible[]>([]);
 
-    // Fetch available slots when date is selected
     useEffect(() => {
         const fetchAvailableSlots = async () => {
             if (!selectedDate || !doctor.id) return;
@@ -35,14 +34,12 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 setSlotsLoading(true);
                 setError('');
 
-                // Validate date format (should be YYYY-MM-DD)
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateRegex.test(selectedDate)) {
                     throw new Error('Formato de fecha inválido');
                 }
 
                 const slots = await horarioService.getSlotsDisponibles(doctor.id, selectedDate);
-                // Show only available slots that are in the future
                 setAvailableSlots(slots.filter(slot => slot.disponible && isFutureSlot(slot.fechaHora)));
             } catch (err: any) {
                 console.error('Error fetching available slots:', err);

@@ -4,7 +4,7 @@ import { citaService } from '../../api/cita.service';
 import { useVideoCall } from '../../hooks/useVideoCall';
 import { ErrorModal } from '../../components/ErrorModal';
 import type { Cita } from '../../types';
-import { Calendar, Video, DollarSign, AlertCircle, CheckCircle, XCircle, ArrowLeft, Stethoscope } from 'lucide-react';
+import { Calendar, Video, DollarSign, AlertCircle, CheckCircle, XCircle, ArrowLeft, Stethoscope, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { PaymentButton } from '../../components/PaymentButton';
 
@@ -16,7 +16,8 @@ export const MyAppointments = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
-    const [joiningCallId, setJoiningCallId] = useState<number | null>(null); // Estado para tracking de loading por cita
+    const [joiningCallId, setJoiningCallId] = useState<number | null>(null);
+    const [earlyJoinMessage, setEarlyJoinMessage] = useState<string>(''); // Estado para tracking de loading por cita
 
     useEffect(() => {
         loadAppointments();
@@ -60,20 +61,25 @@ export const MyAppointments = () => {
             const now = new Date();
             const fifteenMinutes = 15 * 60 * 1000;
 
-            // Checkear si se trata de unir antes
+            // Check if trying to join too early
             if (now.getTime() < (aptDate.getTime() - fifteenMinutes)) {
                 const timeUntil = Math.ceil((aptDate.getTime() - now.getTime()) / (60 * 1000));
-                alert(`La sala estará disponible 15 minutos antes de la hora agendada.\n\nTiempo restante: ${timeUntil} minutos`);
+                setEarlyJoinMessage(`La sala estará disponible 15 minutos antes de la hora agendada.\n\nTiempo restante: ${timeUntil} minutos`);
                 return;
             }
         }
 
-        setJoiningCallId(citaId); // Marcar esta cita como "cargando"
+        setJoiningCallId(citaId);
         const result = await joinVideoCall(citaId);
-        setJoiningCallId(null); // Quitar el loading
+        setJoiningCallId(null);
 
         if (!result.success) {
-            setError(result.message);
+            // Si el error es por tiempo, mostrar mensaje amigable
+            if (result.message.includes('sala de video') || result.message.includes('cita ID')) {
+                setEarlyJoinMessage('La sala estará disponible a la hora agendada. Por favor intenta nuevamente en unos minutos.');
+            } else {
+                setError(result.message);
+            }
         }
     };
 
@@ -372,6 +378,27 @@ export const MyAppointments = () => {
                 onClose={() => setError('')}
                 message={error}
             />
+
+            {/* Early Join Info Modal */}
+            {earlyJoinMessage && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-blue-100 animate-in fade-in zoom-in duration-200">
+                        <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Clock className="w-10 h-10 text-blue-500" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">Un momento...</h2>
+                        <p className="text-gray-600 mb-8 whitespace-pre-line leading-relaxed">
+                            {earlyJoinMessage}
+                        </p>
+                        <button
+                            onClick={() => setEarlyJoinMessage('')}
+                            className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 font-semibold"
+                        >
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
