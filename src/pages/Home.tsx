@@ -80,7 +80,7 @@ export const Home = () => {
             {/* Glassmorphism card */}
             <div className="relative backdrop-blur-xl bg-white/10 border-2 border-blue-200/30 p-12 rounded-3xl text-center shadow-xl hover:shadow-2xl hover:border-blue-300/50 transition-all duration-300">
               <div className="flex justify-center mb-4">
-                <MessageSquare className="h-16 w-16 text-blue-600 animate-bounce" />
+                <MessageSquare className="h-16 w-16 text-blue-600 animate-[bounce_2s_ease-in-out_infinite]" />
               </div>
               <h2 className="text-4xl font-bold mb-4 bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 ¿Eres médico?

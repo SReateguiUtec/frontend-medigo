@@ -50,16 +50,6 @@ export const MyAppointments = () => {
         }
     };
 
-    const handleCancelAppointment = async (citaId: number) => {
-        try {
-            await citaService.cancelCita(citaId);
-            // Recargar las citas después de cancelar
-            loadAppointments();
-        } catch (err: any) {
-            console.error('Error cancelling appointment:', err);
-            setError(err.response?.data?.message || 'Error al cancelar la cita');
-        }
-    };
 
     // Función para unirse a la videollamada
     const handleJoinVideoCall = async (citaId: number) => {
@@ -165,11 +155,6 @@ export const MyAppointments = () => {
             return new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime();
         });
 
-    const canCancel = (appointment: Cita) => {
-        const aptDate = new Date(appointment.fechaHora);
-        const now = new Date();
-        return aptDate > now && (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA');
-    };
 
     // Verificar si es hora de la cita (15 minutos antes hasta 1 hora después)
     const isTimeForAppointment = (appointment: Cita) => {
@@ -370,16 +355,6 @@ export const MyAppointments = () => {
                                                 >
                                                     <Video className="w-4 h-4" />
                                                     {joiningCallId === appointment.id ? 'Conectando...' : 'Unirse ahora'}
-                                                </button>
-                                            )}
-
-                                            {canCancel(appointment) && (
-                                                <button
-                                                    onClick={() => handleCancelAppointment(appointment.id)}
-                                                    className="flex-1 lg:flex-none w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all text-sm font-medium"
-                                                >
-                                                    <XCircle className="w-4 h-4" />
-                                                    Cancelar
                                                 </button>
                                             )}
                                         </div>
