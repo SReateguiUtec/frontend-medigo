@@ -79,7 +79,6 @@ export const Sidebar = () => {
 
     return (
         <>
-            {/* Mobile Hamburger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-900 text-white rounded-lg shadow-lg hover:bg-gray-800 transition-colors"
@@ -88,15 +87,13 @@ export const Sidebar = () => {
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Overlay removed - sidebar is full width on mobile */}
-
             {/* Sidebar */}
             <div className={`h-screen w-full md:w-64 bg-gray-900 text-gray-100 flex flex-col fixed left-0 top-0 z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 } md:translate-x-0`}>
                 {/* Header */}
                 <div className="p-6 border-b border-gray-800">
-                    <div className="flex items-center gap-3">
-                        <div className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-2">
+                        <div className="w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden">
                             <img
                                 src="/logo-blanco.png"
                                 alt="MediGO Logo"

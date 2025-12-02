@@ -136,23 +136,21 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
         return 'No especificada';
     };
 
-    // Format time from datetime string using Peru timezone
     const formatTime = (dateTimeString: string) => {
-        const date = new Date(dateTimeString);
+        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
+        const date = new Date(cleanDateString);
         return date.toLocaleTimeString('es-PE', {
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: 'America/Lima',
             hour12: false
         });
     };
 
-    // Check if a time slot is in the future (using Peru timezone)
-    const isFutureSlot = (slotDateTime: string) => {
-        const slotDate = new Date(slotDateTime);
-        // Get current time in Peru timezone
-        const nowInPeru = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Lima' }));
-        return slotDate > nowInPeru;
+    const isFutureSlot = (dateTimeString: string) => {
+        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
+        const slotDate = new Date(cleanDateString);
+        const now = new Date();
+        return slotDate > now;
     };
 
     return (
@@ -179,9 +177,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                     <p className="text-white/90">Con {doctor.nombres} {doctor.apellidos}</p>
                 </div>
 
-                {/* Content */}
                 <div className="p-8">
-                    {/* Success Message */}
                     {success && (
                         <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 flex items-start gap-4 animate-in fade-in slide-in-from-top-2">
                             <div className="bg-green-500 rounded-full p-2">
@@ -196,7 +192,6 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                         </div>
                     )}
 
-                    {/* Error Message */}
                     {error && (
                         <div className="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-2xl p-6 flex items-start gap-4">
                             <div className="bg-red-500 rounded-full p-2">
@@ -209,7 +204,6 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                         </div>
                     )}
 
-                    {/* Doctor Info Card */}
                     <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 mb-8">
                         <div className="flex items-start gap-4">
                             <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-3">
