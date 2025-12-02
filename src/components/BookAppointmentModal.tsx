@@ -81,8 +81,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 return;
             }
 
-            // Send datetime as-is (backend expects Peru local time in format YYYY-MM-DDTHH:mm:ss)
-            const fechaHora = dateTimeString;
+            // Send datetime with Peru timezone offset (backend expects ISO format with timezone)
+            const fechaHora = `${dateTimeString}-05:00`;
 
             // Crear cita pendiente (sin pagar)
             const cita = await citaService.createCita({
