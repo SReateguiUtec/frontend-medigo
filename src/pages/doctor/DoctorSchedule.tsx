@@ -111,6 +111,18 @@ export default function DoctorSchedule() {
     const handleAddHorario = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Validate that end time is after start time
+        const [startHour, startMinute] = newHorario.horaInicio.split(':').map(Number);
+        const [endHour, endMinute] = newHorario.horaFin.split(':').map(Number);
+
+        const startTimeInMinutes = startHour * 60 + startMinute;
+        const endTimeInMinutes = endHour * 60 + endMinute;
+
+        if (endTimeInMinutes <= startTimeInMinutes) {
+            setError('La hora de fin debe ser posterior a la hora de inicio');
+            return;
+        }
+
         try {
             setSaving(true);
             setError(null);

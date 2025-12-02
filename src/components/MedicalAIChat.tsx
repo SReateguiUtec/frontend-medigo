@@ -152,7 +152,7 @@ export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
                             <Bot className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg">MediGIA</h3>
+                            <h3 className="font-bold text-lg">Alma</h3>
                             <p className="text-sm text-white/80">Pregunta sobre tu historial</p>
                         </div>
                     </div>
@@ -184,7 +184,7 @@ export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
                 {messages.length === 0 && (
                     <div className="text-center text-gray-500 mt-8">
                         <Bot className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                        <p className="text-lg font-medium">¡Hola! Soy tu asistente médico</p>
+                        <p className="text-lg font-medium">¡Hola! Soy Alma, tu asistente médico</p>
                         <p className="text-sm mt-2">Pregúntame sobre tu historial médico</p>
                         <div className="mt-6 space-y-2 text-left max-w-md mx-auto">
                             <p className="text-sm text-gray-600">Ejemplos de preguntas:</p>

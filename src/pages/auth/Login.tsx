@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Heart, Bell, Zap, Activity, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Heart, Bell, Zap, Eye, EyeOff } from 'lucide-react';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -69,8 +69,8 @@ export const Login = () => {
           </Link>
 
           <div className="mb-12">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-              <Activity className="w-8 h-8" />
+            <div className="w-40 h-32 rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
+              <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-5xl font-bold mb-4">
               Bienvenido a MediGO
@@ -96,9 +96,8 @@ export const Login = () => {
         </div>
       </div>
 
-      {/* Right Panel - Dark Form */}
-      <div className="w-full lg:w-1/2 bg-gray-950 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-lg">
           {/* Mobile back button */}
           <Link to="/" className="lg:hidden inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8">
             <ArrowLeft className="w-5 h-5" />
@@ -106,12 +105,11 @@ export const Login = () => {
           </Link>
 
           {/* Logo for mobile */}
-          <div className="lg:hidden mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Heart className="w-6 h-6 text-white" />
+          <div className="lg:hidden mb-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-64 h-52 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
               </div>
-              <span className="text-2xl font-bold text-white">MediGO</span>
             </div>
           </div>
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
 import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown } from 'lucide-react';
 import { Listbox, Transition } from '@headlessui/react';
+import { AnimatedImage } from '../../components/AnimatedImage';
 
 // Doctores de demostración
 const showcaseDoctors = [
@@ -482,16 +483,13 @@ export const SearchDoctors = () => {
                 className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) ? 'cursor-pointer transform hover:-translate-y-1' : ''}`}
               >
                 {/* Doctor Image */}
-                <div className="relative h-48 bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <div className="relative h-48 bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center overflow-hidden">
                   {doctor.rutaFoto ? (
-                    <img
+                    <AnimatedImage
                       src={doctor.rutaFoto}
                       alt={`${doctor.nombres} ${doctor.apellidos}`}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement!.innerHTML = '<div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center"><svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                      }}
+                      fallbackSrc=""
                     />
                   ) : (
                     <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">

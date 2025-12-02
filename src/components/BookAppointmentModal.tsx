@@ -71,32 +71,18 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             }
 
             const dateTimeString = `${selectedDate}T${selectedTime}:00`;
-            const appointmentDate = new Date(dateTimeString);
-
-            // Verificar que la fecha no sea en el pasado
-            const now = new Date();
+            const appointmentDate = new Date(dateTimeString + '-05:00');
+            const nowInPeru = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Lima' }));
 
             // Validar que la fecha/hora seleccionada sea futura
-            if (appointmentDate < now) {
+            if (appointmentDate < nowInPeru) {
                 setError('La fecha y hora deben ser en el futuro');
                 setLoading(false);
                 return;
             }
 
-            // Formatear la fecha con el offset de zona horaria para enviar al backend
-            const pad = (n: number) => n < 10 ? '0' + n : n;
-            const timezoneOffset = appointmentDate.getTimezoneOffset();
-            const sign = timezoneOffset > 0 ? '-' : '+';
-            const offsetHours = pad(Math.floor(Math.abs(timezoneOffset) / 60));
-            const offsetMinutes = pad(Math.abs(timezoneOffset) % 60);
-
-            const fechaHora = appointmentDate.getFullYear() + '-' +
-                pad(appointmentDate.getMonth() + 1) + '-' +
-                pad(appointmentDate.getDate()) + 'T' +
-                pad(appointmentDate.getHours()) + ':' +
-                pad(appointmentDate.getMinutes()) + ':' +
-                pad(appointmentDate.getSeconds()) +
-                sign + offsetHours + ':' + offsetMinutes;
+            // Send to backend in ISO format with Peru timezone offset
+            const fechaHora = appointmentDate.toISOString().replace('Z', '-05:00');
 
             // Crear cita pendiente (sin pagar)
             const cita = await citaService.createCita({
@@ -150,17 +136,23 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
         return 'No especificada';
     };
 
-    // Format time from datetime string
+    // Format time from datetime string using Peru timezone
     const formatTime = (dateTimeString: string) => {
         const date = new Date(dateTimeString);
-        return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('es-PE', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/Lima',
+            hour12: false
+        });
     };
 
-    // Check if a time slot is in the future
+    // Check if a time slot is in the future (using Peru timezone)
     const isFutureSlot = (slotDateTime: string) => {
         const slotDate = new Date(slotDateTime);
-        const now = new Date();
-        return slotDate > now;
+        // Get current time in Peru timezone
+        const nowInPeru = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Lima' }));
+        return slotDate > nowInPeru;
     };
 
     return (
