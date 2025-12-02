@@ -5,9 +5,10 @@ import { useAuth } from '../../context/AuthContext';
 import type { HistorialMedico } from '../../types';
 import {
     ArrowLeft, FileText, Calendar, Stethoscope, Pill, ClipboardList,
-    Activity, TrendingUp, Search, Filter, Clock
+    Activity, TrendingUp, Search, Filter, Clock, Check, ChevronDown
 } from 'lucide-react';
 import { MedicalAIChat } from '../../components/MedicalAIChat';
+import { Listbox, Transition } from '@headlessui/react';
 
 export const MyMedicalHistory = () => {
     const navigate = useNavigate();
@@ -209,18 +210,51 @@ export const MyMedicalHistory = () => {
                                     />
                                 </div>
                                 <div className="relative sm:w-48">
-                                    <Filter className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
-                                    <select
-                                        value={selectedYear}
-                                        onChange={(e) => setSelectedYear(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all appearance-none bg-white"
-                                    >
-                                        {availableYears.map(year => (
-                                            <option key={year} value={year}>
-                                                {year === 'all' ? 'Todos los años' : year}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <Listbox value={selectedYear} onChange={setSelectedYear}>
+                                        <div className="relative">
+                                            <Listbox.Button className="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-12 pr-10 text-left border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all hover:border-gray-300">
+                                                <Filter className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                                                <span className="block truncate text-gray-900 font-medium">
+                                                    {selectedYear === 'all' ? 'Todos los años' : selectedYear}
+                                                </span>
+                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                    <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                </span>
+                                            </Listbox.Button>
+                                            <Transition
+                                                as="div"
+                                                leave="transition ease-in duration-100"
+                                                leaveFrom="opacity-100"
+                                                leaveTo="opacity-0"
+                                            >
+                                                <Listbox.Options className="absolute z-10 mt-2 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                    {availableYears.map((year) => (
+                                                        <Listbox.Option
+                                                            key={year}
+                                                            value={year}
+                                                            className={({ active }) =>
+                                                                `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-emerald-50 text-emerald-900' : 'text-gray-900'
+                                                                }`
+                                                            }
+                                                        >
+                                                            {({ selected }) => (
+                                                                <>
+                                                                    <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                                                        {year === 'all' ? 'Todos los años' : year}
+                                                                    </span>
+                                                                    {selected && (
+                                                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                                                                            <Check className="h-5 w-5" aria-hidden="true" />
+                                                                        </span>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </Listbox.Option>
+                                                    ))}
+                                                </Listbox.Options>
+                                            </Transition>
+                                        </div>
+                                    </Listbox>
                                 </div>
                             </div>
                             {filteredHistoriales.length !== historiales.length && (

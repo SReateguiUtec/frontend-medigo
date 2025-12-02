@@ -73,7 +73,7 @@ export const Login = () => {
               <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Bienvenido a MediGO
+              Bienvenido de vuelta
             </h1>
             <p className="text-xl text-white/90">
               Accede a tu cuenta y gestiona tu salud de manera rápida y segura

@@ -97,7 +97,7 @@ export const Register = () => {
               <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Únete a MediGO
+              Únete a nuestra plataforma
             </h1>
             <p className="text-xl text-white/90">
               Crea tu cuenta y comienza a gestionar tu salud de manera profesional

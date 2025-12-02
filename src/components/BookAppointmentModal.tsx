@@ -71,18 +71,18 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             }
 
             const dateTimeString = `${selectedDate}T${selectedTime}:00`;
-            const appointmentDate = new Date(dateTimeString + '-05:00');
-            const nowInPeru = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Lima' }));
+            const appointmentDate = new Date(dateTimeString);
+            const now = new Date();
 
             // Validar que la fecha/hora seleccionada sea futura
-            if (appointmentDate < nowInPeru) {
+            if (appointmentDate < now) {
                 setError('La fecha y hora deben ser en el futuro');
                 setLoading(false);
                 return;
             }
 
-            // Send to backend in ISO format with Peru timezone offset
-            const fechaHora = appointmentDate.toISOString().replace('Z', '-05:00');
+            // Send datetime as-is (backend expects Peru local time in format YYYY-MM-DDTHH:mm:ss)
+            const fechaHora = dateTimeString;
 
             // Crear cita pendiente (sin pagar)
             const cita = await citaService.createCita({

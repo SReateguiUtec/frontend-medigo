@@ -63,12 +63,26 @@ export const MyAppointments = () => {
 
     // Función para unirse a la videollamada
     const handleJoinVideoCall = async (citaId: number) => {
+        const appointment = appointments.find(apt => apt.id === citaId);
+
+        if (appointment) {
+            const aptDate = new Date(appointment.fechaHora);
+            const now = new Date();
+            const fifteenMinutes = 15 * 60 * 1000;
+
+            // Checkear si se trata de unir antes
+            if (now.getTime() < (aptDate.getTime() - fifteenMinutes)) {
+                const timeUntil = Math.ceil((aptDate.getTime() - now.getTime()) / (60 * 1000));
+                alert(`La sala estará disponible 15 minutos antes de la hora agendada.\n\nTiempo restante: ${timeUntil} minutos`);
+                return;
+            }
+        }
+
         setJoiningCallId(citaId); // Marcar esta cita como "cargando"
         const result = await joinVideoCall(citaId);
         setJoiningCallId(null); // Quitar el loading
 
         if (!result.success) {
-            // Show more descriptive error message
             setError(result.message);
         }
     };
@@ -157,17 +171,18 @@ export const MyAppointments = () => {
         return aptDate > now && (appointment.estado === 'PENDIENTE' || appointment.estado === 'CONFIRMADA');
     };
 
-    // Verificar si es hora de la cita (dentro de 1 hora antes o después, o si ya pasó pero está confirmada)
+    // Verificar si es hora de la cita (15 minutos antes hasta 1 hora después)
     const isTimeForAppointment = (appointment: Cita) => {
         const aptDate = new Date(appointment.fechaHora);
         const now = new Date();
+        const fifteenMinutes = 15 * 60 * 1000; // 15 minutos en milisegundos
         const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
 
-        // Verificar si la cita está confirmada O si es pendiente pero dentro del horario
+        // Solo permitir unirse si la cita está confirmada y es dentro de 15 min antes hasta 1 hora después
         return (
-            (appointment.estado === 'CONFIRMADA' || appointment.estado === 'PENDIENTE') &&
-            (aptDate.getTime() - now.getTime() <= oneHour && aptDate.getTime() + oneHour > now.getTime() ||
-                aptDate.getTime() < now.getTime())
+            appointment.estado === 'CONFIRMADA' &&
+            now.getTime() >= (aptDate.getTime() - fifteenMinutes) &&
+            now.getTime() <= (aptDate.getTime() + oneHour)
         );
     };
 
