@@ -123,7 +123,7 @@ export const Home = () => {
                 Servicios
               </Badge>
               <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                Estas son nuestras especialidades
+                La especialidad que buscas
               </h3>
             </div>
           </AnimatedSection>

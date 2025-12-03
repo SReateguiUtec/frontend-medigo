@@ -136,13 +136,6 @@ export default function DoctorSchedule() {
             return;
         }
 
-        // Validate that the time range is a multiple of the appointment duration
-        const durationInMinutes = endTimeInMinutes - startTimeInMinutes;
-        if (durationInMinutes % newHorario.duracionCita !== 0) {
-            setError(`El rango de horario (${durationInMinutes} min) debe ser múltiplo de la duración de la cita (${newHorario.duracionCita} min). Por favor ajusta la hora de fin.`);
-            return;
-        }
-
         try {
             setSaving(true);
             setError(null);
