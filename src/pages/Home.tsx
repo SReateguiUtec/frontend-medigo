@@ -1,9 +1,9 @@
 import LampDemo from '@/components/lamp-demo';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { EncryptedTextDemoSecond } from '@/components/EncryptedTextDemoSecond';
+import { WhisperDemo } from '@/components/WhisperDemo';
 import Grid from '@/components/Grid';
-import InfiniteMovingCardsDemo from '@/components/infinite-moving-cards-demo';
+import Testimonials from '@/components/Testimonials';
 import { AnimatedSection } from '@/components/animated-section';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Zap, PictureInPicture2, DollarSign, ShieldCheck, Sparkles, MessageCircle } from 'lucide-react';
@@ -39,7 +39,7 @@ export const Home = () => {
               </span>
             </Badge>
 
-            <EncryptedTextDemoSecond />
+            <WhisperDemo />
             <br></br>
             {!isAuthenticated && (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto sm:max-w-none">
@@ -74,26 +74,39 @@ export const Home = () => {
 
         <AnimatedSection delay={400}>
           <div className="relative max-w-7xl mx-auto">
-            {/* Subtle gradient glow effect behind the card */}
-            <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 blur-3xl rounded-3xl"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-indigo-500/20 to-blue-500/20 blur-3xl rounded-3xl"></div>
 
-            {/* Glassmorphism card */}
-            <div className="relative backdrop-blur-xl bg-white/10 border-2 border-blue-200/30 p-12 rounded-3xl text-center shadow-xl hover:shadow-2xl hover:border-blue-300/50 transition-all duration-300">
-              <div className="flex justify-center mb-4">
-                <MessageSquare className="h-16 w-16 text-blue-600 animate-[bounce_2s_ease-in-out_infinite]" />
+            {/* Glassmorphism card with grid layout */}
+            <div className="relative backdrop-blur-xl bg-white/10 border-2 border-blue-200/30 rounded-3xl shadow-xl hover:shadow-2xl hover:border-blue-300/50 transition-all duration-300 overflow-hidden">
+              <div className="grid md:grid-cols-2 gap-4 items-center">
+                {/* Right side - Content */}
+                <div className="p-12 text-center">
+                  <div className="flex flex-col items-center mb-6">
+                    <MessageSquare className="h-12 w-12 text-blue-600 animate-[bounce_2s_ease-in-out_infinite] mb-4" />
+                    <h2 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      ¿Eres médico?
+                    </h2>
+                  </div>
+                  <p className="text-xl mb-8 text-gray-700">
+                    Únete a nuestra plataforma y expande tu alcance profesional
+                  </p>
+                  <Link
+                    to="/register?role=MEDICO"
+                    className="inline-block bg-linear-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Registrarse como Médico
+                  </Link>
+                </div>
+
+                {/* Left side - Image */}
+                <div className="flex justify-center items-center p-8">
+                  <img
+                    src="/medico.png"
+                    alt="Médico profesional"
+                    className="w-full max-w-xs h-auto object-contain transform transition-all duration-300 hover:scale-105 hover:drop-shadow-2xl"
+                  />
+                </div>
               </div>
-              <h2 className="text-4xl font-bold mb-4 bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                ¿Eres médico?
-              </h2>
-              <p className="text-xl mb-8 text-gray-700 max-w-2xl mx-auto">
-                Únete a nuestra plataforma y expande tu alcance profesional
-              </p>
-              <Link
-                to="/register?role=MEDICO"
-                className="inline-block bg-linear-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Registrarse como Médico
-              </Link>
             </div>
           </div>
         </AnimatedSection>
@@ -130,20 +143,11 @@ export const Home = () => {
           </AnimatedSection>
         </section>
 
-        <br></br>
-        <br></br>
-
-        <AnimatedSection delay={600}>
-          <div className="text-center mb-8">
-            <Badge variant="outline" className="mb-4">
-              Testimonios
-            </Badge>
-            <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
-              Lo que dicen nuestros usuarios
-            </h3>
-            <InfiniteMovingCardsDemo />
-          </div>
-        </AnimatedSection>
+        <section id="testimonios">
+          <AnimatedSection delay={600}>
+            <Testimonials />
+          </AnimatedSection>
+        </section>
 
         {/* Pricing Section */}
         <section id="pricing">
@@ -278,18 +282,56 @@ export const Home = () => {
                 </div>
               </div>
 
-              {/* Description Text */}
-              <div className="text-center space-y-3">
-                <p className="text-xl md:text-2xl text-gray-700 font-medium">
-                  Por cierto, te presentamos a <span className="font-bold text-indigo-600">A.L.M.A</span>
-                </p>
-                <p className="text-lg md:text-xl text-gray-600">
-                  <strong className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-600">Asistente en Línea de Médica Avanzada.</strong>
-                </p>
-              </div>
+              <AnimatedSection delay={1000}>
+                <div className="mt-16 flex flex-col items-center justify-center">
+                  <p className="text-xl md:text-2xl text-gray-600 mb-12 font-medium text-center">
+                    Por cierto, te presentamos a <span className="font-bold text-indigo-600">A.L.M.A</span>
+                  </p>
+
+                  <div className="flex flex-col items-start justify-center select-none pl-10 md:pl-0">
+                    <div className="flex items-baseline gap-2 md:gap-2 group hover:translate-x-2 transition-transform duration-300">
+                      <span className="text-7xl md:text-9xl font-black bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 drop-shadow-sm">
+                        A
+                      </span>
+                      <span className="text-3xl md:text-6xl font-light text-gray-700 tracking-tight self-center">
+                        sistente en
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline gap-2 md:gap-2 group hover:translate-x-2 transition-transform duration-300 -mt-2 md:-mt-6">
+                      <span className="text-7xl md:text-9xl font-black bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-violet-600 drop-shadow-sm">
+                        L
+                      </span>
+                      <span className="text-3xl md:text-6xl font-light text-gray-700 tracking-tight self-center">
+                        ínea de
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline gap-2 md:gap-2 group hover:translate-x-2 transition-transform duration-300 -mt-2 md:-mt-6">
+                      <span className="text-7xl md:text-9xl font-black bg-clip-text text-transparent bg-linear-to-r from-violet-600 to-purple-600 drop-shadow-sm">
+                        M
+                      </span>
+                      <span className="text-3xl md:text-6xl font-light text-gray-700 tracking-tight self-center">
+                        édica
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline gap-2 md:gap-2 group hover:translate-x-2 transition-transform duration-300 -mt-2 md:-mt-6">
+                      <span className="text-7xl md:text-9xl font-black bg-clip-text text-transparent bg-linear-to-r from-purple-600 to-fuchsia-600 drop-shadow-sm">
+                        A
+                      </span>
+                      <span className="text-3xl md:text-6xl font-light text-gray-700 tracking-tight self-center">
+                        vanzada
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
             </div>
           </AnimatedSection>
         </section>
+
+        <br></br>
 
         {/* FAQ Section */}
         <section id="faq" className="container mx-auto px-4 py-15">

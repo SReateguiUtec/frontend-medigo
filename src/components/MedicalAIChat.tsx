@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, AlertCircle, Clock, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { aiService } from '../api/ai.service';
 import type { AIConsultaResponse } from '../api/ai.service';
 import { AITermsModal } from './AITermsModal';
@@ -9,11 +10,30 @@ interface Message {
     text: string;
     isUser: boolean;
     timestamp: Date;
+    isTyping?: boolean;
 }
 
 interface MedicalAIChatProps {
     isFullScreen?: boolean;
 }
+
+const TypewriterEffect = ({ text }: { text: string }) => {
+    const [displayedText, setDisplayedText] = useState('');
+
+    useEffect(() => {
+        const words = text.split(' ');
+        let i = 0;
+        setDisplayedText('');
+        const timer = setInterval(() => {
+            i++;
+            setDisplayedText(words.slice(0, i).join(' '));
+            if (i >= words.length) clearInterval(timer);
+        }, 50); // Adjust speed here
+        return () => clearInterval(timer);
+    }, [text]);
+
+    return <ReactMarkdown>{displayedText}</ReactMarkdown>;
+};
 
 export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -65,6 +85,7 @@ export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
     const handleDeclineTerms = () => {
         setShowTerms(false);
     };
+
 
     const handleSendMessage = async () => {
         if (!inputText.trim() || loading) return;
@@ -153,7 +174,7 @@ export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
                         </div>
                         <div>
                             <h3 className="font-bold text-lg">Alma</h3>
-                            <p className="text-sm text-white/80">Pregunta sobre tu historial</p>
+                            <p className="text-sm text-white/80">Tu asistente de IA</p>
                         </div>
                     </div>
                     <div className="text-right">
@@ -213,7 +234,13 @@ export const MedicalAIChat = ({ isFullScreen = false }: MedicalAIChatProps) => {
                                 : 'bg-white border border-gray-200 text-gray-800'
                                 }`}
                         >
-                            <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                            {message.isUser ? (
+                                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                            ) : (
+                                <div className="text-sm prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-gray-900">
+                                    <TypewriterEffect text={message.text} />
+                                </div>
+                            )}
                             <p className={`text-xs mt-1 ${message.isUser ? 'text-blue-100' : 'text-gray-500'}`}>
                                 {message.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                             </p>

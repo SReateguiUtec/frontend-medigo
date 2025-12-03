@@ -15,6 +15,7 @@ import { MedicalChatPage } from './pages/patient/MedicalChatPage';
 import { Messages } from './pages/patient/Messages';
 import { Chat } from './pages/patient/Chat';
 import { Appointments } from './pages/doctor/Appointments';
+import { DoctorHome } from './pages/doctor/DoctorHome';
 import { DoctorProfile } from './pages/doctor/Profile';
 import DoctorSchedule from './pages/doctor/DoctorSchedule';
 import { PatientMedicalHistory } from './pages/doctor/PatientMedicalHistory';
@@ -43,7 +44,7 @@ const HomeRedirect = () => {
     if (user?.rol === 'PACIENTE') {
       return <Navigate to="/patient/home" />;
     } else if (user?.rol === 'MEDICO') {
-      return <Navigate to="/doctor/appointments" />;
+      return <Navigate to="/doctor/home" />;
     } else if (user?.rol === 'ADMIN') {
       return <Navigate to="/admin" />;
     }
@@ -137,6 +138,16 @@ function AppContent() {
             <ProtectedRoute>
               <AuthenticatedLayout noPadding>
                 <MedicalChatPage />
+              </AuthenticatedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/home"
+          element={
+            <ProtectedRoute>
+              <AuthenticatedLayout>
+                <DoctorHome />
               </AuthenticatedLayout>
             </ProtectedRoute>
           }

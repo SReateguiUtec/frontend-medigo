@@ -40,7 +40,18 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 }
 
                 const slots = await horarioService.getSlotsDisponibles(doctor.id, selectedDate);
-                setAvailableSlots(slots.filter(slot => slot.disponible && isFutureSlot(slot.fechaHora)));
+                console.log('🔍 Slots recibidos del backend:', slots);
+                console.log('🕐 Hora actual:', new Date());
+
+                const filteredSlots = slots.filter(slot => {
+                    const isAvailable = slot.disponible;
+                    const isFuture = isFutureSlot(slot.fechaHora);
+                    console.log(`Slot ${slot.fechaHora}: disponible=${isAvailable}, futuro=${isFuture}`);
+                    return isAvailable && isFuture;
+                });
+
+                console.log('✅ Slots filtrados (disponibles y futuros):', filteredSlots);
+                setAvailableSlots(filteredSlots);
             } catch (err: any) {
                 console.error('Error fetching available slots:', err);
                 setError('Error al obtener los horarios disponibles. Por favor intente nuevamente.');
@@ -134,8 +145,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     const formatTime = (dateTimeString: string) => {
-        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
-        const date = new Date(cleanDateString);
+        // Parse the datetime string properly (it may include timezone offset like -05:00)
+        const date = new Date(dateTimeString);
         return date.toLocaleTimeString('es-PE', {
             hour: '2-digit',
             minute: '2-digit',
@@ -144,8 +155,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     const isFutureSlot = (dateTimeString: string) => {
-        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
-        const slotDate = new Date(cleanDateString);
+        // Parse the datetime string properly with timezone
+        const slotDate = new Date(dateTimeString);
         const now = new Date();
         return slotDate > now;
     };

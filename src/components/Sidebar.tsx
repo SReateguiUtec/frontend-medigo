@@ -32,6 +32,11 @@ export const Sidebar = () => {
             icon: <Search className="w-5 h-5" />
         }] : []),
         ...(isMedico ? [{
+            name: 'Home',
+            path: '/doctor/home',
+            icon: <Home className="w-5 h-5" />
+        }] : []),
+        ...(isMedico ? [{
             name: 'Mis Citas',
             path: '/doctor/appointments',
             icon: <Calendar className="w-5 h-5" />

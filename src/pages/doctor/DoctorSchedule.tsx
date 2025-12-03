@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Clock, Calendar, Timer } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { horarioService } from '../../services/horario.service';
 import type { HorarioMedico, CreateHorarioRequest } from '../../services/horario.service';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { CustomSelect } from '../../components/ui/CustomSelect';
 
 const DIAS_SEMANA = [
     { value: 'LUNES', label: 'Lunes' },
@@ -12,6 +14,17 @@ const DIAS_SEMANA = [
     { value: 'VIERNES', label: 'Viernes' },
     { value: 'SABADO', label: 'Sábado' },
     { value: 'DOMINGO', label: 'Domingo' }
+];
+
+const FULL_HOURS = Array.from({ length: 24 }, (_, i) => {
+    const hour = i.toString().padStart(2, '0');
+    return { value: `${hour}:00`, label: `${hour}:00` };
+});
+
+const DURATIONS = [
+    { value: 15, label: '15 minutos' },
+    { value: 30, label: '30 minutos' },
+    { value: 60, label: '60 minutos' }
 ];
 
 export default function DoctorSchedule() {
@@ -120,6 +133,13 @@ export default function DoctorSchedule() {
 
         if (endTimeInMinutes <= startTimeInMinutes) {
             setError('La hora de fin debe ser posterior a la hora de inicio');
+            return;
+        }
+
+        // Validate that the time range is a multiple of the appointment duration
+        const durationInMinutes = endTimeInMinutes - startTimeInMinutes;
+        if (durationInMinutes % newHorario.duracionCita !== 0) {
+            setError(`El rango de horario (${durationInMinutes} min) debe ser múltiplo de la duración de la cita (${newHorario.duracionCita} min). Por favor ajusta la hora de fin.`);
             return;
         }
 
@@ -267,27 +287,23 @@ export default function DoctorSchedule() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Día de la semana
                                 </label>
-                                <select
+                                <CustomSelect
                                     value={newHorario.diaSemana}
-                                    onChange={(e) => setNewHorario({ ...newHorario, diaSemana: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                >
-                                    {DIAS_SEMANA.map(dia => (
-                                        <option key={dia.value} value={dia.value}>{dia.label}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setNewHorario({ ...newHorario, diaSemana: value })}
+                                    options={DIAS_SEMANA}
+                                    icon={Calendar}
+                                />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Hora inicio
                                 </label>
-                                <input
-                                    type="time"
+                                <CustomSelect
                                     value={newHorario.horaInicio}
-                                    onChange={(e) => setNewHorario({ ...newHorario, horaInicio: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                    required
+                                    onChange={(value) => setNewHorario({ ...newHorario, horaInicio: value })}
+                                    options={FULL_HOURS}
+                                    icon={Clock}
                                 />
                             </div>
 
@@ -295,12 +311,11 @@ export default function DoctorSchedule() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Hora fin
                                 </label>
-                                <input
-                                    type="time"
+                                <CustomSelect
                                     value={newHorario.horaFin}
-                                    onChange={(e) => setNewHorario({ ...newHorario, horaFin: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                    required
+                                    onChange={(value) => setNewHorario({ ...newHorario, horaFin: value })}
+                                    options={FULL_HOURS}
+                                    icon={Clock}
                                 />
                             </div>
 
@@ -308,23 +323,19 @@ export default function DoctorSchedule() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Duración cita (min)
                                 </label>
-                                <select
+                                <CustomSelect
                                     value={newHorario.duracionCita}
-                                    onChange={(e) => setNewHorario({ ...newHorario, duracionCita: Number(e.target.value) })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                >
-                                    <option value={15}>15 minutos</option>
-                                    <option value={30}>30 minutos</option>
-                                    <option value={45}>45 minutos</option>
-                                    <option value={60}>60 minutos</option>
-                                </select>
+                                    onChange={(value) => setNewHorario({ ...newHorario, duracionCita: Number(value) })}
+                                    options={DURATIONS}
+                                    icon={Timer}
+                                />
                             </div>
                         </div>
 
                         <button
                             type="submit"
                             disabled={saving}
-                            className="mt-4 px-6 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="mt-4 px-6 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
                             {saving ? 'Guardando...' : 'Agregar Horario'}
                         </button>
