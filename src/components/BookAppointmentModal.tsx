@@ -26,6 +26,7 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     const [success, setSuccess] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<SlotDisponible[]>([]);
 
+    // Fetch available slots when date is selected
     useEffect(() => {
         const fetchAvailableSlots = async () => {
             if (!selectedDate || !doctor.id) return;
@@ -34,24 +35,15 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 setSlotsLoading(true);
                 setError('');
 
+                // Validate date format (should be YYYY-MM-DD)
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateRegex.test(selectedDate)) {
                     throw new Error('Formato de fecha inválido');
                 }
 
                 const slots = await horarioService.getSlotsDisponibles(doctor.id, selectedDate);
-                console.log('🔍 Slots recibidos del backend:', slots);
-                console.log('🕐 Hora actual:', new Date());
-
-                const filteredSlots = slots.filter(slot => {
-                    const isAvailable = slot.disponible;
-                    const isFuture = isFutureSlot(slot.fechaHora);
-                    console.log(`Slot ${slot.fechaHora}: disponible=${isAvailable}, futuro=${isFuture}`);
-                    return isAvailable && isFuture;
-                });
-
-                console.log('✅ Slots filtrados (disponibles y futuros):', filteredSlots);
-                setAvailableSlots(filteredSlots);
+                // Show only available slots that are in the future
+                setAvailableSlots(slots.filter(slot => slot.disponible && isFutureSlot(slot.fechaHora)));
             } catch (err: any) {
                 console.error('Error fetching available slots:', err);
                 setError('Error al obtener los horarios disponibles. Por favor intente nuevamente.');
@@ -89,8 +81,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
                 return;
             }
 
-            // Send datetime with Peru timezone offset (backend expects ISO format with timezone)
-            const fechaHora = `${dateTimeString}-05:00`;
+            // Send datetime as-is (backend expects Peru local time in format YYYY-MM-DDTHH:mm:ss)
+            const fechaHora = dateTimeString;
 
             // Crear cita pendiente (sin pagar)
             const cita = await citaService.createCita({
@@ -145,8 +137,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     const formatTime = (dateTimeString: string) => {
-        // Parse the datetime string properly (it may include timezone offset like -05:00)
-        const date = new Date(dateTimeString);
+        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
+        const date = new Date(cleanDateString);
         return date.toLocaleTimeString('es-PE', {
             hour: '2-digit',
             minute: '2-digit',
@@ -155,8 +147,8 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
     };
 
     const isFutureSlot = (dateTimeString: string) => {
-        // Parse the datetime string properly with timezone
-        const slotDate = new Date(dateTimeString);
+        const cleanDateString = dateTimeString.replace(/Z|[+-]\d{2}:\d{2}$/g, '');
+        const slotDate = new Date(cleanDateString);
         const now = new Date();
         return slotDate > now;
     };
