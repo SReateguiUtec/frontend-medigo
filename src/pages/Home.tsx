@@ -1,5 +1,5 @@
 import LampDemo from '@/components/lamp-demo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { WhisperDemo } from '@/components/WhisperDemo';
 import Grid from '@/components/Grid';
@@ -19,6 +19,7 @@ import { PricingCard } from '@/components/ui/pricing-card';
 
 export const Home = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -191,6 +192,7 @@ export const Home = () => {
                 },
               ]}
               buttonText="Empezar ahora"
+              onButtonClick={() => navigate('/register')}
             />
           </AnimatedSection>
         </section>

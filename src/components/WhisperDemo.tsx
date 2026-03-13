@@ -55,13 +55,13 @@ export function WhisperDemo() {
         <div className="mx-auto max-w-5xl py-4 text-center">
             <div className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-800">
                 <WhisperText
-                    text="Conectando pacientes y médicos a través de la "
+                    text="Tu salud, siempre a tu alcance y siempre "
                     className="text-black"
                     delay={100}
                     startDelay={0}
                 />
                 <WhisperText
-                    text="tecnología"
+                    text="contigo"
                     className="text-blue-600 underline decoration-blue-600/30 decoration-4 underline-offset-[20px] text-7xl md:text-7xl"
                     delay={100}
                     startDelay={secondTextDelay}
