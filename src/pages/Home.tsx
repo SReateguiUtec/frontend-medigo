@@ -6,8 +6,7 @@ import Grid from '@/components/Grid';
 import Testimonials from '@/components/Testimonials';
 import { AnimatedSection } from '@/components/animated-section';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Zap, PictureInPicture2, DollarSign, ShieldCheck, Sparkles, MessageCircle } from 'lucide-react';
-import Timer from '@/components/ui/timer';
+import { MessageSquare, Zap, PictureInPicture2, Sparkles, MessageCircle } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/accordion";
 import { LogoCarouselDemo } from '@/components/LogoCarousel';
 import DemoOne from '@/components/slider-demo';
+import { PricingCard } from '@/components/ui/pricing-card';
 
 export const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -152,102 +152,46 @@ export const Home = () => {
         {/* Pricing Section */}
         <section id="pricing">
           <AnimatedSection delay={400}>
-            <div className="container mx-auto px-4 py-20">
-              <div className="text-center mb-16">
+            <div className="container mx-auto px-4 pt-12">
+              <div className="text-center mb-6">
                 <Badge variant="outline" className="mb-4 border-black-500 text-black-600">
                   Pricing
                 </Badge>
                 <h3 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">
                   Precios Transparentes
                 </h3>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Solo cobramos una pequeña comisión por cada consulta
-                </p>
-              </div>
-
-              <div className="max-w-4xl mx-auto">
-                {/* Main Pricing Card */}
-                <div className="relative">
-                  {/* Animated gradient background */}
-                  <div className="absolute inset-0 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur-2xl opacity-20 animate-pulse"></div>
-
-                  <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-12 border border-blue-100 shadow-2xl">
-                    <div className="text-center mb-8">
-                      <div className="inline-block mb-6 relative">
-                        {/* Glow effect behind percentage */}
-                        <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-30"></div>
-                        <Timer
-                          target={5}
-                          duration={4}
-                          suffix="%"
-                          className="relative text-8xl md:text-9xl font-black bg-linear-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-                        />
-                      </div>
-                      <h4 className="text-3xl font-bold text-gray-900 mb-3">
-                        Comisión por Consulta
-                      </h4>
-                      <p className="text-gray-600 text-lg max-w-xl mx-auto">
-                        Solo cobramos el 5% del monto total de cada consulta médica realizada en la plataforma
-                      </p>
-                    </div>
-
-                    {/* Grid */}
-                    <div className="grid md:grid-cols-3 gap-4 mt-8">
-                      <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 hover:shadow-lg transition-shadow">
-                        <div className="text-center">
-                          <p className="text-3xl font-bold text-gray-900 mb-1">S/100</p>
-                          <div className="h-px bg-linear-to-r from-transparent via-blue-300 to-transparent my-3"></div>
-                          <p className="text-sm text-gray-500">Comisión</p>
-                          <p className="text-2xl font-bold text-blue-600">S/5</p>
-                        </div>
-                      </div>
-
-                      <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200 hover:shadow-lg transition-shadow transform md:scale-105">
-                        <div className="text-center">
-                          <p className="text-3xl font-bold text-gray-900 mb-1">S/150</p>
-                          <div className="h-px bg-linear-to-r from-transparent via-indigo-300 to-transparent my-3"></div>
-                          <p className="text-sm text-gray-500">Comisión</p>
-                          <p className="text-2xl font-bold text-indigo-600">S/7.50</p>
-                        </div>
-                      </div>
-
-                      <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 hover:shadow-lg transition-shadow">
-                        <div className="text-center">
-                          <p className="text-3xl font-bold text-gray-900 mb-1">S/200</p>
-                          <div className="h-px bg-linear-to-r from-transparent via-purple-300 to-transparent my-3"></div>
-                          <p className="text-sm text-gray-500">Comisión</p>
-                          <p className="text-2xl font-bold text-purple-600">S/10</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Benefits */}
-                    <div className="mt-8 pt-8 border-t border-gray-200">
-                      <div className="grid md:grid-cols-3 gap-6 text-center">
-                        <div>
-                          <div className="flex justify-center mb-2">
-                            <DollarSign className="h-8 w-8 text-blue-500" />
-                          </div>
-                          <p className="text-sm font-semibold text-gray-900">Sin costos ocultos</p>
-                        </div>
-                        <div>
-                          <div className="flex justify-center mb-2">
-                            <ShieldCheck className="h-8 w-8 text-green-500" />
-                          </div>
-                          <p className="text-sm font-semibold text-gray-900">Pagos seguros</p>
-                        </div>
-                        <div>
-                          <div className="flex justify-center mb-2">
-                            <Zap className="h-8 w-8 text-purple-500" />
-                          </div>
-                          <p className="text-sm font-semibold text-gray-900">Procesamiento instantáneo</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
+
+            <PricingCard
+              title="Comisión por Consulta"
+              description="Solo cobramos un porcentaje del monto total de cada consulta realizada."
+              price={5}
+              pricePrefix=""
+              priceSuffix="%"
+              paymentNote="unica comision por consulta"
+              features={[
+                {
+                  title: "Beneficios",
+                  items: [
+                    "Sin costos ocultos",
+                    "Pagos seguros",
+                    "Procesamiento instantáneo",
+                    "Cobro solo al completar la consulta",
+                  ],
+                },
+                {
+                  title: "Ejemplos de comisión",
+                  items: [
+                    "S/100 → S/5",
+                    "S/150 → S/7.50",
+                    "S/200 → S/10",
+                    "Sin membresías ni planes mensuales",
+                  ],
+                },
+              ]}
+              buttonText="Empezar ahora"
+            />
           </AnimatedSection>
         </section>
 
