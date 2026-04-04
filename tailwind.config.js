@@ -1,3 +1,5 @@
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -51,6 +53,7 @@ export default {
         marquee: "marquee var(--duration) linear infinite",
         "marquee-reverse": "marquee-reverse var(--duration) linear infinite",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+        aurora: "aurora 60s linear infinite",
       },
       keyframes: {
         marquee: {
@@ -65,8 +68,20 @@ export default {
           from: { transform: "translateY(0)" },
           to: { transform: "translateY(-50%)" },
         },
+        aurora: {
+          from: { backgroundPosition: "50% 50%, 50% 50%" },
+          to: { backgroundPosition: "350% 50%, 350% 50%" },
+        },
       },
     },
   },
-  plugins: [],
+  plugins: [addVariablesForColors],
+}
+
+function addVariablesForColors({ addBase, theme }) {
+  const allColors = flattenColorPalette(theme("colors"));
+  const newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+  addBase({ ":root": newVars });
 }

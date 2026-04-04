@@ -6,10 +6,10 @@ export default function Grid() {
         <div id="beneficios" className="py-12 sm:py-16 scroll-mt-32">
             <div className="mx-auto max-w-5xl px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <Badge variant="outline" className="mb-4">
+                    <Badge variant="outline" className="mb-4 border-black">
                         Beneficios
                     </Badge>
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800">
+                    <h2 className="text-4xl md:text-5xl font-normal text-gray-800">
                         ¿Por qué elegir MediGO?
                     </h2>
                 </div>

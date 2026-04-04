@@ -22,10 +22,10 @@ import { PatientMedicalHistory } from './pages/doctor/PatientMedicalHistory';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { NavbarDemo } from './components/NavbarDemo';
 import { AuthenticatedLayout } from './components/AuthenticatedLayout';
-import { Footer } from './components/Footer';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentCancel } from './pages/PaymentCancel';
 import { NotFound } from './pages/NotFound';
+import { FooterWithMinimalOutline } from './components/minimal-footer';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -251,7 +251,7 @@ function AppContent() {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {showNavbar && <Footer />}
+      {showNavbar && <FooterWithMinimalOutline />}
     </div>
   );
 }

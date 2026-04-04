@@ -12,7 +12,10 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@hugeicons/core-free-icons": "^4.0.0",
+    "@hugeicons/react": "^1.1.6",
     "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-progress": "^1.1.8",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@stomp/stompjs": "^7.2.1",
@@ -26,7 +29,7 @@
     "framer-motion": "^12.23.25",
     "gsap": "^3.13.0",
     "lucide-react": "^0.554.0",
-    "motion": "^12.23.24",
+    "motion": "^12.38.0",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -34,7 +37,7 @@
     "react-router-dom": "^7.9.6",
     "sockjs-client": "^1.6.1",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

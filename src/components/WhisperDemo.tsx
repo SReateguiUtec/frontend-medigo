@@ -48,20 +48,20 @@ const WhisperText = ({ text, className = "", delay = 50, startDelay = 0 }: Whisp
 };
 
 export function WhisperDemo() {
-    const firstTextWords = "Conectando pacientes y médicos a través de la ".split(" ").length;
+    const firstTextWords = "Tu salud, siempre a tu alcance con ".split(" ").length;
     const secondTextDelay = firstTextWords * 100; // Aumentado de 50 a 100ms
 
     return (
         <div className="mx-auto max-w-5xl py-4 text-center">
-            <div className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-800">
+            <div className="text-5xl md:text-6xl font-bold tracking-tight text-gray-800">
                 <WhisperText
-                    text="Tu salud, siempre a tu alcance y siempre "
+                    text="Tu salud, siempre a tu alcance con "
                     className="text-black"
                     delay={100}
                     startDelay={0}
                 />
                 <WhisperText
-                    text="contigo"
+                    text="MediGO"
                     className="text-blue-600 underline decoration-blue-600/30 decoration-4 underline-offset-[20px] text-7xl md:text-7xl"
                     delay={100}
                     startDelay={secondTextDelay}

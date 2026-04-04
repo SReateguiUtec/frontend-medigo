@@ -22,6 +22,10 @@ type EncryptedTextProps = {
     encryptedClassName?: string;
     /** CSS class for styling the revealed characters */
     revealedClassName?: string;
+    /** Substring within text that should be bold when revealed */
+    boldText?: string;
+    /** CSS class for the bold portion of text */
+    boldClassName?: string;
 };
 
 const DEFAULT_CHARSET =
@@ -53,9 +57,23 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
     flipDelayMs = 50,
     encryptedClassName,
     revealedClassName,
+    boldText,
+    boldClassName,
 }) => {
+    const boldIndices = React.useMemo(() => {
+        if (!boldText) return new Set<number>();
+        const indices = new Set<number>();
+        let idx = text.indexOf(boldText);
+        while (idx !== -1) {
+            for (let i = 0; i < boldText.length; i++) {
+                indices.add(idx + i);
+            }
+            idx = text.indexOf(boldText, idx + 1);
+        }
+        return indices;
+    }, [text, boldText]);
     const ref = useRef<HTMLSpanElement>(null);
-    const isInView = useInView(ref, { once: true });
+    const isInView = useInView(ref, { once: false });
 
     const [revealCount, setRevealCount] = useState<number>(0);
     const animationFrameRef = useRef<number | null>(null);
@@ -135,6 +153,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
         >
             {text.split("").map((char, index) => {
                 const isRevealed = index < revealCount;
+                const isBold = isRevealed && boldIndices.has(index);
                 const displayChar = isRevealed
                     ? char
                     : char === " "
@@ -145,7 +164,10 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
                 return (
                     <span
                         key={index}
-                        className={cn(isRevealed ? revealedClassName : encryptedClassName)}
+                        className={cn(
+                            isRevealed ? revealedClassName : encryptedClassName,
+                            isBold && boldClassName,
+                        )}
                     >
                         {displayChar}
                     </span>

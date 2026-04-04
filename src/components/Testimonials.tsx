@@ -78,12 +78,12 @@ const Testimonials = () => {
                     className="flex flex-col items-center justify-center max-w-4xl mx-auto px-4"
                 >
                     <div className="flex justify-center mb-4">
-                        <Badge variant="outline">
+                        <Badge variant="outline" className="border-black">
                             Testimonios
                         </Badge>
                     </div>
 
-                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 text-center">
+                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-gray-900 mb-4 text-center">
                         Lo que dicen nuestros usuarios
                     </h3>
                 </motion.div>
