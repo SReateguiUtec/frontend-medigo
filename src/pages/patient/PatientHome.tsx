@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { profileService } from '@/api/profile.service';
+import type { Paciente } from '@/types';
 import {
     Search,
     MessageSquare,
@@ -14,71 +17,43 @@ import {
     Bell,
     Droplet,
     Weight,
-    Zap
+    Zap,
+    ArrowRight,
+    Plus,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/Card';
+import {
+    DashboardHeader,
+    StatCard,
+    DashboardSection,
+    QuickActionGrid,
+    DashboardPanel,
+} from '@/components/dashboard';
+import { cn } from '@/lib/utils';
 
 export const PatientHome = () => {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const navigate = useNavigate();
 
-    const quickStats = [
-        {
-            label: 'Consultas este mes',
-            value: '3',
-            change: '+2',
-            icon: Activity,
-            color: 'blue'
-        },
-        {
-            label: 'Adherencia tratamiento',
-            value: '92%',
-            change: '+5%',
-            icon: CheckCircle,
-            color: 'emerald'
-        },
-        {
-            label: 'Próximas citas',
-            value: '2',
-            change: '0',
-            icon: Calendar,
-            color: 'purple'
+    // Sync name from profile if JWT didn't include it
+    useEffect(() => {
+        if (user && !user.nombres) {
+            profileService.getProfile().then((profile) => {
+                updateUser({ ...user, ...(profile as Paciente) });
+            }).catch(() => {});
         }
+    }, []);
+
+    const quickStats = [
+        { label: 'Consultas este mes', value: '3', trend: '+2', icon: Activity, trendPositive: true },
+        { label: 'Adherencia al tratamiento', value: '92%', trend: '+5%', icon: CheckCircle, trendPositive: true },
+        { label: 'Próximas citas', value: '2', icon: Calendar },
     ];
 
     const healthMetrics = [
-        {
-            label: 'Presión Arterial',
-            value: '120/80',
-            unit: 'mmHg',
-            change: '+2%',
-            icon: Heart,
-            status: 'Normal'
-        },
-        {
-            label: 'Peso',
-            value: '72',
-            unit: 'kg',
-            change: '-1.5%',
-            icon: Weight,
-            status: 'Normal'
-        },
-        {
-            label: 'Glucosa',
-            value: '95',
-            unit: 'mg/dL',
-            change: '0%',
-            icon: Droplet,
-            status: 'Normal'
-        },
-        {
-            label: 'Frecuencia Cardíaca',
-            value: '72',
-            unit: 'bpm',
-            change: '+3%',
-            icon: Zap,
-            status: 'Normal'
-        }
+        { label: 'Presión arterial', value: '120/80', unit: 'mmHg', change: '+2%', icon: Heart, status: 'Normal' },
+        { label: 'Peso', value: '72', unit: 'kg', change: '-1.5%', icon: Weight, status: 'Normal' },
+        { label: 'Glucosa', value: '95', unit: 'mg/dL', change: '0%', icon: Droplet, status: 'Normal' },
+        { label: 'Frecuencia cardíaca', value: '72', unit: 'bpm', change: '+3%', icon: Zap, status: 'Normal' },
     ];
 
     const upcomingAppointments = [
@@ -89,7 +64,6 @@ export const PatientHome = () => {
             date: '2025-12-05',
             time: '10:00 AM',
             avatar: 'MG',
-            color: 'blue'
         },
         {
             id: 2,
@@ -98,289 +72,216 @@ export const PatientHome = () => {
             date: '2025-12-10',
             time: '3:30 PM',
             avatar: 'CR',
-            color: 'purple'
-        }
+        },
     ];
 
     const alerts = [
-        {
-            id: 1,
-            message: 'Vacuna contra la influenza pendiente',
-            dueDate: '14 dic',
-            priority: 'high'
-        },
-        {
-            id: 2,
-            message: 'Examen de sangre de rutina',
-            dueDate: '19 dic',
-            priority: 'medium'
-        }
+        { id: 1, message: 'Vacuna contra la influenza pendiente', dueDate: '14 dic', priority: 'high' as const },
+        { id: 2, message: 'Examen de sangre de rutina', dueDate: '19 dic', priority: 'medium' as const },
     ];
 
     const activeMedications = [
-        {
-            id: 1,
-            name: 'Losartán',
-            dosage: '50mg',
-            frequency: 'Cada 12 horas',
-            nextDose: '2:00 PM'
-        },
-        {
-            id: 2,
-            name: 'Metformina',
-            dosage: '850mg',
-            frequency: 'Cada 8 horas',
-            nextDose: '6:00 PM'
-        }
+        { id: 1, name: 'Losartán', dosage: '50mg', frequency: 'Cada 12 horas', nextDose: '2:00 PM' },
+        { id: 2, name: 'Metformina', dosage: '850mg', frequency: 'Cada 8 horas', nextDose: '6:00 PM' },
     ];
 
     const quickActions = [
         {
-            title: 'Buscar Médico',
+            title: 'Buscar médico',
+            description: 'Encuentra especialistas',
             icon: Search,
-            path: '/patient/search',
-            color: 'blue'
+            onClick: () => navigate('/patient/search'),
         },
         {
             title: 'Chat MediGIA',
+            description: 'Asistente de salud',
             icon: MessageSquare,
-            path: '/patient/ai-chat',
-            color: 'purple'
+            onClick: () => navigate('/patient/ai-chat'),
         },
         {
-            title: 'Mi Historial',
+            title: 'Mi historial',
+            description: 'Registros médicos',
             icon: FileText,
-            path: '/patient/historial-medico',
-            color: 'emerald'
-        }
+            onClick: () => navigate('/patient/historial-medico'),
+        },
     ];
 
+    const todayLabel = new Date().toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    });
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="px-4 md:px-6 py-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                                Dashboard
-                            </h1>
-                            <p className="text-gray-600">Bienvenido de vuelta a tu dashboard, {user?.nombres}</p>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <DashboardHeader
+                title={`Hola, ${user?.nombres?.split(' ')[0] ?? 'paciente'}`}
+                subtitle={`Resumen de tu salud · ${todayLabel}`}
+                action={
+                    <button
+                        type="button"
+                        onClick={() => navigate('/patient/search')}
+                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Nueva cita
+                    </button>
+                }
+            />
+
+            <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                {quickStats.map((stat) => (
+                    <StatCard key={stat.label} {...stat} />
+                ))}
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12">
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    {quickStats.map((stat, index) => (
-                        <Card key={index} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="pt-6 pb-6">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color === 'blue' ? 'bg-blue-50' :
-                                        stat.color === 'emerald' ? 'bg-emerald-50' :
-                                            'bg-purple-50'
-                                        }`}>
-                                        <stat.icon className={`w-6 h-6 ${stat.color === 'blue' ? 'text-blue-600' :
-                                            stat.color === 'emerald' ? 'text-emerald-600' :
-                                                'text-purple-600'
-                                            }`} />
-                                    </div>
-                                    {stat.change !== '0' && (
-                                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${stat.change.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-600'}`}>
-                                            {stat.change}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div className="space-y-8 lg:col-span-2">
+                    <DashboardSection
+                        title="Indicadores de salud"
+                        description="Tus métricas más recientes"
+                        icon={Heart}
+                    >
+                        <DashboardPanel padding="none">
+                            <ul className="divide-y divide-slate-100">
+                                {healthMetrics.map((metric) => (
+                                    <li
+                                        key={metric.label}
+                                        className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50/80"
+                                    >
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                                            <metric.icon className="h-4 w-4" strokeWidth={1.75} />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-medium text-slate-900">{metric.label}</p>
+                                            <div className="mt-0.5 flex items-baseline gap-1.5">
+                                                <span className="font-display text-xl font-semibold tabular-nums text-slate-900">
+                                                    {metric.value}
+                                                </span>
+                                                <span className="text-sm text-slate-500">{metric.unit}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex shrink-0 flex-col items-end gap-1.5">
+                                            <span className="text-xs text-slate-400">{metric.change}</span>
+                                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                                                <CheckCircle className="h-3 w-3" />
+                                                {metric.status}
+                                            </span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </DashboardPanel>
+                    </DashboardSection>
+
+                    <DashboardSection title="Acceso rápido" description="Tareas frecuentes">
+                        <QuickActionGrid actions={quickActions} columns={3} />
+                    </DashboardSection>
+
+                    <DashboardSection title="Medicamentos activos" icon={Pill}>
+                        <DashboardPanel padding="none">
+                            <ul className="divide-y divide-slate-100">
+                                {activeMedications.map((med) => (
+                                    <li
+                                        key={med.id}
+                                        className="flex items-center justify-between gap-4 px-5 py-4"
+                                    >
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-900">{med.name}</p>
+                                            <p className="mt-0.5 text-xs text-slate-500">
+                                                {med.dosage} · {med.frequency}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-medium tracking-wide text-slate-400 uppercase">
+                                                Próxima dosis
+                                            </p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums text-blue-700">
+                                                {med.nextDose}
+                                            </p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </DashboardPanel>
+                    </DashboardSection>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Health Dashboard */}
-                        <Card className="bg-white border border-gray-200 shadow-sm">
-                            <CardContent className="pt-6 pb-6">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <Heart className="w-5 h-5 text-red-500" />
-                                    <h2 className="text-xl font-bold text-gray-900">Dashboard de Salud</h2>
+                <div className="space-y-8">
+                    <DashboardSection title="Alertas" icon={Bell}>
+                        <div className="space-y-3">
+                            {alerts.map((alert) => (
+                                <div
+                                    key={alert.id}
+                                    className={cn(
+                                        'rounded-2xl border p-4',
+                                        alert.priority === 'high'
+                                            ? 'border-rose-200/80 bg-rose-50/50'
+                                            : 'border-amber-200/80 bg-amber-50/50'
+                                    )}
+                                >
+                                    <div className="flex gap-3">
+                                        <AlertCircle
+                                            className={cn(
+                                                'mt-0.5 h-4 w-4 shrink-0',
+                                                alert.priority === 'high' ? 'text-rose-600' : 'text-amber-600'
+                                            )}
+                                        />
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">{alert.message}</p>
+                                            <p className="mt-1 text-xs text-slate-500">Vence: {alert.dueDate}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="space-y-4">
-                                    {healthMetrics.map((metric, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
-                                        >
-                                            {/* Icon */}
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${metric.label === 'Presión Arterial' ? 'bg-red-100' :
-                                                metric.label === 'Peso' ? 'bg-blue-100' :
-                                                    metric.label === 'Glucosa' ? 'bg-purple-100' :
-                                                        'bg-orange-100'
-                                                }`}>
-                                                <metric.icon className={`w-6 h-6 ${metric.label === 'Presión Arterial' ? 'text-red-600' :
-                                                    metric.label === 'Peso' ? 'text-blue-600' :
-                                                        metric.label === 'Glucosa' ? 'text-purple-600' :
-                                                            'text-orange-600'
-                                                    }`} />
-                                            </div>
+                            ))}
+                        </div>
+                    </DashboardSection>
 
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 mb-1">{metric.label}</p>
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
-                                                    <span className="text-sm text-gray-500">{metric.unit}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Status and Change */}
-                                            <div className="flex flex-col items-end gap-2 shrink-0">
-                                                <span className="text-xs text-gray-500">{metric.change}</span>
-                                                <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">
-                                                    <CheckCircle className="w-3 h-3" />
-                                                    {metric.status}
+                    <DashboardSection
+                        title="Próximas citas"
+                        icon={Calendar}
+                        action={
+                            <button
+                                type="button"
+                                onClick={() => navigate('/patient/appointments')}
+                                className="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-blue-700 transition-colors hover:text-blue-800"
+                            >
+                                Ver todas
+                                <ArrowRight className="h-3.5 w-3.5" />
+                            </button>
+                        }
+                    >
+                        <div className="space-y-3">
+                            {upcomingAppointments.map((appointment) => (
+                                <DashboardPanel key={appointment.id} padding="sm" className="transition-shadow hover:shadow-[0_8px_24px_rgba(15,118,110,0.06)]">
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-800 ring-1 ring-blue-100">
+                                            {appointment.avatar}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-semibold text-slate-900">
+                                                {appointment.doctor}
+                                            </p>
+                                            <p className="text-xs text-slate-500">{appointment.specialty}</p>
+                                            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                                <span className="inline-flex items-center gap-1">
+                                                    <Calendar className="h-3 w-3" />
+                                                    {new Date(appointment.date).toLocaleDateString('es-ES', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                    })}
+                                                </span>
+                                                <span className="inline-flex items-center gap-1">
+                                                    <Clock className="h-3 w-3" />
+                                                    {appointment.time}
                                                 </span>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Quick Actions */}
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Acceso Rápido</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {quickActions.map((action, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => {
-                                            console.log('Navigating to:', action.path);
-                                            navigate(action.path);
-                                        }}
-                                        className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all text-center group"
-                                    >
-                                        <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${action.color === 'blue' ? 'bg-blue-50' :
-                                            action.color === 'purple' ? 'bg-purple-50' :
-                                                action.color === 'emerald' ? 'bg-emerald-50' :
-                                                    'bg-orange-50'
-                                            }`}>
-                                            <action.icon className={`w-6 h-6 ${action.color === 'blue' ? 'text-blue-600' :
-                                                action.color === 'purple' ? 'text-purple-600' :
-                                                    action.color === 'emerald' ? 'text-emerald-600' :
-                                                        'text-orange-600'
-                                                }`} />
-                                        </div>
-                                        <p className="text-sm font-semibold text-gray-900">{action.title}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Medications */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Pill className="w-5 h-5 text-pink-500" />
-                                <h2 className="text-xl font-bold text-gray-900">Medicamentos Activos</h2>
-                            </div>
-                            <Card className="bg-white border border-gray-200 shadow-sm">
-                                <CardContent className="pt-4 pb-4">
-                                    <div className="space-y-3">
-                                        {activeMedications.map((med, index) => (
-                                            <div
-                                                key={med.id}
-                                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 ${index !== activeMedications.length - 1 ? 'border-b border-gray-100' : ''}`}
-                                            >
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-900 text-sm">{med.name}</h4>
-                                                    <p className="text-xs text-gray-600">{med.dosage} • {med.frequency}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-xs text-gray-500 mb-1">Próxima dosis</p>
-                                                    <span className="text-sm font-semibold text-blue-600">{med.nextDose}</span>
-                                                </div>
-                                            </div>
-                                        ))}
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </DashboardPanel>
+                            ))}
                         </div>
-                    </div>
-
-                    {/* Sidebar */}
-                    <div className="space-y-6">
-                        {/* Alerts */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Bell className="w-5 h-5 text-orange-500" />
-                                <h3 className="text-lg font-bold text-gray-900">Alertas Importantes</h3>
-                            </div>
-                            <div className="space-y-3">
-                                {alerts.map((alert) => (
-                                    <Card key={alert.id} className={`border-l-4 ${alert.priority === 'high' ? 'border-red-500 bg-red-50' : 'border-yellow-500 bg-yellow-50'}`}>
-                                        <CardContent className="pt-4 pb-4">
-                                            <div className="flex items-start gap-2">
-                                                <AlertCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${alert.priority === 'high' ? 'text-red-600' : 'text-yellow-600'}`} />
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-medium text-gray-900">{alert.message}</p>
-                                                    <p className="text-xs text-gray-600 mt-1">Vence: {alert.dueDate}</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Upcoming Appointments */}
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-blue-500" />
-                                    <h3 className="text-lg font-bold text-gray-900">Próximas Citas</h3>
-                                </div>
-                                <button
-                                    onClick={() => navigate('/patient/search')}
-                                    className="text-blue-600 hover:text-blue-700 font-semibold text-xs"
-                                >
-                                    + Nueva
-                                </button>
-                            </div>
-                            <div className="space-y-3">
-                                {upcomingAppointments.map((appointment) => (
-                                    <Card key={appointment.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                        <CardContent className="pt-4 pb-4">
-                                            <div className="flex items-start gap-3">
-                                                <div className={`w-12 h-12 rounded-full bg-${appointment.color}-100 flex items-center justify-center text-${appointment.color}-700 font-bold text-sm shrink-0`}>
-                                                    {appointment.avatar}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-bold text-gray-900 text-sm truncate">{appointment.doctor}</h4>
-                                                    <p className="text-xs text-gray-600 mb-2">{appointment.specialty}</p>
-                                                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                        <span className="flex items-center gap-1">
-                                                            <Calendar className="w-3 h-3" />
-                                                            {new Date(appointment.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                                                        </span>
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="w-3 h-3" />
-                                                            {appointment.time}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    </DashboardSection>
                 </div>
             </div>
         </div>

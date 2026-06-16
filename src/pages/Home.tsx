@@ -1,78 +1,34 @@
 import { VerticalTabs } from '@/components/ui/vertical-tabs';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { WhisperDemo } from '@/components/WhisperDemo';
+
 import Grid from '@/components/Grid';
 import Testimonials from '@/components/Testimonials';
 import { AnimatedSection } from '@/components/animated-section';
 import { Badge } from '@/components/ui/badge';
-import { Zap, PictureInPicture2, Sparkles, MessageCircle } from 'lucide-react';
+import { Zap, Sparkles, MessageCircle } from 'lucide-react';
 import { LogoCarouselDemo } from '@/components/LogoCarousel';
 import DemoOne from '@/components/slider-demo';
 import PricingSection from '@/components/pricing';
-import { AuroraBackground } from '@/components/ui/aurora-background';
+
 import FrequentlyAskedQuestionsStack from '@/components/faq';
-import { DemoAiAssistantBasic } from '@/components/demo-ai';
-import { EncryptedText } from "@/components/ui/encrypted-text";
+
+
+import { HeroSplit } from '@/components/home/HeroSplit';
+import { AlmaOrb } from '@/components/home/AlmaOrb';
 
 export const Home = () => {
-  const { isAuthenticated } = useAuth();
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <AuroraBackground className="min-h-screen w-full" showRadialGradient={false}>
-        <br></br>
-        <br></br>
-        <br></br>
+    <div className="min-h-screen bg-white">
+      {/* Modern Grid Background */}
+      <div className="absolute inset-0 z-0 h-full w-full bg-white bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_80%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      <div className="absolute inset-0 z-0 bg-linear-to-b from-blue-50/50 to-transparent pointer-events-none"></div>
 
-        <div className="container mx-auto px-4 py-15">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <Badge
-                variant="secondary"
-                className="mb-8 px-6 py-3 text-base bg-linear-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md border-2 border-blue-600/30 shadow-lg shadow-blue-500/20 text-blue-900"
-              >
-                <span className="font-semibold flex items-center gap-2 justify-center">
-                  <PictureInPicture2 className="h-4 w-4 animate-pulse" />
-                  Plataforma de Telemedicina
-                </span>
-              </Badge>
+      <div className="relative z-10 pt-10">
+        <HeroSplit />
 
-              <WhisperDemo />
-              <br></br>
-              {!isAuthenticated && (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto sm:max-w-none">
-                  <Link
-                    to="/register"
-                    className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 sm:px-8 rounded-full text-base sm:text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-blue-500/25 text-center"
-                  >
-                    Comenzar Ahora
-                  </Link>
-                  <Link
-                    to="/login"
-                    className="w-full sm:w-auto bg-white text-blue-600 px-6 py-3 sm:px-8 rounded-full text-base sm:text-lg font-semibold hover:bg-blue-50 transition shadow-lg hover:shadow-blue-500/10 text-center"
-                  >
-                    Iniciar Sesión
-                  </Link>
-                </div>
-              )}
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection delay={100}>
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-light tracking-tight text-gray-800">
-                La experiencia de muchos a <span className="font-semibold"> tu servicio.</span>
-              </h2>
-            </div>
-          </AnimatedSection>
-
+        <div className="container mx-auto px-4 pb-15">
           <LogoCarouselDemo />
-
-          <br></br>
-
         </div>
-      </AuroraBackground>
+      </div>
 
       <div className="container mx-auto px-4">
         <section id="servicios">
@@ -94,102 +50,114 @@ export const Home = () => {
           <DemoOne />
         </div>
 
-        {/* ALMA Section */}
-        <section className="container mx-auto px-4 py-20">
-          <AnimatedSection delay={500}>
+      </div>
+
+      {/* ALMA Section */}
+      <section className="w-full bg-slate-950 py-12 md:py-16 relative overflow-hidden">
+        {/* Dark theme background glowing effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-[100px]"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <AnimatedSection delay={200}>
             {/* Section Title */}
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4 border-black">
+            <div className="text-center mb-8">
+              <Badge variant="outline" className="mb-4 border-indigo-500/30 text-indigo-300 bg-indigo-500/10">
                 Inteligencia Artificial
               </Badge>
-              <h3 className="text-4xl md:text-5xl font-normal text-gray-900 mb-4 leading-tight">
-                <EncryptedText
-                  text="En MediGO te cuidamos con nuestra alma"
-                  encryptedClassName="text-neutral-500"
-                  revealedClassName="font-normal text-gray-900"
-                  boldText="alma"
-                  boldClassName="font-semibold text-indigo-600"
-                  revealDelayMs={50}
-                />
+              <h3 className="text-3xl md:text-5xl font-normal text-white mb-2 md:mb-4 leading-tight px-2">
+                En MediGO te cuidamos con nuestra <span className="font-semibold text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]">alma</span>
               </h3>
             </div>
 
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               {/* Feature Badges */}
-              <div className="flex flex-wrap gap-3 justify-center mb-8">
-                <div className="px-6 py-3 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-full border border-blue-200 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-700">IA potenciada por Gemini</span>
+              <div className="flex flex-wrap gap-2 md:gap-3 justify-center mb-6 md:mb-10 px-2">
+                <div className="px-3 py-1.5 md:px-4 md:py-2 bg-slate-900/50 backdrop-blur-md rounded-full border border-slate-800 flex items-center gap-1.5 hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-default">
+                  <Sparkles className="h-3 w-3 md:h-3.5 md:w-3.5 text-cyan-400" />
+                  <span className="text-[11px] md:text-xs font-medium text-slate-200">IA potenciada por Gemini</span>
                 </div>
-                <div className="px-6 py-3 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-full border border-blue-200 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-700">Asistencia 24/7</span>
+                <div className="px-3 py-1.5 md:px-4 md:py-2 bg-slate-900/50 backdrop-blur-md rounded-full border border-slate-800 flex items-center gap-1.5 hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-default">
+                  <MessageCircle className="h-3 w-3 md:h-3.5 md:w-3.5 text-cyan-400" />
+                  <span className="text-[11px] md:text-xs font-medium text-slate-200">Asistencia 24/7</span>
                 </div>
-                <div className="px-6 py-3 bg-linear-to-r from-blue-500/10 to-indigo-500/10 rounded-full border border-blue-200 flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-700">Respuestas Instantáneas</span>
+                <div className="px-3 py-1.5 md:px-4 md:py-2 bg-slate-900/50 backdrop-blur-md rounded-full border border-slate-800 flex items-center gap-1.5 hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-default">
+                  <Zap className="h-3 w-3 md:h-3.5 md:w-3.5 text-cyan-400" />
+                  <span className="text-[11px] md:text-xs font-medium text-slate-200">Respuestas Instantáneas</span>
                 </div>
               </div>
 
-              <AnimatedSection delay={1000}>
-                <div className="mt-6 flex flex-col items-center justify-center">
-                  <p className="text-xl md:text-2xl text-gray-600 mb-10 font-medium text-center">
-                    Por cierto, te presentamos a <span className="font-bold text-blue-600">A.L.M.A</span>
+              <AnimatedSection delay={400}>
+                <div className="flex flex-col items-center justify-center">
+                  <p className="text-lg md:text-2xl text-slate-400 mb-1 font-medium text-center">
+                    Por cierto, te presentamos a <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-cyan-400 tracking-wide">A.L.M.A</span>
                   </p>
-                  <AnimatedSection delay={1500} className="w-full">
-                    <DemoAiAssistantBasic />
-                  </AnimatedSection>
+                  <p className="text-[10px] md:text-xs text-indigo-300/60 mb-2 md:mb-6 font-mono tracking-[0.2em] uppercase text-center">
+                    Asistente en Línea de Médica Avanzada
+                  </p>
+
+                  {/* Alma Orb Component */}
+                  <div className="scale-75 md:scale-100 origin-top -mt-4 md:mt-0">
+                    <AlmaOrb />
+                  </div>
+
+
                 </div>
               </AnimatedSection>
             </div>
           </AnimatedSection>
-        </section>
+        </div>
+      </section>
 
-        <br></br>
-        <br></br>
-        <section id="beneficios">
-          <AnimatedSection delay={400}>
-            <Grid />
-          </AnimatedSection>
-        </section>
+      {/* Beneficios */}
+      <section id="beneficios" className="container mx-auto px-4 py-16">
+        <AnimatedSection delay={400}>
+          <Grid />
+        </AnimatedSection>
+      </section>
 
-        <section id="testimonios">
+      {/* Testimonios (White Background Break) */}
+      <section id="testimonios" className="w-full bg-white py-24 shadow-sm border-y border-slate-200/60">
+        <div className="container mx-auto px-4">
           <AnimatedSection delay={600}>
             <Testimonials />
           </AnimatedSection>
-        </section>
+        </div>
+      </section>
 
+      {/* Vertical Tabs */}
+      <section className="container mx-auto px-4 py-20">
         <AnimatedSection delay={400}>
           <VerticalTabs />
         </AnimatedSection>
+      </section>
 
-        {/* Pricing Section */}
-        <section id="pricing">
+      {/* Pricing Section (Subtle Slate Background Break) */}
+      <section id="pricing" className="w-full bg-slate-50 py-24 border-t border-slate-200/60">
+        <div className="container mx-auto px-4">
           <AnimatedSection delay={400}>
             <PricingSection />
           </AnimatedSection>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="container mx-auto px-4 py-15">
-          <AnimatedSection delay={500}>
-            <div className="text-center mb-4">
-              <Badge variant="outline" className="mb-4 border-black">
-                FAQ
-              </Badge>
-              <h3 className="text-4xl md:text-5xl font-normal tracking-tight text-gray-900">
-                Preguntas Frecuentes
-              </h3>
-            </div>
-            <FrequentlyAskedQuestionsStack />
-          </AnimatedSection>
-        </section >
-      </div>
+      {/* FAQ Section */}
+      <section id="faq" className="container mx-auto px-4 py-24">
+        <AnimatedSection delay={500}>
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 border-slate-300">
+              FAQ
+            </Badge>
+            <h3 className="text-4xl md:text-5xl font-normal tracking-tight text-gray-900">
+              Preguntas Frecuentes
+            </h3>
+          </div>
+          <FrequentlyAskedQuestionsStack />
+        </AnimatedSection>
+      </section>
 
-      <br></br>
-      <br></br>
-      <br></br>
-
-    </div >
+    </div>
   );
 };

@@ -96,6 +96,22 @@
     body {
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
+        font-family: "Noto Sans", system-ui, sans-serif;
+    }
+
+    .font-display {
+        font-family: "Figtree", system-ui, sans-serif;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 

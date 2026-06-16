@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Upload, Image as ImageIcon, Calendar, User, Stethoscope, X } from 'lucide-react';
+import { Upload, Image as ImageIcon, Calendar, Stethoscope, X, ClipboardList, Pill, FileText, MessageCircle } from 'lucide-react';
 import { historialMedicoService } from '@/api/historial-medico.service';
 import { imagenMedicaService, type ImagenMedica } from '@/api/imagen-medica.service';
 import { MedicalImageViewer } from '@/components/MedicalImageViewer';
@@ -9,6 +9,8 @@ import { MedicalImage } from '@/components/MedicalImage';
 import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 import { useAuth } from '@/context/AuthContext';
 import type { HistorialMedico } from '@/types';
+import { DashboardHeader, DashboardPanel } from '@/components/dashboard';
+import { cn } from '@/lib/utils';
 
 export const HistorialMedicoPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -19,7 +21,7 @@ export const HistorialMedicoPage = () => {
     const [selectedImage, setSelectedImage] = useState<ImagenMedica | null>(null);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string>('');
+    const [error, setError] = useState('');
     const [imageToDelete, setImageToDelete] = useState<ImagenMedica | null>(null);
 
     const canAnnotate = user?.rol === 'MEDICO';
@@ -29,8 +31,7 @@ export const HistorialMedicoPage = () => {
         try {
             const data = await historialMedicoService.getById(Number(id));
             setHistorial(data);
-        } catch (error) {
-            console.error('Error loading historial:', error);
+        } catch {
             setError('Error al cargar el historial médico');
         }
     };
@@ -40,9 +41,7 @@ export const HistorialMedicoPage = () => {
         try {
             const data = await imagenMedicaService.getImagesByHistorial(Number(id));
             setImagenes(data);
-        } catch (error) {
-            console.error('Error loading images:', error);
-            // Don't set error here, just log it - images might not exist yet
+        } catch {
             setImagenes([]);
         } finally {
             setLoading(false);
@@ -54,261 +53,231 @@ export const HistorialMedicoPage = () => {
         loadImages();
     }, [id]);
 
-    const handleUploadSuccess = () => {
-        loadImages();
-    };
-
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-                    <p className="text-red-600 mb-4">{error}</p>
-                    <p className="text-gray-500 text-sm mb-6">
-                        Verifica que el backend esté corriendo en http://localhost:8080
-                    </p>
-                    <button
-                        onClick={() => window.history.back()}
-                        className="w-full px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
-                    >
-                        Volver
-                    </button>
+            <div className="flex min-h-[320px] items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+                    <p className="text-sm text-slate-500">Cargando historial...</p>
                 </div>
             </div>
         );
     }
 
-    if (!historial) {
+    if (error || !historial) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p className="text-gray-600">Historial médico no encontrado</p>
+            <div>
+                <DashboardHeader title="Historial médico" subtitle="" />
+                <DashboardPanel className="flex flex-col items-center py-16 text-center">
+                    <p className="text-sm font-medium text-rose-700">{error || 'Registro no encontrado'}</p>
+                    <button type="button" onClick={() => navigate(-1)}
+                        className="mt-4 cursor-pointer text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900">
+                        ← Volver
+                    </button>
+                </DashboardPanel>
             </div>
         );
     }
+
+    const doctor = historial.cita.medico;
+    const especialidad = doctor.especialidades?.[0]?.nombre_especialidad || 'Especialista';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-8">
-            <div className="max-w-7xl mx-auto px-4">
-                {/* Header Card with Doctor Info */}
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-                    <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                <Stethoscope className="w-8 h-8 text-white" />
-                            </div>
-                            <div className="flex-1">
-                                <h1 className="text-2xl font-bold text-white">
-                                    Dr. {historial.cita.medico.nombres} {historial.cita.medico.apellidos}
-                                </h1>
-                                <p className="text-emerald-100">Especialista</p>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
-                                <div className="flex items-center gap-2 text-white">
-                                    <Calendar className="w-4 h-4" />
-                                    <span className="font-medium">
-                                        {new Date(historial.createdAt).toLocaleDateString('es-ES', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric'
-                                        })}
-                                    </span>
+        <div>
+            <DashboardHeader
+                title={`Dr. ${doctor.nombres} ${doctor.apellidos}`}
+                subtitle={`${especialidad} · ${new Date(historial.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+            />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {/* Main column */}
+                <div className="space-y-5 lg:col-span-2">
+                    {/* Doctor header card */}
+                    <DashboardPanel className="overflow-hidden p-0">
+                        <div className="h-2 bg-linear-to-r from-blue-600 to-blue-700" />
+                        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+                                    <Stethoscope className="h-5 w-5" strokeWidth={1.75} />
+                                </div>
+                                <div>
+                                    <p className="font-display text-base font-semibold text-slate-900">
+                                        Dr. {doctor.nombres} {doctor.apellidos}
+                                    </p>
+                                    <p className="text-sm text-slate-500">{especialidad}</p>
                                 </div>
                             </div>
+                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                                <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                                {new Date(historial.cita.fechaHora).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </div>
                         </div>
-                        <div className="mt-4 text-sm text-emerald-100">
-                            Registro: {new Date(historial.createdAt).toLocaleDateString('es-ES', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            })}
-                        </div>
-                    </div>
+                    </DashboardPanel>
 
-                    {/* Diagnosis Section */}
-                    <div className="p-6 border-b border-gray-100">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="p-2 bg-emerald-100 rounded-lg">
-                                <Stethoscope className="w-5 h-5 text-emerald-600" />
-                            </div>
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Diagnóstico</h3>
-                        </div>
-                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border-l-4 border-emerald-500">
-                            <p className="text-gray-700 leading-relaxed">{historial.diagnostico}</p>
-                        </div>
-                    </div>
-
-                    {/* Prescription Section */}
-                    {historial.receta && (
-                        <div className="p-6 border-b border-gray-100">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Calendar className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Receta Médica</h3>
-                            </div>
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-500">
-                                <p className="text-gray-700 leading-relaxed">{historial.receta}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Notes Section */}
-                    {historial.notas && (
-                        <div className="p-6">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="p-2 bg-purple-100 rounded-lg">
-                                    <Calendar className="w-5 h-5 text-purple-600" />
-                                </div>
-                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Notas Adicionales</h3>
-                            </div>
-                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-l-4 border-purple-500">
-                                <p className="text-gray-700 leading-relaxed">{historial.notas}</p>
-                            </div>
-                        </div>
-                    )}
+                    {/* Medical content */}
+                    <DashboardPanel className="space-y-5">
+                        <MedicalBlock icon={ClipboardList} label="Diagnóstico" color="blue">
+                            {historial.diagnostico}
+                        </MedicalBlock>
+                        {historial.receta && (
+                            <MedicalBlock icon={Pill} label="Receta médica" color="indigo">
+                                {historial.receta}
+                            </MedicalBlock>
+                        )}
+                        {historial.notas && (
+                            <MedicalBlock icon={FileText} label="Notas adicionales" color="slate">
+                                {historial.notas}
+                            </MedicalBlock>
+                        )}
+                    </DashboardPanel>
                 </div>
 
-                {/* Consult Doctor Button */}
-                <div className="mb-6">
-                    <button
-                        onClick={() => navigate(`/messages/chat/${historial.cita.medico.id}`)}
-                        className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
-                    >
-                        <User className="w-5 h-5" />
-                        Consulta con tu médico
-                    </button>
-                </div>
-                {/* Imágenes Médicas */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                            <ImageIcon className="w-6 h-6" />
-                            Imágenes Médicas
-                        </h2>
+                {/* Sidebar */}
+                <div className="space-y-5">
+                    {/* Message doctor */}
+                    <DashboardPanel>
+                        <h2 className="font-display mb-3 text-sm font-semibold text-slate-900">¿Tienes dudas?</h2>
+                        <p className="mb-4 text-xs leading-relaxed text-slate-500">
+                            Puedes contactar a tu médico directamente para aclarar el diagnóstico o la receta.
+                        </p>
                         <button
-                            onClick={() => setShowUploadDialog(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            type="button"
+                            onClick={() => navigate(`/messages/chat/${doctor.id}`)}
+                            className="inline-flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
                         >
-                            <Upload className="w-5 h-5" />
-                            Subir Imagen
+                            <MessageCircle className="h-4 w-4" strokeWidth={1.75} />
+                            Consultar con el médico
                         </button>
-                    </div>
+                    </DashboardPanel>
 
-                    {imagenes.length === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <ImageIcon className="w-8 h-8 text-gray-400" />
+                    {/* Date info */}
+                    <DashboardPanel className="space-y-3">
+                        <h2 className="font-display text-sm font-semibold text-slate-900">Detalles del registro</h2>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs">
+                                <span className="text-slate-500">Fecha de cita</span>
+                                <span className="font-medium text-slate-900">
+                                    {new Date(historial.cita.fechaHora).toLocaleDateString('es-ES')}
+                                </span>
                             </div>
-                            <p className="text-gray-600 mb-2">No hay imágenes médicas</p>
-                            <p className="text-sm text-gray-500">
-                                Haz clic en "Subir Imagen" para agregar radiografías, análisis, resonancias, etc.
-                            </p>
+                            <div className="flex justify-between text-xs">
+                                <span className="text-slate-500">Registro creado</span>
+                                <span className="font-medium text-slate-900">
+                                    {new Date(historial.createdAt).toLocaleDateString('es-ES')}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                                <span className="text-slate-500">Con receta</span>
+                                <span className={cn('font-semibold', historial.receta ? 'text-blue-600' : 'text-slate-400')}>
+                                    {historial.receta ? 'Sí' : 'No'}
+                                </span>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {imagenes.map((imagen) => (
-                                <div
-                                    key={imagen.id}
-                                    className="group relative bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-2xl transition-all duration-300"
-                                >
-                                    {/* Delete Button */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setImageToDelete(imagen);
-                                        }}
-                                        className="absolute top-3 right-3 z-10 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow-lg"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-
-                                    {/* Image */}
-                                    <div
-                                        className="aspect-square bg-gray-100 flex items-center justify-center cursor-pointer relative overflow-hidden"
-                                        onClick={() => setSelectedImage(imagen)}
-                                    >
-                                        <MedicalImage
-                                            imageId={imagen.id}
-                                            alt={imagen.fileName}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                        />
-                                        {/* Overlay on hover */}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                                                    <p className="text-sm font-semibold text-gray-900">Click para ver</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="p-4 bg-gradient-to-br from-gray-50 to-white">
-                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                            <h4 className="font-semibold text-gray-900 truncate flex-1">
-                                                {imagen.fileName}
-                                            </h4>
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full whitespace-nowrap">
-                                                {(imagen.fileSize / 1024).toFixed(0)} KB
-                                            </span>
-                                        </div>
-                                        {imagen.description && (
-                                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                                                {imagen.description}
-                                            </p>
-                                        )}
-                                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                                            <Calendar className="w-3 h-3" />
-                                            <span>{new Date(imagen.uploadedAt).toLocaleDateString('es-ES', {
-                                                day: 'numeric',
-                                                month: 'long',
-                                                year: 'numeric'
-                                            })}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    </DashboardPanel>
                 </div>
             </div>
 
-            {/* Image Viewer Modal */}
+            {/* Medical images */}
+            <section className="mt-8">
+                <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                            <ImageIcon className="h-4 w-4" strokeWidth={1.75} />
+                        </div>
+                        <div>
+                            <h2 className="font-display text-lg font-semibold text-slate-900">Imágenes médicas</h2>
+                            <p className="text-xs text-slate-500">{imagenes.length} archivo{imagenes.length !== 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setShowUploadDialog(true)}
+                        className="inline-flex min-h-[40px] cursor-pointer items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                    >
+                        <Upload className="h-4 w-4" strokeWidth={1.75} />
+                        Subir imagen
+                    </button>
+                </div>
+
+                {imagenes.length === 0 ? (
+                    <DashboardPanel className="flex flex-col items-center py-14 text-center">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+                            <ImageIcon className="h-7 w-7 text-slate-400" strokeWidth={1.5} />
+                        </div>
+                        <p className="mt-4 text-sm font-medium text-slate-700">Sin imágenes médicas</p>
+                        <p className="mt-1 max-w-xs text-xs text-slate-500">
+                            Sube radiografías, análisis o resonancias para mantener tu historial completo.
+                        </p>
+                    </DashboardPanel>
+                ) : (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {imagenes.map((imagen) => (
+                            <article
+                                key={imagen.id}
+                                className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-blue-200/80 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)]"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={() => setImageToDelete(imagen)}
+                                    className="absolute right-3 top-3 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/90 text-slate-500 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-rose-50 hover:text-rose-600"
+                                    aria-label="Eliminar imagen"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+
+                                <div
+                                    className="relative aspect-square cursor-pointer overflow-hidden bg-slate-100"
+                                    onClick={() => setSelectedImage(imagen)}
+                                >
+                                    <MedicalImage
+                                        imageId={imagen.id}
+                                        alt={imagen.fileName}
+                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-colors group-hover:bg-slate-900/25">
+                                        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-800 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                                            Ver imagen
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="p-4">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <p className="truncate text-sm font-medium text-slate-900">{imagen.fileName}</p>
+                                        <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                                            {(imagen.fileSize / 1024).toFixed(0)} KB
+                                        </span>
+                                    </div>
+                                    {imagen.description && (
+                                        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{imagen.description}</p>
+                                    )}
+                                    <p className="mt-2 flex items-center gap-1 text-[11px] text-slate-400">
+                                        <Calendar className="h-3 w-3" />
+                                        {new Date(imagen.uploadedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
+            </section>
+
             {selectedImage && (
-                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 p-4 backdrop-blur-sm">
                     <div className="w-full max-w-6xl">
-                        <MedicalImageViewer
-                            image={selectedImage}
-                            onClose={() => setSelectedImage(null)}
-                            canAnnotate={canAnnotate}
-                        />
+                        <MedicalImageViewer image={selectedImage} onClose={() => setSelectedImage(null)} canAnnotate={canAnnotate} />
                     </div>
                 </div>
             )}
 
-            {/* Upload Dialog */}
             {showUploadDialog && id && (
                 <ImageUploadDialog
                     historialMedicoId={Number(id)}
-                    onUploadSuccess={handleUploadSuccess}
+                    onUploadSuccess={() => loadImages()}
                     onClose={() => setShowUploadDialog(false)}
                 />
             )}
 
-            {/* Delete Confirmation Dialog */}
             <DeleteConfirmDialog
                 isOpen={imageToDelete !== null}
                 onClose={() => setImageToDelete(null)}
@@ -317,10 +286,9 @@ export const HistorialMedicoPage = () => {
                         try {
                             await imagenMedicaService.deleteImage(imageToDelete.id);
                             loadImages();
-                        } catch (error: any) {
-                            console.error('Error deleting image:', error);
-                            const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
-                            alert(`Error al eliminar la imagen: ${errorMessage}`);
+                        } catch (err: unknown) {
+                            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error desconocido';
+                            alert(`Error al eliminar la imagen: ${msg}`);
                         }
                     }
                 }}
@@ -330,3 +298,27 @@ export const HistorialMedicoPage = () => {
         </div>
     );
 };
+
+function MedicalBlock({ icon: Icon, label, color, children }: {
+    icon: typeof FileText;
+    label: string;
+    color: 'blue' | 'indigo' | 'slate';
+    children: React.ReactNode;
+}) {
+    const iconBg = { blue: 'bg-blue-50 text-blue-600', indigo: 'bg-indigo-50 text-indigo-600', slate: 'bg-slate-100 text-slate-600' };
+    const blockBg = { blue: 'bg-blue-50/40 border-blue-100/80', indigo: 'bg-indigo-50/40 border-indigo-100/80', slate: 'bg-slate-50/60 border-slate-200/80' };
+
+    return (
+        <div>
+            <div className="mb-2 flex items-center gap-2">
+                <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', iconBg[color])}>
+                    <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                </div>
+                <h4 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{label}</h4>
+            </div>
+            <div className={cn('rounded-xl border px-4 py-3', blockBg[color])}>
+                <p className="text-sm leading-relaxed text-slate-700">{children}</p>
+            </div>
+        </div>
+    );
+}

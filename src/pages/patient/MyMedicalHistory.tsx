@@ -4,11 +4,13 @@ import { historialMedicoService } from '../../api/historial-medico.service';
 import { useAuth } from '../../context/AuthContext';
 import type { HistorialMedico } from '../../types';
 import {
-    ArrowLeft, FileText, Calendar, Stethoscope, Pill, ClipboardList,
-    Activity, TrendingUp, Search, Filter, Clock, Check, ChevronDown
+    FileText, Calendar, Stethoscope, Pill, ClipboardList,
+    Activity, TrendingUp, Search, Filter, Check, ChevronDown, ArrowRight
 } from 'lucide-react';
 import { MedicalAIChat } from '../../components/MedicalAIChat';
 import { Listbox, Transition } from '@headlessui/react';
+import { DashboardHeader, StatCard, DashboardPanel } from '@/components/dashboard';
+import { cn } from '@/lib/utils';
 
 export const MyMedicalHistory = () => {
     const navigate = useNavigate();
@@ -19,73 +21,51 @@ export const MyMedicalHistory = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedYear, setSelectedYear] = useState<string>('all');
 
-    useEffect(() => {
-        loadHistory();
-    }, []);
+    useEffect(() => { loadHistory(); }, []);
 
     const loadHistory = async () => {
-        if (!user) {
-            setError('Debes iniciar sesión para ver tu historial');
-            setLoading(false);
-            return;
-        }
-
+        if (!user) { setError('Debes iniciar sesión'); setLoading(false); return; }
         try {
             const data = await historialMedicoService.getMyHistory();
-            const sorted = data.sort((a, b) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-            setHistoriales(sorted);
-        } catch (err: any) {
-            console.error('Error loading medical history:', err);
-            setError(err.response?.data?.message || 'Error al cargar el historial médico');
+            setHistoriales(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        } catch (err: unknown) {
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al cargar el historial médico';
+            setError(msg);
         } finally {
             setLoading(false);
         }
     };
 
-    // Estadísticas calculadas
-    const stats = useMemo(() => {
-        const total = historiales.length;
-        const withPrescription = historiales.filter(h => h.receta).length;
-        const uniqueDoctors = new Set(historiales.map(h => h.cita.medico.id)).size;
-        const thisYear = historiales.filter(h =>
-            new Date(h.createdAt).getFullYear() === new Date().getFullYear()
-        ).length;
+    const stats = useMemo(() => ({
+        total: historiales.length,
+        withPrescription: historiales.filter(h => h.receta).length,
+        uniqueDoctors: new Set(historiales.map(h => h.cita.medico.id)).size,
+        thisYear: historiales.filter(h => new Date(h.createdAt).getFullYear() === new Date().getFullYear()).length,
+    }), [historiales]);
 
-        return { total, withPrescription, uniqueDoctors, thisYear };
-    }, [historiales]);
-
-    // Años disponibles para filtrar
     const availableYears = useMemo(() => {
         const years = historiales.map(h => new Date(h.createdAt).getFullYear());
         return ['all', ...Array.from(new Set(years)).sort((a, b) => b - a)];
     }, [historiales]);
 
-    // Filtrar historiales
-    const filteredHistoriales = useMemo(() => {
-        return historiales.filter(h => {
-            const matchesSearch = searchTerm === '' ||
-                h.diagnostico.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                h.cita.medico.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                h.cita.medico.apellidos.toLowerCase().includes(searchTerm.toLowerCase());
-
-            const matchesYear = selectedYear === 'all' ||
-                new Date(h.createdAt).getFullYear().toString() === selectedYear;
-
-            return matchesSearch && matchesYear;
-        });
-    }, [historiales, searchTerm, selectedYear]);
+    const filtered = useMemo(() => historiales.filter(h => {
+        const matchSearch = !searchTerm ||
+            h.diagnostico.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            h.cita.medico.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            h.cita.medico.apellidos.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchYear = selectedYear === 'all' || new Date(h.createdAt).getFullYear().toString() === selectedYear;
+        return matchSearch && matchYear;
+    }), [historiales, searchTerm, selectedYear]);
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="relative">
-                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200 border-t-emerald-600 mx-auto"></div>
-                        <Activity className="w-6 h-6 text-emerald-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            <div>
+                <DashboardHeader title="Historial médico" subtitle="Cargando tus registros..." />
+                <div className="flex min-h-[320px] items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+                        <p className="text-sm text-slate-500">Cargando historial médico...</p>
                     </div>
-                    <p className="mt-6 text-gray-600 font-medium">Cargando tu historial médico...</p>
                 </div>
             </div>
         );
@@ -93,299 +73,208 @@ export const MyMedicalHistory = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border border-red-100">
-                    <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <FileText className="w-10 h-10 text-red-500" />
+            <div>
+                <DashboardHeader title="Historial médico" subtitle="" />
+                <DashboardPanel className="flex flex-col items-center py-16 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
+                        <FileText className="h-7 w-7 text-rose-500" strokeWidth={1.5} />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3">Error</h2>
-                    <p className="text-gray-600 mb-8">{error}</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="px-8 py-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
-                    >
-                        Volver
+                    <p className="mt-4 text-sm font-medium text-rose-700">{error}</p>
+                    <button type="button" onClick={() => navigate(-1)}
+                        className="mt-6 cursor-pointer text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900">
+                        ← Volver
                     </button>
-                </div>
+                </DashboardPanel>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 py-8 px-4 sm:px-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex items-center gap-4 mb-8">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-3 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-emerald-600 hover:border-emerald-300 hover:shadow-md transition-all"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex-1">
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-                            Mi Historial Médico
-                        </h1>
-                        <p className="text-gray-600 text-sm mt-1">Dashboard completo de tus consultas y tratamientos</p>
+        <div>
+            <DashboardHeader
+                title="Historial médico"
+                subtitle="Registro completo de tus consultas y tratamientos"
+            />
+
+            {historiales.length === 0 ? (
+                <DashboardPanel className="flex flex-col items-center py-20 text-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+                        <FileText className="h-8 w-8 text-slate-400" strokeWidth={1.5} />
                     </div>
-                </div>
-
-                {historiales.length === 0 ? (
-                    <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-16 text-center">
-                        <div className="w-24 h-24 bg-gradient-to-br from-emerald-50 to-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                            <FileText className="w-12 h-12 text-emerald-600" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                            No tienes registros médicos
-                        </h3>
-                        <p className="text-gray-500 max-w-md mx-auto text-lg">
-                            Los registros médicos creados por tus doctores aparecerán aquí después de tus consultas.
-                        </p>
+                    <h3 className="mt-5 font-display text-lg font-semibold text-slate-900">Sin registros médicos</h3>
+                    <p className="mt-2 max-w-xs text-sm text-slate-500">
+                        Los registros creados por tus médicos aparecerán aquí después de tus consultas.
+                    </p>
+                </DashboardPanel>
+            ) : (
+                <>
+                    {/* Stats */}
+                    <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                        <StatCard label="Registros totales" value={stats.total.toString()} icon={FileText} trend={`+${stats.thisYear} este año`} trendPositive />
+                        <StatCard label="Con receta médica" value={stats.withPrescription.toString()} icon={Pill} />
+                        <StatCard label="Médicos distintos" value={stats.uniqueDoctors.toString()} icon={Stethoscope} />
+                        <StatCard label="Consultas este año" value={stats.thisYear.toString()} icon={TrendingUp} />
                     </div>
-                ) : (
-                    <>
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            <div className="bg-white rounded-2xl p-6 border border-emerald-100 shadow-lg hover:shadow-xl transition-all">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                                        <FileText className="w-6 h-6 text-emerald-600" />
-                                    </div>
-                                    <TrendingUp className="w-5 h-5 text-emerald-500" />
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
-                                <p className="text-sm text-gray-500 mt-1">Registros Totales</p>
-                            </div>
 
-                            <div className="bg-white rounded-2xl p-6 border border-blue-100 shadow-lg hover:shadow-xl transition-all">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                        <Pill className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <Activity className="w-5 h-5 text-blue-500" />
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">{stats.withPrescription}</p>
-                                <p className="text-sm text-gray-500 mt-1">Con Receta Médica</p>
-                            </div>
+                    {/* AI Assistant */}
+                    <div className="mb-8">
+                        <MedicalAIChat />
+                    </div>
 
-                            <div className="bg-white rounded-2xl p-6 border border-purple-100 shadow-lg hover:shadow-xl transition-all">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                                        <Stethoscope className="w-6 h-6 text-purple-600" />
-                                    </div>
-                                    <Activity className="w-5 h-5 text-purple-500" />
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">{stats.uniqueDoctors}</p>
-                                <p className="text-sm text-gray-500 mt-1">Doctores Diferentes</p>
+                    {/* Search + Year filter */}
+                    <DashboardPanel className="mb-8">
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <div className="relative flex-1">
+                                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por diagnóstico o médico..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full min-h-[44px] rounded-xl border border-slate-200/80 bg-slate-50/50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                                />
                             </div>
-
-                            <div className="bg-white rounded-2xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                                        <Calendar className="w-6 h-6 text-orange-600" />
+                            <div className="sm:w-44">
+                                <Listbox value={selectedYear} onChange={setSelectedYear}>
+                                    <div className="relative">
+                                        <Listbox.Button className="relative flex min-h-[44px] w-full cursor-pointer items-center rounded-xl border border-slate-200/80 bg-slate-50/50 px-4 py-2.5 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+                                            <Filter className="mr-2.5 h-4 w-4 shrink-0 text-slate-400" strokeWidth={1.75} />
+                                            <span className="flex-1 truncate font-medium text-slate-900">
+                                                {selectedYear === 'all' ? 'Todos los años' : selectedYear}
+                                            </span>
+                                            <ChevronDown className="pointer-events-none h-4 w-4 text-slate-400" />
+                                        </Listbox.Button>
+                                        <Transition leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
+                                            <Listbox.Options className="absolute z-20 mt-2 w-full overflow-auto rounded-xl border border-slate-200/80 bg-white py-1 shadow-lg focus:outline-none">
+                                                {availableYears.map((year) => (
+                                                    <Listbox.Option key={year} value={year}
+                                                        className={({ active }) => cn('relative cursor-pointer py-2.5 pl-10 pr-4 text-sm', active ? 'bg-blue-50 text-blue-900' : 'text-slate-900')}>
+                                                        {({ selected }) => (<>
+                                                            <span className={selected ? 'font-semibold' : ''}>{year === 'all' ? 'Todos los años' : year}</span>
+                                                            {selected && <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600"><Check className="h-4 w-4" /></span>}
+                                                        </>)}
+                                                    </Listbox.Option>
+                                                ))}
+                                            </Listbox.Options>
+                                        </Transition>
                                     </div>
-                                    <Clock className="w-5 h-5 text-orange-500" />
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">{stats.thisYear}</p>
-                                <p className="text-sm text-gray-500 mt-1">Este Año</p>
+                                </Listbox>
                             </div>
                         </div>
+                        {filtered.length !== historiales.length && (
+                            <p className="mt-3 text-xs text-slate-500">
+                                Mostrando {filtered.length} de {historiales.length} registros
+                            </p>
+                        )}
+                    </DashboardPanel>
 
-                        {/* AI Assistant Section */}
-                        <div className="mb-8">
-                            <MedicalAIChat />
-                        </div>
+                    {/* Timeline */}
+                    {filtered.length === 0 ? (
+                        <DashboardPanel className="flex flex-col items-center py-16 text-center">
+                            <Search className="h-10 w-10 text-slate-300" strokeWidth={1.5} />
+                            <h3 className="mt-4 font-display text-base font-semibold text-slate-900">Sin resultados</h3>
+                            <p className="mt-1 text-sm text-slate-500">Intenta con otros términos o filtros</p>
+                        </DashboardPanel>
+                    ) : (
+                        <div className="relative space-y-4">
+                            {/* Vertical timeline line */}
+                            <div className="absolute left-[23px] top-10 hidden h-[calc(100%-80px)] w-px bg-slate-100 md:block" />
 
-                        {/* Search and Filters */}
-                        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-1 relative">
-                                    <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar por diagnóstico o doctor..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
-                                <div className="relative sm:w-48">
-                                    <Listbox value={selectedYear} onChange={setSelectedYear}>
-                                        <div className="relative">
-                                            <Listbox.Button className="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-12 pr-10 text-left border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all hover:border-gray-300">
-                                                <Filter className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-                                                <span className="block truncate text-gray-900 font-medium">
-                                                    {selectedYear === 'all' ? 'Todos los años' : selectedYear}
-                                                </span>
-                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                                    <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                                </span>
-                                            </Listbox.Button>
-                                            <Transition
-                                                as="div"
-                                                leave="transition ease-in duration-100"
-                                                leaveFrom="opacity-100"
-                                                leaveTo="opacity-0"
-                                            >
-                                                <Listbox.Options className="absolute z-10 mt-2 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                    {availableYears.map((year) => (
-                                                        <Listbox.Option
-                                                            key={year}
-                                                            value={year}
-                                                            className={({ active }) =>
-                                                                `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-emerald-50 text-emerald-900' : 'text-gray-900'
-                                                                }`
-                                                            }
-                                                        >
-                                                            {({ selected }) => (
-                                                                <>
-                                                                    <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-                                                                        {year === 'all' ? 'Todos los años' : year}
-                                                                    </span>
-                                                                    {selected && (
-                                                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                                                            <Check className="h-5 w-5" aria-hidden="true" />
-                                                                        </span>
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </Listbox.Option>
-                                                    ))}
-                                                </Listbox.Options>
-                                            </Transition>
-                                        </div>
-                                    </Listbox>
-                                </div>
-                            </div>
-                            {filteredHistoriales.length !== historiales.length && (
-                                <p className="text-sm text-gray-500 mt-4">
-                                    Mostrando {filteredHistoriales.length} de {historiales.length} registros
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Timeline de Registros */}
-                        <div className="space-y-6">
-                            {filteredHistoriales.map((historial, index) => (
-                                <div
+                            {filtered.map((historial) => (
+                                <article
                                     key={historial.id}
-                                    className="relative bg-white rounded-2xl border border-gray-100 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                                    className="group relative rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-blue-200/80 hover:shadow-[0_8px_24px_rgba(37,99,235,0.07)] md:ml-12 md:p-6"
                                 >
-                                    {/* Timeline connector */}
-                                    {index !== filteredHistoriales.length - 1 && (
-                                        <div className="absolute left-[38px] top-[80px] w-0.5 h-12 bg-gradient-to-b from-emerald-200 to-transparent"></div>
-                                    )}
+                                    {/* Timeline dot */}
+                                    <div className="absolute -left-[37px] top-6 hidden h-4 w-4 rounded-full border-2 border-blue-200 bg-blue-50 ring-4 ring-white md:block" />
 
                                     {/* Header */}
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-100 mb-5">
-                                        <div className="flex items-start gap-4">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-2xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                                                <Stethoscope className="w-7 h-7 text-white" />
+                                    <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-center">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100 transition-transform group-hover:scale-105">
+                                                <Stethoscope className="h-5 w-5" strokeWidth={1.75} />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
+                                                <h3 className="font-display text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
                                                     Dr. {historial.cita.medico.nombres} {historial.cita.medico.apellidos}
                                                 </h3>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                                <p className="mt-0.5 text-sm text-slate-500">
                                                     {historial.cita.medico.especialidades?.[0]?.nombre_especialidad || 'Especialista'}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200">
-                                                <Calendar className="w-4 h-4" />
-                                                {new Date(historial.cita.fechaHora).toLocaleDateString('es-ES', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                })}
+                                        <div className="flex flex-col items-start gap-1 sm:items-end">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100">
+                                                <Calendar className="h-3 w-3" />
+                                                {new Date(historial.cita.fechaHora).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </span>
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-[11px] text-slate-400">
                                                 Registro: {new Date(historial.createdAt).toLocaleDateString('es-ES')}
                                             </span>
                                         </div>
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="space-y-5">
-                                        {/* Diagnóstico */}
-                                        <div className="group/item">
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                                                    <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                                                    Diagnóstico
-                                                </h4>
-                                            </div>
-                                            <p className="text-gray-700 bg-gradient-to-r from-gray-50 to-emerald-50/30 p-5 rounded-xl border border-gray-100 leading-relaxed">
-                                                {historial.diagnostico}
-                                            </p>
-                                        </div>
+                                    {/* Content sections */}
+                                    <div className="mt-4 space-y-4">
+                                        <MedicalBlock icon={ClipboardList} label="Diagnóstico" color="blue">
+                                            {historial.diagnostico}
+                                        </MedicalBlock>
 
-                                        {/* Receta */}
                                         {historial.receta && (
-                                            <div className="group/item">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                        <Pill className="w-4 h-4 text-blue-600" />
-                                                    </div>
-                                                    <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                                                        Receta Médica
-                                                    </h4>
-                                                </div>
-                                                <p className="text-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50/30 p-5 rounded-xl border border-blue-100 leading-relaxed">
-                                                    {historial.receta}
-                                                </p>
-                                            </div>
+                                            <MedicalBlock icon={Pill} label="Receta médica" color="indigo">
+                                                {historial.receta}
+                                            </MedicalBlock>
                                         )}
 
-                                        {/* Notas */}
                                         {historial.notas && (
-                                            <div className="group/item">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                                                        <FileText className="w-4 h-4 text-purple-600" />
-                                                    </div>
-                                                    <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                                                        Notas Adicionales
-                                                    </h4>
-                                                </div>
-                                                <p className="text-gray-700 bg-gradient-to-r from-purple-50 to-pink-50/30 p-5 rounded-xl border border-purple-100 leading-relaxed">
-                                                    {historial.notas}
-                                                </p>
-                                            </div>
+                                            <MedicalBlock icon={FileText} label="Notas adicionales" color="slate">
+                                                {historial.notas}
+                                            </MedicalBlock>
                                         )}
-
-                                        {/* Ver Detalles Button */}
-                                        <div className="pt-4 border-t border-gray-100">
-                                            <button
-                                                onClick={() => navigate(`/patient/historial-medico/${historial.id}`)}
-                                                className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-blue-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                                            >
-                                                <FileText className="w-5 h-5" />
-                                                Ver Detalles e Imágenes Médicas
-                                            </button>
-                                        </div>
                                     </div>
-                                </div>
+
+                                    {/* CTA */}
+                                    <div className="mt-5 border-t border-slate-100 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate(`/patient/historial-medico/${historial.id}`)}
+                                            className="inline-flex min-h-[40px] cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                                        >
+                                            <Activity className="h-4 w-4" />
+                                            Ver imágenes y detalles
+                                            <ArrowRight className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                </article>
                             ))}
                         </div>
-
-                        {filteredHistoriales.length === 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-12 text-center">
-                                <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                    No se encontraron resultados
-                                </h3>
-                                <p className="text-gray-500">
-                                    Intenta con otros términos de búsqueda o filtros
-                                </p>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                    )}
+                </>
+            )}
         </div>
     );
 };
+
+function MedicalBlock({ icon: Icon, label, color, children }: {
+    icon: typeof FileText;
+    label: string;
+    color: 'blue' | 'indigo' | 'slate';
+    children: React.ReactNode;
+}) {
+    const iconBg = { blue: 'bg-blue-50 text-blue-600', indigo: 'bg-indigo-50 text-indigo-600', slate: 'bg-slate-100 text-slate-600' };
+    const blockBg = { blue: 'bg-blue-50/40 border-blue-100/80', indigo: 'bg-indigo-50/40 border-indigo-100/80', slate: 'bg-slate-50/60 border-slate-200/80' };
+
+    return (
+        <div>
+            <div className="mb-2 flex items-center gap-2">
+                <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', iconBg[color])}>
+                    <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                </div>
+                <h4 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{label}</h4>
+            </div>
+            <div className={cn('rounded-xl border px-4 py-3', blockBg[color])}>
+                <p className="text-sm leading-relaxed text-slate-700">{children}</p>
+            </div>
+        </div>
+    );
+}

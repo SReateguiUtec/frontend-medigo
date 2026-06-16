@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { messageService } from '../../api/message.service';
 import type { Conversation } from '../../types/message';
-import { MessageCircle, ArrowLeft, User, Clock, Trash2 } from 'lucide-react';
+import { MessageCircle, User, Clock, Trash2, Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { getImageUrl } from '../../utils/url.helper';
+import { DashboardHeader, DashboardPanel } from '@/components/dashboard';
 
 export const Messages = () => {
     const navigate = useNavigate();
@@ -16,11 +17,6 @@ export const Messages = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [conversationToDelete, setConversationToDelete] = useState<{ userId: number; userName: string } | null>(null);
 
-    // Debug logging for conversations
-    useEffect(() => {
-        console.log('Conversations updated:', conversations);
-    }, [conversations]);
-
     const handleDeleteClick = (userId: number, userName: string) => {
         setConversationToDelete({ userId, userName });
         setShowDeleteModal(true);
@@ -28,30 +24,24 @@ export const Messages = () => {
 
     const handleDeleteConfirm = async () => {
         if (!conversationToDelete) return;
-
         try {
             await messageService.deleteConversation(conversationToDelete.userId);
-            // Refresh the conversations list
             loadConversations();
-        } catch (err: any) {
-            console.error('Error deleting conversation:', err);
+        } catch {
             setError('Error al eliminar la conversación');
         } finally {
             setConversationToDelete(null);
         }
     };
 
-    useEffect(() => {
-        loadConversations();
-    }, []);
+    useEffect(() => { loadConversations(); }, []);
 
     const loadConversations = async () => {
         try {
             setLoading(true);
             const data = await messageService.getConversations();
             setConversations(data);
-        } catch (err: any) {
-            console.error('Error loading conversations:', err);
+        } catch {
             setError('Error al cargar conversaciones');
         } finally {
             setLoading(false);
@@ -61,10 +51,7 @@ export const Messages = () => {
     const formatTime = (dateString: string | null) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-
+        const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
         if (diffMins < 60) return `Hace ${diffMins}m`;
         if (diffMins < 1440) return `Hace ${Math.floor(diffMins / 60)}h`;
         return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
@@ -72,10 +59,13 @@ export const Messages = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-500 font-medium">Cargando mensajes...</p>
+            <div>
+                <DashboardHeader title="Mensajes" subtitle="Tus conversaciones" />
+                <div className="flex min-h-[320px] items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+                        <p className="text-sm text-slate-500">Cargando mensajes...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -83,140 +73,117 @@ export const Messages = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50/50 py-6 px-4">
-                <div className="max-w-4xl mx-auto">
-                    {/* Header */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Mensajes</h1>
-                            <p className="text-gray-500 text-sm">Tus conversaciones</p>
-                        </div>
-                    </div>
+            <DashboardHeader
+                title="Mensajes"
+                subtitle="Tus conversaciones con médicos y pacientes"
+            />
 
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4">
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Conversations List */}
-                    {conversations.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-                            <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                <MessageCircle className="w-10 h-10 text-gray-400" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                No tienes conversaciones
-                            </h3>
-                            <p className="text-gray-500 mb-6">
-                                {user?.rol === 'PACIENTE'
-                                    ? 'Busca un médico y envíale un mensaje para comenzar'
-                                    : 'Los pacientes pueden contactarte desde tu perfil'}
-                            </p>
-                            {user?.rol === 'PACIENTE' && (
-                                <button
-                                    onClick={() => navigate('/patient/search')}
-                                    className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 font-medium"
-                                >
-                                    Buscar Médicos
-                                </button>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="space-y-2">
-                            {conversations.map((conversation) => (
-                                <div
-                                    key={conversation.userId}
-                                    className="w-full bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md hover:border-emerald-100 transition-all group flex items-center gap-4"
-                                >
-                                    <button
-                                        onClick={() => navigate(`/messages/chat/${conversation.userId}`)}
-                                        className="flex-1 text-left"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            {/* Avatar */}
-                                            <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100">
-                                                {conversation.profilePicture ? (
-                                                    <img
-                                                        src={getImageUrl(conversation.profilePicture)}
-                                                        alt={conversation.userName}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            // Fallback to icon on error
-                                                            e.currentTarget.style.display = 'none';
-                                                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-                                                        <User className="w-6 h-6" />
-                                                    </div>
-                                                )}
-                                                {/* Fallback icon container (hidden by default if image exists) */}
-                                                {conversation.profilePicture && (
-                                                    <div className="hidden w-full h-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-                                                        <User className="w-6 h-6" />
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <h3 className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                                                        {conversation.userName}
-                                                    </h3>
-                                                    {conversation.lastMessageTime && (
-                                                        <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                            <Clock className="w-3 h-3" />
-                                                            {formatTime(conversation.lastMessageTime)}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center justify-between">
-                                                    <p className="text-sm text-gray-600 truncate">
-                                                        {conversation.lastMessage || 'No hay mensajes aún'}
-                                                    </p>
-                                                    {conversation.unreadCount > 0 && (
-                                                        <span className="ml-2 bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                                            {conversation.unreadCount}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </button>
-
-                                    {/* Delete button */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteClick(conversation.userId, conversation.userName);
-                                        }}
-                                        className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors flex-shrink-0"
-                                        title="Eliminar conversación"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+            {error && (
+                <div role="alert" className="mb-6 rounded-2xl border border-rose-200/80 bg-rose-50/80 px-4 py-3.5 text-sm text-rose-700">
+                    {error}
                 </div>
-            </div>
+            )}
+
+            {conversations.length === 0 ? (
+                <DashboardPanel className="flex flex-col items-center py-20 text-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+                        <MessageCircle className="h-8 w-8 text-slate-400" strokeWidth={1.5} />
+                    </div>
+                    <h3 className="mt-5 font-display text-lg font-semibold text-slate-900">
+                        Sin conversaciones
+                    </h3>
+                    <p className="mt-2 max-w-xs text-sm text-slate-500">
+                        {user?.rol === 'PACIENTE'
+                            ? 'Busca un médico y envíale un mensaje para comenzar.'
+                            : 'Los pacientes pueden contactarte desde tu perfil.'}
+                    </p>
+                    {user?.rol === 'PACIENTE' && (
+                        <button
+                            type="button"
+                            onClick={() => navigate('/patient/search')}
+                            className="mt-6 inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                        >
+                            <Search className="h-4 w-4" strokeWidth={2} />
+                            Buscar médicos
+                        </button>
+                    )}
+                </DashboardPanel>
+            ) : (
+                <DashboardPanel padding="none">
+                    <ul className="divide-y divide-slate-100">
+                        {conversations.map((conv) => (
+                            <li key={conv.userId} className="group flex items-center gap-0">
+                                {/* Clickable area */}
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/messages/chat/${conv.userId}`)}
+                                    className="flex min-h-[72px] flex-1 cursor-pointer items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-slate-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
+                                >
+                                    {/* Avatar */}
+                                    <div className="relative shrink-0">
+                                        <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
+                                            {conv.profilePicture ? (
+                                                <img
+                                                    src={getImageUrl(conv.profilePicture)}
+                                                    alt={conv.userName}
+                                                    className="h-full w-full object-cover"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center bg-blue-50">
+                                                    <User className="h-5 w-5 text-blue-400" strokeWidth={1.75} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        {conv.unreadCount > 0 && (
+                                            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+                                                {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-baseline justify-between gap-3">
+                                            <p className={`truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-blue-700 ${conv.unreadCount > 0 ? 'font-bold' : ''}`}>
+                                                {conv.userName}
+                                            </p>
+                                            {conv.lastMessageTime && (
+                                                <span className="inline-flex shrink-0 items-center gap-1 text-xs text-slate-400">
+                                                    <Clock className="h-3 w-3" />
+                                                    {formatTime(conv.lastMessageTime)}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className={`mt-0.5 truncate text-sm ${conv.unreadCount > 0 ? 'font-medium text-slate-700' : 'text-slate-500'}`}>
+                                            {conv.lastMessage || 'Sin mensajes aún'}
+                                        </p>
+                                    </div>
+                                </button>
+
+                                {/* Delete */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteClick(conv.userId, conv.userName)}
+                                    className="mr-4 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-300 opacity-0 transition-all hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                                    aria-label={`Eliminar conversación con ${conv.userName}`}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </DashboardPanel>
+            )}
 
             <ConfirmationModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={handleDeleteConfirm}
                 title="Eliminar conversación"
-                message={`¿Estás seguro de que quieres eliminar la conversación con ${conversationToDelete?.userName || ''}? Esta acción no se puede deshacer.`}
+                message={`¿Eliminar la conversación con ${conversationToDelete?.userName ?? ''}? Esta acción no se puede deshacer.`}
                 confirmText="Eliminar"
                 cancelText="Cancelar"
             />

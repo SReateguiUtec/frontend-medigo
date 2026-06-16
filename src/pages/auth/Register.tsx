@@ -1,304 +1,351 @@
 import { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authService } from '../../api/auth.service';
-import { ArrowLeft, Users, Stethoscope, Check, Shield, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import {
+    ArrowLeft, Eye, EyeOff, Mail, Lock, User, IdCard,
+    Users, Stethoscope, CheckCircle2, ShieldCheck,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const sideFeatures = [
+    { icon: ShieldCheck, label: 'Datos 100% cifrados y seguros' },
+    { icon: Stethoscope, label: 'Médicos verificados y certificados' },
+    { icon: Users, label: 'Más de 10,000 pacientes activos' },
+];
 
 export const Register = () => {
-  const [searchParams] = useSearchParams();
-  const [userType, setUserType] = useState<'PACIENTE' | 'MEDICO'>(
-    searchParams.get('role') === 'MEDICO' ? 'MEDICO' : 'PACIENTE'
-  );
-  const [formData, setFormData] = useState({
-    nombres: '',
-    apellidos: '',
-    email: '',
-    password: '',
-    dni: '',
-  });
-  const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [userType, setUserType] = useState<'PACIENTE' | 'MEDICO'>(
+        searchParams.get('role') === 'MEDICO' ? 'MEDICO' : 'PACIENTE'
+    );
+    const [formData, setFormData] = useState({
+        nombres: '',
+        apellidos: '',
+        email: '',
+        password: '',
+        dni: '',
+    });
+    const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            if (userType === 'PACIENTE') {
+                await authService.registerPaciente({
+                    nombres: formData.nombres,
+                    apellidos: formData.apellidos,
+                    email: formData.email,
+                    password: formData.password,
+                });
+            } else {
+                await authService.registerMedico({
+                    nombres: formData.nombres,
+                    apellidos: formData.apellidos,
+                    email: formData.email,
+                    password: formData.password,
+                    dni: formData.dni,
+                });
+            }
+            setSuccess(true);
+            setTimeout(() => navigate('/login'), 2500);
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Error al registrarse. Intenta de nuevo.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    try {
-      if (userType === 'PACIENTE') {
-        await authService.registerPaciente({
-          nombres: formData.nombres,
-          apellidos: formData.apellidos,
-          email: formData.email,
-          password: formData.password,
-        });
-      } else {
-        await authService.registerMedico({
-          nombres: formData.nombres,
-          apellidos: formData.apellidos,
-          email: formData.email,
-          password: formData.password,
-          dni: formData.dni,
-        });
-      }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-      // Show success message
-      setSuccess(true);
+    return (
+        <div className="min-h-screen flex bg-white">
+            {/* Left panel — visual brand */}
+            <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col">
+                <img
+                    src="/medico1.png"
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-linear-to-br from-blue-900/80 via-blue-800/60 to-blue-600/40" />
 
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse');
-    } finally {
-      setLoading(false);
-    }
-  };
+                <div className="relative z-10 flex flex-col justify-between h-full p-12">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200 w-fit"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="text-sm font-medium">Volver al inicio</span>
+                    </Link>
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+                    <div>
+                        <div className="mb-8">
+                            <img
+                                src="/logo-completo-blanco.png"
+                                alt="MediGO"
+                                className="h-10 w-auto object-contain"
+                            />
+                        </div>
+                        <h1 className="text-4xl font-bold text-white leading-tight mb-3">
+                            Únete a MediGO
+                        </h1>
+                        <p className="text-white/75 text-lg leading-relaxed max-w-sm">
+                            Crea tu cuenta y accede a la red de especialistas médicos más completa del país.
+                        </p>
 
-  const features = [
-    {
-      icon: <Check className="w-5 h-5" />,
-      title: 'Registro Rápido y Sencillo',
-      description: 'Crea tu cuenta en menos de 2 minutos'
-    },
-    {
-      icon: <Shield className="w-5 h-5" />,
-      title: 'Datos Seguros',
-      description: 'Tu información está protegida con los más altos estándares de seguridad'
-    },
-    {
-      icon: <Users className="w-5 h-5" />,
-      title: 'Comunidad Médica',
-      description: 'Únete a miles de usuarios que confían en MediGO'
-    }
-  ];
+                        <div className="mt-10 space-y-4">
+                            {sideFeatures.map(({ icon: Icon, label }) => (
+                                <div key={label} className="flex items-center gap-3">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 backdrop-blur-sm">
+                                        <Icon className="h-4 w-4 text-white" strokeWidth={1.75} />
+                                    </div>
+                                    <span className="text-sm font-medium text-white/85">{label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-  return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-purple-600 via-blue-600 to-blue-700 p-12 flex-col justify-between text-white relative overflow-hidden">
-        <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
-
-        <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-12">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Volver al inicio</span>
-          </Link>
-
-          <div className="mb-12">
-            <div className="w-40 h-32 rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
-              <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
-            </div>
-            <h1 className="text-5xl font-bold mb-4">
-              Únete a nuestra plataforma
-            </h1>
-            <p className="text-xl text-white/90">
-              Crea tu cuenta y comienza a gestionar tu salud de manera profesional
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center shrink-0">
-                  {feature.icon}
+                    <p className="text-xs text-white/40">
+                        © 2025 MediGO · Plataforma de Telemedicina
+                    </p>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">{feature.title}</h3>
-                  <p className="text-white/80 text-sm">{feature.description}</p>
+            </div>
+
+            {/* Right panel — form */}
+            <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-12 lg:px-16 overflow-y-auto">
+                {/* Mobile back */}
+                <div className="w-full max-w-sm lg:hidden mb-6">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="text-sm">Volver al inicio</span>
+                    </Link>
                 </div>
-              </div>
-            ))}
-          </div>
+
+                <div className="w-full max-w-sm">
+                    {/* Mobile logo */}
+                    <div className="lg:hidden mb-8 flex justify-center">
+                        <img src="/logo-completo-blanco.png" alt="MediGO" className="h-10 w-auto invert" />
+                    </div>
+
+                    <div className="mb-7">
+                        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Crear cuenta
+                        </h2>
+                        <p className="mt-1.5 text-sm text-slate-500">
+                            Completa el formulario para unirte a MediGO
+                        </p>
+                    </div>
+
+                    {success ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-center">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 mb-5">
+                                <CheckCircle2 className="h-8 w-8 text-emerald-600" strokeWidth={1.5} />
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-900">¡Cuenta creada!</h3>
+                            <p className="mt-2 text-sm text-slate-500 max-w-xs">
+                                Te redirigiremos al inicio de sesión en un momento.
+                            </p>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                            {error && (
+                                <div
+                                    role="alert"
+                                    className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                                >
+                                    <span className="mt-0.5 shrink-0">⚠</span>
+                                    <span>{error}</span>
+                                </div>
+                            )}
+
+                            {/* Role selector */}
+                            <div className="space-y-2">
+                                <span className="block text-sm font-medium text-slate-700">
+                                    Tipo de cuenta
+                                </span>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                    {([
+                                        { value: 'PACIENTE', label: 'Paciente', icon: Users },
+                                        { value: 'MEDICO', label: 'Médico', icon: Stethoscope },
+                                    ] as const).map(({ value, label, icon: Icon }) => (
+                                        <button
+                                            key={value}
+                                            type="button"
+                                            onClick={() => setUserType(value)}
+                                            className={cn(
+                                                'flex items-center justify-center gap-2.5 min-h-[48px] rounded-xl border-2 text-sm font-semibold transition-all duration-200 cursor-pointer',
+                                                userType === value
+                                                    ? 'border-blue-700 bg-blue-50 text-blue-800'
+                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                                            )}
+                                        >
+                                            <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Names row */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                    <label htmlFor="nombres" className="block text-sm font-medium text-slate-700">
+                                        Nombres
+                                    </label>
+                                    <div className="relative">
+                                        <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                                        <input
+                                            id="nombres"
+                                            name="nombres"
+                                            type="text"
+                                            required
+                                            autoComplete="given-name"
+                                            placeholder="Juan"
+                                            value={formData.nombres}
+                                            onChange={handleChange}
+                                            className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 focus-visible:bg-white"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label htmlFor="apellidos" className="block text-sm font-medium text-slate-700">
+                                        Apellidos
+                                    </label>
+                                    <input
+                                        id="apellidos"
+                                        name="apellidos"
+                                        type="text"
+                                        required
+                                        autoComplete="family-name"
+                                        placeholder="Pérez"
+                                        value={formData.apellidos}
+                                        onChange={handleChange}
+                                        className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 focus-visible:bg-white"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* DNI — solo médicos */}
+                            {userType === 'MEDICO' && (
+                                <div className="space-y-1.5">
+                                    <label htmlFor="dni" className="block text-sm font-medium text-slate-700">
+                                        DNI
+                                    </label>
+                                    <div className="relative">
+                                        <IdCard className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                                        <input
+                                            id="dni"
+                                            name="dni"
+                                            type="text"
+                                            required
+                                            maxLength={8}
+                                            autoComplete="off"
+                                            placeholder="12345678"
+                                            value={formData.dni}
+                                            onChange={handleChange}
+                                            className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 focus-visible:bg-white"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-1.5">
+                                <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                                    Correo electrónico
+                                </label>
+                                <div className="relative">
+                                    <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        required
+                                        autoComplete="email"
+                                        placeholder="tu@correo.com"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 focus-visible:bg-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                                    Contraseña
+                                </label>
+                                <div className="relative">
+                                    <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        autoComplete="new-password"
+                                        placeholder="Mínimo 8 caracteres"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 focus-visible:bg-white"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-slate-400">Mínimo 8 caracteres</p>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full min-h-[44px] cursor-pointer rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <span className="inline-flex items-center justify-center gap-2">
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                                        Creando cuenta...
+                                    </span>
+                                ) : (
+                                    'Crear cuenta'
+                                )}
+                            </button>
+                        </form>
+                    )}
+
+                    <p className="mt-6 text-center text-sm text-slate-500">
+                        ¿Ya tienes cuenta?{' '}
+                        <Link
+                            to="/login"
+                            className="font-semibold text-blue-700 hover:text-blue-800 transition-colors"
+                        >
+                            Inicia sesión
+                        </Link>
+                    </p>
+
+                    <div className="mt-8 border-t border-slate-100 pt-6">
+                        <p className="text-center text-xs text-slate-400">
+                            Al registrarte aceptas nuestros{' '}
+                            <span className="text-slate-500 font-medium">Términos de servicio</span>
+                            {' '}y{' '}
+                            <span className="text-slate-500 font-medium">Política de privacidad</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div className="w-full lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-lg">
-          {/* Mobile back button */}
-          <Link to="/" className="lg:hidden inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Volver al inicio</span>
-          </Link>
-
-          {/* Logo for mobile */}
-          <div className="lg:hidden mb-4">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-64 h-52 rounded-lg flex items-center justify-center overflow-hidden">
-                <img src="/logo-completo-blanco.png" alt="MediGO Logo" className="w-full h-full object-contain" />
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h2>
-            <p className="text-gray-400">Completa el formulario para registrarte en la plataforma</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-500/10 border border-green-500/50 text-green-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...</span>
-              </div>
-            )}
-
-            {/* User Type Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">
-                Tipo de Usuario
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType('PACIENTE')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${userType === 'PACIENTE'
-                    ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
-                    }`}
-                >
-                  <Users className="w-5 h-5" />
-                  <span className="font-medium">Paciente</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType('MEDICO')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${userType === 'MEDICO'
-                    ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
-                    }`}
-                >
-                  <Stethoscope className="w-5 h-5" />
-                  <span className="font-medium">Médico</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="nombres" className="block text-sm font-medium text-gray-300 mb-2">
-                  Nombres
-                </label>
-                <input
-                  id="nombres"
-                  name="nombres"
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Juan"
-                  value={formData.nombres}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="apellidos" className="block text-sm font-medium text-gray-300 mb-2">
-                  Apellidos
-                </label>
-                <input
-                  id="apellidos"
-                  name="apellidos"
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Pérez"
-                  value={formData.apellidos}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            {userType === 'MEDICO' && (
-              <div>
-                <label htmlFor="dni" className="block text-sm font-medium text-gray-300 mb-2">
-                  DNI
-                </label>
-                <input
-                  id="dni"
-                  name="dni"
-                  type="text"
-                  required
-                  maxLength={8}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="12345678"
-                  value={formData.dni}
-                  onChange={handleChange}
-                />
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Correo Electrónico
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="tu.correo@ejemplo.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Mínimo 8 caracteres"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-950"
-            >
-              {loading ? 'Registrando...' : 'Crear Cuenta'}
-            </button>
-
-            <div className="text-center">
-              <span className="text-gray-400">¿Ya tienes una cuenta? </span>
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
-                Inicia sesión aquí
-              </Link>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };

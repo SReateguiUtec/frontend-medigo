@@ -1,16 +1,20 @@
 import { useState, useRef } from 'react';
-import { IconCamera, IconTrash, IconUpload, IconX } from '@tabler/icons-react';
+import { Camera, Trash2, Upload, X, Loader2 } from 'lucide-react';
+import { getImageUrl } from '@/utils/url.helper';
+import { cn } from '@/lib/utils';
 
 interface ProfilePhotoUploadProps {
     currentPhotoUrl?: string | null;
     onPhotoUpdate: (file: File) => Promise<void>;
     onPhotoDelete: () => Promise<void>;
+    initials?: string;
 }
 
 export const ProfilePhotoUpload = ({
     currentPhotoUrl,
     onPhotoUpdate,
-    onPhotoDelete
+    onPhotoDelete,
+    initials = '?',
 }: ProfilePhotoUploadProps) => {
     const [preview, setPreview] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -20,22 +24,21 @@ export const ProfilePhotoUpload = ({
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     const validateFile = (file: File): string | null => {
         if (!ALLOWED_TYPES.includes(file.type)) {
-            return 'Solo se permiten imágenes (JPG, PNG, WEBP)';
+            return 'Solo se permiten imágenes JPG, PNG o WEBP';
         }
         if (file.size > MAX_FILE_SIZE) {
-            return 'La imagen no debe superar los 5MB';
+            return 'La imagen no debe superar los 5 MB';
         }
         return null;
     };
 
     const handleFileSelect = (file: File) => {
         setError('');
-
         const validationError = validateFile(file);
         if (validationError) {
             setError(validationError);
@@ -44,17 +47,13 @@ export const ProfilePhotoUpload = ({
 
         setSelectedFile(file);
         const reader = new FileReader();
-        reader.onloadend = () => {
-            setPreview(reader.result as string);
-        };
+        reader.onloadend = () => setPreview(reader.result as string);
         reader.readAsDataURL(file);
     };
 
     const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            handleFileSelect(file);
-        }
+        if (file) handleFileSelect(file);
     };
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -70,24 +69,23 @@ export const ProfilePhotoUpload = ({
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(false);
-
         const file = e.dataTransfer.files?.[0];
-        if (file) {
-            handleFileSelect(file);
-        }
+        if (file) handleFileSelect(file);
     };
 
     const handleUpload = async () => {
         if (!selectedFile) return;
-
         try {
             setUploading(true);
             setError('');
             await onPhotoUpdate(selectedFile);
             setSelectedFile(null);
             setPreview(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al subir la foto');
+        } catch (err: unknown) {
+            const message =
+                (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                'Error al subir la foto';
+            setError(message);
         } finally {
             setUploading(false);
         }
@@ -100,8 +98,11 @@ export const ProfilePhotoUpload = ({
             await onPhotoDelete();
             setSelectedFile(null);
             setPreview(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al eliminar la foto');
+        } catch (err: unknown) {
+            const message =
+                (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                'Error al eliminar la foto';
+            setError(message);
         } finally {
             setDeleting(false);
         }
@@ -111,134 +112,138 @@ export const ProfilePhotoUpload = ({
         setSelectedFile(null);
         setPreview(null);
         setError('');
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const displayPhoto = preview || currentPhotoUrl;
+    const resolvedPhoto = preview || (currentPhotoUrl ? getImageUrl(currentPhotoUrl) : null);
 
     return (
-        <div className="space-y-4">
-            {/* Photo Display */}
-            <div className="relative group">
-                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg mx-auto">
-                    {displayPhoto ? (
-                        <img
-                            src={displayPhoto}
-                            alt="Profile"
-                            className="w-full h-full rounded-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                            <IconCamera size={48} className="text-white" />
-                        </div>
-                    )}
+        <div className="flex flex-col items-center gap-2">
+            {/* Avatar + hover overlay */}
+            <div className="group relative inline-block">
+                <div className="rounded-full bg-white p-1 ring-4 ring-white shadow-[0_8px_24px_rgba(15,118,110,0.12)]">
+                    <div className="relative h-24 w-24 overflow-hidden rounded-full bg-blue-50 md:h-28 md:w-28">
+                        {resolvedPhoto ? (
+                            <img src={resolvedPhoto} alt="Foto de perfil" className="h-full w-full object-cover" />
+                        ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-blue-600 to-blue-700">
+                                {initials !== '?' ? (
+                                    <span className="font-display text-2xl font-semibold text-white">{initials}</span>
+                                ) : (
+                                    <Camera className="h-8 w-8 text-white/90" strokeWidth={1.5} />
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Overlay on hover */}
                 {!preview && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="bg-black bg-opacity-60 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 transition-all"
-                        >
-                            Cambiar foto
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-slate-900/0 opacity-0 transition-all duration-200 group-hover:bg-slate-900/45 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                        aria-label="Cambiar foto de perfil"
+                    >
+                        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm">
+                            Cambiar
+                        </span>
+                    </button>
                 )}
             </div>
 
-            {/* File Input (Hidden) */}
+            {/* Delete button — directly below the avatar */}
+            {currentPhotoUrl && !preview && (
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex min-h-[32px] cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+                >
+                    {deleting ? (
+                        <>
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Eliminando...
+                        </>
+                    ) : (
+                        <>
+                            <Trash2 className="h-3 w-3" />
+                            Eliminar foto
+                        </>
+                    )}
+                </button>
+            )}
+
+            {/* Upload zone — only when no photo exists */}
+            {!preview && !currentPhotoUrl && (
+                <button
+                    type="button"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={cn(
+                        'w-full max-w-xs cursor-pointer rounded-xl border border-dashed px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
+                        isDragging
+                            ? 'border-blue-400 bg-blue-50/50'
+                            : 'border-slate-200 bg-slate-50/50 hover:border-blue-200 hover:bg-blue-50/30'
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Upload className="h-4 w-4 text-slate-400" strokeWidth={1.75} />
+                        <div>
+                            <p className="text-xs font-medium text-slate-700">Subir foto de perfil</p>
+                            <p className="text-[11px] text-slate-500">JPG, PNG o WEBP · máx. 5 MB</p>
+                        </div>
+                    </div>
+                </button>
+            )}
+
+            {/* Preview confirm/cancel */}
+            {preview && selectedFile && (
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        onClick={handleUpload}
+                        disabled={uploading}
+                        className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 rounded-lg bg-blue-700 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-800 disabled:opacity-50"
+                    >
+                        {uploading ? (
+                            <>
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                Subiendo...
+                            </>
+                        ) : (
+                            <>
+                                <Upload className="h-3.5 w-3.5" />
+                                Confirmar
+                            </>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        disabled={uploading}
+                        className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                    >
+                        <X className="h-3.5 w-3.5" />
+                        Cancelar
+                    </button>
+                </div>
+            )}
+
             <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={handleFileInputChange}
                 className="hidden"
+                aria-label="Seleccionar imagen de perfil"
             />
 
-            {/* Drag & Drop Zone (only show if no preview) */}
-            {!preview && !currentPhotoUrl && (
-                <div
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isDragging
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
-                        }`}
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <IconUpload size={32} className="mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600 font-medium">
-                        Arrastra una imagen o haz click para seleccionar
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                        JPG, PNG o WEBP (máx. 5MB)
-                    </p>
-                </div>
-            )}
-
-            {/* Preview Actions */}
-            {preview && selectedFile && (
-                <div className="flex gap-2 justify-center">
-                    <button
-                        onClick={handleUpload}
-                        disabled={uploading}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                    >
-                        {uploading ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                Subiendo...
-                            </>
-                        ) : (
-                            <>
-                                <IconUpload size={18} />
-                                Subir Foto
-                            </>
-                        )}
-                    </button>
-                    <button
-                        onClick={handleCancel}
-                        disabled={uploading}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                    >
-                        <IconX size={18} />
-                        Cancelar
-                    </button>
-                </div>
-            )}
-
-            {/* Delete Button (only if photo exists and no preview) */}
-            {currentPhotoUrl && !preview && (
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleDelete}
-                        disabled={deleting}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                    >
-                        {deleting ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700"></div>
-                                Eliminando...
-                            </>
-                        ) : (
-                            <>
-                                <IconTrash size={18} />
-                                Eliminar Foto
-                            </>
-                        )}
-                    </button>
-                </div>
-            )}
-
-            {/* Error Message */}
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <p role="alert" className="max-w-xs text-center text-xs text-rose-600">
                     {error}
-                </div>
+                </p>
             )}
         </div>
     );

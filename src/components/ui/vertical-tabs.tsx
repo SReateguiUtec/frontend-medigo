@@ -13,7 +13,7 @@ const SERVICES = [
         description:
             "Accede a miles de pacientes que buscan atención médica de calidad.",
         image:
-            "/medigo-ss.gif",
+            "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop",
     },
     {
         id: "02",

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { profileService } from '@/api/profile.service';
+import type { Medico } from '@/types';
 import {
     Calendar,
     Clock,
@@ -12,20 +14,34 @@ import {
     BarChart3,
     CheckCircle,
     AlertCircle,
-    User
+    User,
+    ArrowRight,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/Card';
 import { citaService } from '@/api/cita.service';
 import type { Cita } from '@/types';
+import {
+    DashboardHeader,
+    StatCard,
+    DashboardSection,
+    QuickActionGrid,
+    DashboardPanel,
+} from '@/components/dashboard';
+import { cn } from '@/lib/utils';
 
 export const DoctorHome = () => {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const navigate = useNavigate();
     const [citas, setCitas] = useState<Cita[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadCitas();
+        // Sync name from profile if JWT didn't include it
+        if (user && !user.nombres) {
+            profileService.getProfile().then((profile) => {
+                updateUser({ ...user, ...(profile as Medico) });
+            }).catch(() => {});
+        }
     }, []);
 
     const loadCitas = async () => {
@@ -39,70 +55,66 @@ export const DoctorHome = () => {
         }
     };
 
-    // Filtrar citas de hoy y próximas
-    // Nota: Comparamos componentes de fecha (año/mes/día) directamente en lugar de timestamps
-    // para evitar problemas de zona horaria. Esto funciona correctamente sin importar
-    // si el backend envía las fechas en UTC, con offset (-05:00), o en hora local.
     const today = new Date();
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
 
-    const todayAppointments = citas.filter(cita => {
+    const todayAppointments = citas.filter((cita) => {
         const citaDate = new Date(cita.fechaHora);
-        return citaDate.getFullYear() === todayYear &&
+        return (
+            citaDate.getFullYear() === todayYear &&
             citaDate.getMonth() === todayMonth &&
             citaDate.getDate() === todayDay &&
-            cita.estado !== 'CANCELADA';
+            cita.estado !== 'CANCELADA'
+        );
     });
 
-    const upcomingAppointments = citas.filter(cita => {
-        const citaDate = new Date(cita.fechaHora);
-        return citaDate > new Date() && cita.estado !== 'CANCELADA';
-    }).slice(0, 5);
+    const upcomingAppointments = citas
+        .filter((cita) => new Date(cita.fechaHora) > new Date() && cita.estado !== 'CANCELADA')
+        .slice(0, 5);
 
-    // Estadísticas
-    const completedThisMonth = citas.filter(cita => {
+    const completedThisMonth = citas.filter((cita) => {
         const citaDate = new Date(cita.fechaHora);
         const now = new Date();
-        return citaDate.getMonth() === now.getMonth() &&
+        return (
+            citaDate.getMonth() === now.getMonth() &&
             citaDate.getFullYear() === now.getFullYear() &&
-            cita.estado === 'COMPLETADA';
+            cita.estado === 'COMPLETADA'
+        );
     }).length;
 
-    const pendingAppointments = citas.filter(cita =>
-        cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA'
+    const pendingAppointments = citas.filter(
+        (cita) => cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA'
     ).length;
 
     const quickStats = [
         {
-            label: 'Citas Hoy',
+            label: 'Citas hoy',
             value: todayAppointments.length.toString(),
-            change: `${pendingAppointments} pendientes`,
+            hint: `${pendingAppointments} pendientes`,
             icon: Calendar,
-            color: 'blue'
         },
         {
             label: 'Pacientes este mes',
             value: completedThisMonth.toString(),
-            change: '+12%',
+            trend: '+12%',
             icon: Users,
-            color: 'emerald'
+            trendPositive: true,
         },
         {
             label: 'Calificación',
             value: '4.8',
-            change: '⭐ Excelente',
+            hint: 'Excelente',
             icon: Star,
-            color: 'yellow'
         },
         {
             label: 'Ingresos del mes',
             value: 'S/3,450',
-            change: '+8%',
+            trend: '+8%',
             icon: DollarSign,
-            color: 'purple'
-        }
+            trendPositive: true,
+        },
     ];
 
     const weeklyStats = [
@@ -112,294 +124,236 @@ export const DoctorHome = () => {
         { day: 'Jue', appointments: 15 },
         { day: 'Vie', appointments: 11 },
         { day: 'Sáb', appointments: 6 },
-        { day: 'Dom', appointments: 3 }
+        { day: 'Dom', appointments: 3 },
     ];
 
-    const maxAppointments = Math.max(...weeklyStats.map(s => s.appointments));
+    const maxAppointments = Math.max(...weeklyStats.map((s) => s.appointments));
 
     const quickActions = [
         {
-            title: 'Mi Agenda',
+            title: 'Mi agenda',
+            description: 'Gestiona tus citas',
             icon: Calendar,
-            path: '/doctor/appointments',
-            color: 'blue'
+            onClick: () => navigate('/doctor/appointments'),
         },
         {
             title: 'Horarios',
+            description: 'Configura disponibilidad',
             icon: Clock,
-            path: '/doctor/schedule',
-            color: 'purple'
+            onClick: () => navigate('/doctor/schedule'),
         },
         {
             title: 'Pacientes',
+            description: 'Historiales clínicos',
             icon: Users,
-            path: '/doctor/patients',
-            color: 'emerald'
+            onClick: () => navigate('/doctor/patients'),
         },
         {
             title: 'Perfil',
+            description: 'Tu información',
             icon: Settings,
-            path: '/doctor/profile',
-            color: 'gray'
-        }
+            onClick: () => navigate('/doctor/profile'),
+        },
     ];
 
-    const recentPatients = upcomingAppointments.slice(0, 3).map(cita => ({
+    const recentPatients = upcomingAppointments.slice(0, 3).map((cita) => ({
         id: cita.id,
-        name: `${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() || 'Paciente',
+        name:
+            `${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() || 'Paciente',
         lastVisit: new Date(cita.fechaHora).toLocaleDateString('es-ES'),
-        status: cita.estado,
-        avatar: (cita.paciente?.nombres?.[0] || 'P') + (cita.paciente?.apellidos?.[0] || '')
+        avatar: (cita.paciente?.nombres?.[0] || 'P') + (cita.paciente?.apellidos?.[0] || ''),
     }));
 
+    const todayLabel = new Date().toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    });
+
+    const getStatusStyles = (estado: string) => {
+        if (estado === 'CONFIRMADA') return 'bg-emerald-50 text-emerald-700';
+        if (estado === 'PENDIENTE') return 'bg-amber-50 text-amber-700';
+        return 'bg-slate-100 text-slate-600';
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="px-4 md:px-6 py-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                                Dashboard Médico
-                            </h1>
-                            <p className="text-gray-600">Bienvenido de vuelta, Dr. {user?.apellidos}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="text-right">
-                                <p className="text-sm text-gray-600">Hoy</p>
-                                <p className="text-lg font-bold text-gray-900">
-                                    {new Date().toLocaleDateString('es-ES', {
-                                        weekday: 'short',
-                                        day: 'numeric',
-                                        month: 'short'
-                                    })}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <DashboardHeader
+                title={`Dr. ${user?.apellidos ?? ''}`}
+                subtitle={`Agenda del día · ${todayLabel}`}
+                action={
+                    <button
+                        type="button"
+                        onClick={() => navigate('/doctor/appointments')}
+                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors duration-200 hover:border-blue-200 hover:bg-blue-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                    >
+                        Ver agenda
+                        <ArrowRight className="h-4 w-4" />
+                    </button>
+                }
+            />
+
+            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {quickStats.map((stat) => (
+                    <StatCard key={stat.label} {...stat} />
+                ))}
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12">
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    {quickStats.map((stat, index) => (
-                        <Card key={index} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="pt-6 pb-6">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color === 'blue' ? 'bg-blue-50' :
-                                        stat.color === 'emerald' ? 'bg-emerald-50' :
-                                            stat.color === 'yellow' ? 'bg-yellow-50' :
-                                                'bg-purple-50'
-                                        }`}>
-                                        <stat.icon className={`w-6 h-6 ${stat.color === 'blue' ? 'text-blue-600' :
-                                            stat.color === 'emerald' ? 'text-emerald-600' :
-                                                stat.color === 'yellow' ? 'text-yellow-600' :
-                                                    'text-purple-600'
-                                            }`} />
-                                    </div>
-                                </div>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                                <p className="text-xs text-gray-500">{stat.change}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div className="space-y-8 lg:col-span-2">
+                    <DashboardSection
+                        title="Actividad semanal"
+                        description="Citas atendidas por día"
+                        icon={BarChart3}
+                    >
+                        <DashboardPanel>
+                            <div className="flex h-44 items-end justify-between gap-2 sm:gap-3">
+                                {weeklyStats.map((stat) => {
+                                    const height = `${(stat.appointments / maxAppointments) * 100}%`;
+                                    return (
+                                        <div key={stat.day} className="flex flex-1 flex-col items-center gap-2">
+                                            <span className="text-xs font-semibold tabular-nums text-slate-700">
+                                                {stat.appointments}
+                                            </span>
+                                            <div className="relative flex h-32 w-full items-end rounded-xl bg-slate-100/80 p-1">
+                                                <div
+                                                    className="w-full rounded-lg bg-blue-600 transition-all duration-300 hover:bg-blue-700"
+                                                    style={{ height }}
+                                                    role="img"
+                                                    aria-label={`${stat.day}: ${stat.appointments} citas`}
+                                                />
+                                            </div>
+                                            <span className="text-xs font-medium text-slate-500">{stat.day}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </DashboardPanel>
+                    </DashboardSection>
+
+                    <DashboardSection title="Acceso rápido">
+                        <QuickActionGrid actions={quickActions} columns={4} />
+                    </DashboardSection>
+
+                    <DashboardSection title="Pacientes recientes" icon={Users}>
+                        <DashboardPanel padding="none">
+                            {loading ? (
+                                <p className="px-5 py-8 text-center text-sm text-slate-500">Cargando...</p>
+                            ) : recentPatients.length === 0 ? (
+                                <p className="px-5 py-8 text-center text-sm text-slate-500">
+                                    No hay pacientes recientes
+                                </p>
+                            ) : (
+                                <ul className="divide-y divide-slate-100">
+                                    {recentPatients.map((patient) => (
+                                        <li
+                                            key={patient.id}
+                                            className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-slate-50/80"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-800 ring-1 ring-blue-100">
+                                                    {patient.avatar}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-900">{patient.name}</p>
+                                                    <p className="text-xs text-slate-500">
+                                                        Última visita: {patient.lastVisit}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="cursor-pointer text-xs font-semibold text-blue-700 transition-colors hover:text-blue-800"
+                                            >
+                                                Ver historial
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </DashboardPanel>
+                    </DashboardSection>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Weekly Activity Chart */}
-                        <Card className="bg-white border border-gray-200 shadow-sm">
-                            <CardContent className="pt-6 pb-6">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <BarChart3 className="w-5 h-5 text-blue-500" />
-                                    <h2 className="text-xl font-bold text-gray-900">Actividad Semanal</h2>
-                                </div>
-                                <div className="flex items-end justify-between gap-2 h-48">
-                                    {weeklyStats.map((stat, index) => (
-                                        <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                                            <div className="w-full bg-gray-100 rounded-t-lg relative" style={{ height: '100%' }}>
-                                                <div
-                                                    className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 to-indigo-600 rounded-t-lg transition-all hover:from-blue-700 hover:to-indigo-700"
-                                                    style={{ height: `${(stat.appointments / maxAppointments) * 100}%` }}
-                                                >
-                                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-900">
-                                                        {stat.appointments}
-                                                    </div>
-                                                </div>
+                <div className="space-y-8">
+                    <DashboardSection
+                        title="Citas de hoy"
+                        icon={Calendar}
+                        action={
+                            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100">
+                                {todayAppointments.length}
+                            </span>
+                        }
+                    >
+                        <div className="space-y-3">
+                            {loading ? (
+                                <DashboardPanel padding="sm">
+                                    <p className="text-center text-sm text-slate-500">Cargando...</p>
+                                </DashboardPanel>
+                            ) : todayAppointments.length === 0 ? (
+                                <DashboardPanel padding="sm">
+                                    <p className="text-center text-sm text-slate-500">No hay citas para hoy</p>
+                                </DashboardPanel>
+                            ) : (
+                                todayAppointments.map((cita) => (
+                                    <DashboardPanel key={cita.id} padding="sm">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                                                <User className="h-4 w-4" />
                                             </div>
-                                            <span className="text-xs font-medium text-gray-600">{stat.day}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Quick Actions */}
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Acceso Rápido</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {quickActions.map((action, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => navigate(action.path)}
-                                        className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all text-center group"
-                                    >
-                                        <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${action.color === 'blue' ? 'bg-blue-50' :
-                                            action.color === 'purple' ? 'bg-purple-50' :
-                                                action.color === 'emerald' ? 'bg-emerald-50' :
-                                                    'bg-gray-50'
-                                            }`}>
-                                            <action.icon className={`w-6 h-6 ${action.color === 'blue' ? 'text-blue-600' :
-                                                action.color === 'purple' ? 'text-purple-600' :
-                                                    action.color === 'emerald' ? 'text-emerald-600' :
-                                                        'text-gray-600'
-                                                }`} />
-                                        </div>
-                                        <p className="text-sm font-semibold text-gray-900">{action.title}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Recent Patients */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Users className="w-5 h-5 text-emerald-500" />
-                                <h2 className="text-xl font-bold text-gray-900">Pacientes Recientes</h2>
-                            </div>
-                            <Card className="bg-white border border-gray-200 shadow-sm">
-                                <CardContent className="pt-4 pb-4">
-                                    {loading ? (
-                                        <p className="text-center text-gray-500 py-4">Cargando...</p>
-                                    ) : recentPatients.length === 0 ? (
-                                        <p className="text-center text-gray-500 py-4">No hay pacientes recientes</p>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            {recentPatients.map((patient) => (
-                                                <div
-                                                    key={patient.id}
-                                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate text-sm font-semibold text-slate-900">
+                                                    {`${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() ||
+                                                        'Paciente'}
+                                                </p>
+                                                <p className="mt-1 inline-flex items-center gap-1 text-xs text-slate-500">
+                                                    <Clock className="h-3 w-3" />
+                                                    {new Date(cita.fechaHora).toLocaleTimeString('es-ES', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </p>
+                                                <span
+                                                    className={cn(
+                                                        'mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        getStatusStyles(cita.estado)
+                                                    )}
                                                 >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
-                                                            {patient.avatar}
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-semibold text-gray-900 text-sm">{patient.name}</h4>
-                                                            <p className="text-xs text-gray-600">Última visita: {patient.lastVisit}</p>
-                                                        </div>
-                                                    </div>
-                                                    <button className="text-blue-600 hover:text-blue-700 text-xs font-semibold">
-                                                        Ver historial
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-
-                    {/* Sidebar */}
-                    <div className="space-y-6">
-                        {/* Today's Appointments */}
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-blue-500" />
-                                    <h3 className="text-lg font-bold text-gray-900">Citas de Hoy</h3>
-                                </div>
-                                <span className="text-sm font-semibold text-blue-600">{todayAppointments.length}</span>
-                            </div>
-                            <div className="space-y-3">
-                                {loading ? (
-                                    <Card className="bg-white border border-gray-200">
-                                        <CardContent className="pt-4 pb-4">
-                                            <p className="text-center text-gray-500 text-sm">Cargando...</p>
-                                        </CardContent>
-                                    </Card>
-                                ) : todayAppointments.length === 0 ? (
-                                    <Card className="bg-white border border-gray-200">
-                                        <CardContent className="pt-4 pb-4">
-                                            <p className="text-center text-gray-500 text-sm">No hay citas para hoy</p>
-                                        </CardContent>
-                                    </Card>
-                                ) : (
-                                    todayAppointments.map((cita) => (
-                                        <Card key={cita.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                            <CardContent className="pt-4 pb-4">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
-                                                        <User className="w-5 h-5" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="font-bold text-gray-900 text-sm truncate">
-                                                            {`${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() || 'Paciente'}
-                                                        </h4>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Clock className="w-3 h-3 text-gray-500" />
-                                                            <span className="text-xs text-gray-600">
-                                                                {new Date(cita.fechaHora).toLocaleTimeString('es-ES', {
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit'
-                                                                })}
-                                                            </span>
-                                                        </div>
-                                                        <div className="mt-2">
-                                                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${cita.estado === 'CONFIRMADA' ? 'bg-emerald-50 text-emerald-600' :
-                                                                cita.estado === 'PENDIENTE' ? 'bg-yellow-50 text-yellow-600' :
-                                                                    'bg-gray-50 text-gray-600'
-                                                                }`}>
-                                                                {cita.estado === 'CONFIRMADA' ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                                                                {cita.estado}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Upcoming Appointments */}
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Activity className="w-5 h-5 text-purple-500" />
-                                    <h3 className="text-lg font-bold text-gray-900">Próximas Citas</h3>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                {upcomingAppointments.slice(0, 3).map((cita) => (
-                                    <Card key={cita.id} className="bg-white border border-gray-200 shadow-sm">
-                                        <CardContent className="pt-3 pb-3">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex-1">
-                                                    <p className="font-semibold text-gray-900 text-sm truncate">
-                                                        {`${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() || 'Paciente'}
-                                                    </p>
-                                                    <p className="text-xs text-gray-600">
-                                                        {new Date(cita.fechaHora).toLocaleDateString('es-ES', {
-                                                            day: 'numeric',
-                                                            month: 'short',
-                                                            hour: '2-digit',
-                                                            minute: '2-digit'
-                                                        })}
-                                                    </p>
-                                                </div>
+                                                    {cita.estado === 'CONFIRMADA' ? (
+                                                        <CheckCircle className="h-3 w-3" />
+                                                    ) : (
+                                                        <AlertCircle className="h-3 w-3" />
+                                                    )}
+                                                    {cita.estado}
+                                                </span>
                                             </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                                        </div>
+                                    </DashboardPanel>
+                                ))
+                            )}
                         </div>
-                    </div>
+                    </DashboardSection>
+
+                    <DashboardSection title="Próximas citas" icon={Activity}>
+                        <div className="space-y-2">
+                            {upcomingAppointments.slice(0, 3).map((cita) => (
+                                <DashboardPanel key={cita.id} padding="sm">
+                                    <p className="truncate text-sm font-semibold text-slate-900">
+                                        {`${cita.paciente?.nombres || ''} ${cita.paciente?.apellidos || ''}`.trim() ||
+                                            'Paciente'}
+                                    </p>
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        {new Date(cita.fechaHora).toLocaleDateString('es-ES', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </p>
+                                </DashboardPanel>
+                            ))}
+                        </div>
+                    </DashboardSection>
                 </div>
             </div>
         </div>

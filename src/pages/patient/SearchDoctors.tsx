@@ -1,245 +1,98 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchService } from '../../api/search.service';
-import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown } from 'lucide-react';
+import { Search, User, ChevronLeft, ChevronRight, Mail, DollarSign, Stethoscope, Check, ChevronDown, ArrowRight, Loader2 } from 'lucide-react';
 import { Listbox, Transition } from '@headlessui/react';
 import { AnimatedImage } from '../../components/AnimatedImage';
+import { DashboardHeader } from '@/components/dashboard';
+import { cn } from '@/lib/utils';
+import { getImageUrl } from '@/utils/url.helper';
 
-// Doctores de demostración
 const showcaseDoctors = [
-  {
-    id: 1,
-    nombres: 'Dr. Carl',
-    apellidos: 'Skywalker',
-    email: 'carl.skywalker@medigo.com',
-    rutaFoto: '/medico2.png',
-    bio: 'Especialista en enfermedades cardiovasculares con más de 15 años de experiencia. Certificado por el Colegio Americano de Cardiología.',
-    precioConsulta: 120,
-    numeroColegiado: 'CMP-12345',
-    especialidades: [{ id: 1, nombre_especialidad: 'Cardiología' }],
-  },
-  {
-    id: 2,
-    nombres: 'Dra. Ana',
-    apellidos: 'Rodriguez',
-    email: 'ana.rodriguez@medigo.com',
-    rutaFoto: '/medico1.png',
-    bio: 'Pediatra dedicada al cuidado integral de niños y adolescentes. Experta en desarrollo infantil y vacunación.',
-    precioConsulta: 85,
-    numeroColegiado: 'CMP-23456',
-    especialidades: [{ id: 2, nombre_especialidad: 'Pediatría' }],
-  },
-  {
-    id: 3,
-    nombres: 'Dr. Miguel',
-    apellidos: 'James Sr',
-    email: 'miguel.james@medigo.com',
-    rutaFoto: '/medico3.png',
-    bio: 'Cirujano traumatólogo especializado en lesiones deportivas y cirugía de columna. Atención personalizada.',
-    precioConsulta: 150,
-    numeroColegiado: 'CMP-34567',
-    especialidades: [{ id: 3, nombre_especialidad: 'Traumatología' }],
-  },
-  {
-    id: 4,
-    nombres: 'Dra. Patricia',
-    apellidos: 'Silva',
-    email: 'patricia.silva@medigo.com',
-    rutaFoto: '/medico4.png',
-    bio: 'Dermatóloga con enfoque en tratamientos estéticos y dermatología clínica. Certificada internacionalmente.',
-    precioConsulta: 95,
-    numeroColegiado: 'CMP-45678',
-    especialidades: [{ id: 4, nombre_especialidad: 'Dermatología' }],
-  },
-  {
-    id: 5,
-    nombres: 'Dr. Roberto',
-    apellidos: 'Vargas',
-    email: 'roberto.vargas@medigo.com',
-    rutaFoto: '/medico6.png',
-    bio: 'Neurólogo especializado en trastornos del sistema nervioso. Experto en migrañas y epilepsia.',
-    precioConsulta: 130,
-    numeroColegiado: 'CMP-56789',
-    especialidades: [{ id: 5, nombre_especialidad: 'Neurología' }],
-  },
-  {
-    id: 6,
-    nombres: 'Dra. Laura',
-    apellidos: 'Campos',
-    email: 'laura.campos@medigo.com',
-    rutaFoto: '/medico5.png',
-    bio: 'Ginecóloga obstetra con amplia experiencia en salud reproductiva y embarazo de alto riesgo.',
-    precioConsulta: 110,
-    numeroColegiado: 'CMP-67890',
-    especialidades: [{ id: 6, nombre_especialidad: 'Ginecología' }],
-  },
+  { id: 1, nombres: 'Dr. Carl', apellidos: 'Skywalker', email: 'carl.skywalker@medigo.com', rutaFoto: '/medico2.png', bio: 'Especialista en enfermedades cardiovasculares con más de 15 años de experiencia. Certificado por el Colegio Americano de Cardiología.', precioConsulta: 120, numeroColegiado: 'CMP-12345', especialidades: [{ id: 1, nombre_especialidad: 'Cardiología' }] },
+  { id: 2, nombres: 'Dra. Ana', apellidos: 'Rodriguez', email: 'ana.rodriguez@medigo.com', rutaFoto: '/medico1.png', bio: 'Pediatra dedicada al cuidado integral de niños y adolescentes. Experta en desarrollo infantil y vacunación.', precioConsulta: 85, numeroColegiado: 'CMP-23456', especialidades: [{ id: 2, nombre_especialidad: 'Pediatría' }] },
+  { id: 3, nombres: 'Dr. Miguel', apellidos: 'James Sr', email: 'miguel.james@medigo.com', rutaFoto: '/medico3.png', bio: 'Cirujano traumatólogo especializado en lesiones deportivas y cirugía de columna. Atención personalizada.', precioConsulta: 150, numeroColegiado: 'CMP-34567', especialidades: [{ id: 3, nombre_especialidad: 'Traumatología' }] },
+  { id: 4, nombres: 'Dra. Patricia', apellidos: 'Silva', email: 'patricia.silva@medigo.com', rutaFoto: '/medico4.png', bio: 'Dermatóloga con enfoque en tratamientos estéticos y dermatología clínica. Certificada internacionalmente.', precioConsulta: 95, numeroColegiado: 'CMP-45678', especialidades: [{ id: 4, nombre_especialidad: 'Dermatología' }] },
+  { id: 5, nombres: 'Dr. Roberto', apellidos: 'Vargas', email: 'roberto.vargas@medigo.com', rutaFoto: '/medico6.png', bio: 'Neurólogo especializado en trastornos del sistema nervioso. Experto en migrañas y epilepsia.', precioConsulta: 130, numeroColegiado: 'CMP-56789', especialidades: [{ id: 5, nombre_especialidad: 'Neurología' }] },
+  { id: 6, nombres: 'Dra. Laura', apellidos: 'Campos', email: 'laura.campos@medigo.com', rutaFoto: '/medico5.png', bio: 'Ginecóloga obstetra con amplia experiencia en salud reproductiva y embarazo de alto riesgo.', precioConsulta: 110, numeroColegiado: 'CMP-67890', especialidades: [{ id: 6, nombre_especialidad: 'Ginecología' }] },
 ];
 
+const SPECIALTIES = ['Cardiología', 'Pediatría', 'Traumatología', 'Dermatología', 'Neurología', 'Ginecología', 'Oftalmología', 'Psiquiatría'];
+
 type FilterType = 'name' | 'email' | 'price' | 'specialty';
+
+const filterTabs: { id: FilterType; label: string; icon: typeof Search }[] = [
+  { id: 'name', label: 'Nombre', icon: Search },
+  { id: 'email', label: 'Correo', icon: Mail },
+  { id: 'price', label: 'Precio', icon: DollarSign },
+  { id: 'specialty', label: 'Especialidad', icon: Stethoscope },
+];
 
 export const SearchDoctors = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterType>('name');
-
   const [searchTerm, setSearchTerm] = useState('');
   const [searchEmail, setSearchEmail] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [specialtyId, setSpecialtyId] = useState('');
-
-  const [allDoctors, setAllDoctors] = useState<any[]>(showcaseDoctors); // Todos los doctores disponibles
+  const [allDoctors, setAllDoctors] = useState<any[]>(showcaseDoctors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [pageInfo, setPageInfo] = useState({
-    totalPages: 0,
-    number: 0,
-    first: true,
-    last: true,
-    totalElements: 0,
-  });
+  const [pageInfo, setPageInfo] = useState({ totalPages: 0, number: 0, first: true, last: true, totalElements: 0 });
   const [isSearching, setIsSearching] = useState(false);
 
-  // Filtrado en tiempo real usando useMemo
   const filteredDoctors = useMemo(() => {
-    // Si estamos buscando en el backend, confiamos en los resultados del backend
-    // y solo aplicamos filtrado local si es necesario para una experiencia más fluida
-    // mientras llega la nueva respuesta del backend.
-
-    if (activeFilter !== 'name' || !searchTerm.trim()) {
-      return allDoctors;
-    }
-
+    if (activeFilter !== 'name' || !searchTerm.trim()) return allDoctors;
     const term = searchTerm.toLowerCase();
-    return allDoctors.filter(doctor => {
+    return allDoctors.filter((doctor) => {
       const fullName = `${doctor.nombres} ${doctor.apellidos}`.toLowerCase();
-      const nombres = doctor.nombres.toLowerCase();
-      const apellidos = doctor.apellidos.toLowerCase();
-
-      // Verificamos si es un doctor de demo (ids 1-6) para filtrar localmente
-      // Si son resultados del backend, generalmente ya vienen filtrados, pero esto no hace daño
-      return fullName.includes(term) ||
-        nombres.includes(term) ||
-        apellidos.includes(term);
+      return fullName.includes(term) || doctor.nombres.toLowerCase().includes(term) || doctor.apellidos.toLowerCase().includes(term);
     });
   }, [allDoctors, searchTerm, activeFilter]);
 
-  // Debounce para búsqueda automática
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (activeFilter === 'name') {
-        handleSearch(0);
-      }
-    }, 200); // Esperar 300ms para una respuesta más rápida
-
-    return () => clearTimeout(delayDebounceFn);
+    const delay = setTimeout(() => {
+      if (activeFilter === 'name') handleSearch(0);
+    }, 300);
+    return () => clearTimeout(delay);
   }, [searchTerm, activeFilter]);
 
-  const handleSearch = async (page: number = 0) => {
-    console.log('Performing search with filter:', activeFilter);
+  const handleSearch = async (page = 0) => {
     setLoading(true);
     setError('');
     setIsSearching(true);
     const pageSize = 9;
-
     try {
-      let response;
-
+      let response: any;
       switch (activeFilter) {
         case 'name':
-          if (!searchTerm.trim()) {
-            console.log('No search term, showing showcase doctors');
-            setAllDoctors(showcaseDoctors);
-            setIsSearching(false);
-            setLoading(false);
-            return;
-          }
-          console.log('Searching by name:', searchTerm);
+          if (!searchTerm.trim()) { setAllDoctors(showcaseDoctors); setIsSearching(false); setLoading(false); return; }
           response = await searchService.searchMedicosByNombre(searchTerm, page, pageSize);
           break;
-
         case 'email':
-          if (!searchEmail.trim()) {
-            setError('Por favor ingrese un correo electrónico');
-            setLoading(false);
-            return;
-          }
-          console.log('Searching by email:', searchEmail);
+          if (!searchEmail.trim()) { setError('Ingresa un correo electrónico'); setLoading(false); return; }
           try {
             const medico = await searchService.getMedicoByEmail(searchEmail);
-            response = {
-              content: [medico],
-              totalPages: 1,
-              number: 0,
-              totalElements: 1,
-              first: true,
-              last: true,
-              size: pageSize
-            };
-          } catch (e) {
-            // Si no encuentra retornamos lista vacia
-            response = {
-              content: [],
-              totalPages: 0,
-              number: 0,
-              totalElements: 0,
-              first: true,
-              last: true,
-              size: pageSize
-            };
-          }
+            response = { content: [medico], totalPages: 1, number: 0, totalElements: 1, first: true, last: true };
+          } catch { response = { content: [], totalPages: 0, number: 0, totalElements: 0, first: true, last: true }; }
           break;
-
         case 'price':
-          if (!minPrice || !maxPrice) {
-            setError('Por favor ingrese el rango de precios');
-            setLoading(false);
-            return;
-          }
-          console.log('Searching by price range:', minPrice, '-', maxPrice);
-          response = await searchService.getMedicosByPrecioRange(
-            Number(minPrice),
-            Number(maxPrice),
-            page,
-            pageSize
-          );
+          if (!minPrice || !maxPrice) { setError('Ingresa el rango de precios'); setLoading(false); return; }
+          response = await searchService.getMedicosByPrecioRange(Number(minPrice), Number(maxPrice), page, pageSize);
           break;
-
         case 'specialty':
-          if (!specialtyId) {
-            setError('Por favor seleccione una especialidad');
-            setLoading(false);
-            return;
-          }
-          console.log('Searching by specialty name:', specialtyId);
-          response = await searchService.getMedicosByEspecialidadNombre(
-            specialtyId, // Now this is the specialty name, not ID
-            page,
-            pageSize
-          );
+          if (!specialtyId) { setError('Selecciona una especialidad'); setLoading(false); return; }
+          response = await searchService.getMedicosByEspecialidadNombre(specialtyId, page, pageSize);
           break;
       }
-
       if (response) {
-        console.log('Search results:', response.content); // Debug log
         setAllDoctors(response.content);
-        setPageInfo({
-          totalPages: response.totalPages,
-          number: response.number,
-          first: response.number === 0,
-          last: response.number === response.totalPages - 1,
-          totalElements: response.totalElements,
-        });
+        setPageInfo({ totalPages: response.totalPages, number: response.number, first: response.number === 0, last: response.number === response.totalPages - 1, totalElements: response.totalElements });
       }
-
-      if (page > 0) {
-        const resultsElement = document.getElementById('search-results');
-        if (resultsElement) {
-          resultsElement.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    } catch (err: any) {
-      console.error('Error searching doctors:', err);
-      setError('Error al buscar médicos. Intente nuevamente.');
+      if (page > 0) document.getElementById('search-results')?.scrollIntoView({ behavior: 'smooth' });
+    } catch {
+      setError('Error al buscar médicos. Intenta nuevamente.');
       setAllDoctors([]);
     } finally {
       setLoading(false);
@@ -247,199 +100,112 @@ export const SearchDoctors = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 0 && newPage < pageInfo.totalPages) {
-      handleSearch(newPage);
-    }
+    if (newPage >= 0 && newPage < pageInfo.totalPages) handleSearch(newPage);
   };
 
   const handleDoctorClick = (doctorId: number) => {
-    if (!isSearching) {
-      const demoIds = [1, 2, 3, 4, 5, 6];
-      if (demoIds.includes(doctorId)) {
-        return;
-      }
-    }
+    if (!isSearching && [1, 2, 3, 4, 5, 6].includes(doctorId)) return;
     navigate(`/patient/doctor/${doctorId}`);
   };
 
-  const getEspecialidadNombre = (doctor: any): string => {
-    if (doctor?.especialidades && doctor.especialidades.length > 0) {
-      return doctor.especialidades[0].nombre_especialidad;
-    }
-    return 'No especificada';
-  };
+  const getEspecialidad = (doctor: any) =>
+    doctor?.especialidades?.[0]?.nombre_especialidad ?? 'Especialista';
+
+  const isDemo = (id: number) => !isSearching && [1, 2, 3, 4, 5, 6].includes(id);
 
   return (
-    <div className="space-y-6" id="search-results">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Buscar Médicos</h1>
-        <p className="mt-2 text-gray-600">Encuentra al especialista que necesitas</p>
-      </div>
+    <div id="search-results">
+      <DashboardHeader
+        title="Buscar médicos"
+        subtitle="Encuentra al especialista que necesitas y agenda tu consulta"
+      />
 
-      {/* Search Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 mb-4 border-b pb-4">
-          <button
-            onClick={() => { setActiveFilter('name'); setError(''); }}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'name'
-              ? 'bg-blue-100 text-blue-700 font-medium'
-              : 'text-gray-600 hover:bg-gray-50'
-              }`}
-          >
-            <Search className="w-4 h-4" />
-            Nombre
-          </button>
-          <button
-            onClick={() => { setActiveFilter('email'); setError(''); }}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'email'
-              ? 'bg-blue-100 text-blue-700 font-medium'
-              : 'text-gray-600 hover:bg-gray-50'
-              }`}
-          >
-            <Mail className="w-4 h-4" />
-            Correo
-          </button>
-          <button
-            onClick={() => { setActiveFilter('price'); setError(''); }}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'price'
-              ? 'bg-blue-100 text-blue-700 font-medium'
-              : 'text-gray-600 hover:bg-gray-50'
-              }`}
-          >
-            <DollarSign className="w-4 h-4" />
-            Precio
-          </button>
-          <button
-            onClick={() => { setActiveFilter('specialty'); setError(''); }}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${activeFilter === 'specialty'
-              ? 'bg-blue-100 text-blue-700 font-medium'
-              : 'text-gray-600 hover:bg-gray-50'
-              }`}
-          >
-            <Stethoscope className="w-4 h-4" />
-            Especialidad
-          </button>
+      {/* Search toolbar */}
+      <div className="mb-8 rounded-2xl border border-slate-200/80 bg-white p-1 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+        {/* Filter tabs */}
+        <div className="flex items-center gap-1 border-b border-slate-100 px-3 pb-1 pt-1">
+          {filterTabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => { setActiveFilter(id); setError(''); }}
+              className={cn(
+                'inline-flex min-h-[36px] cursor-pointer items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                activeFilter === id
+                  ? 'bg-blue-50 text-blue-800'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              )}
+            >
+              <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Input Fields */}
-        <div className="flex flex-col md:flex-row gap-2">
+        {/* Input row */}
+        <div className="flex items-center gap-3 px-3 py-3">
           <div className="relative flex-1">
             {activeFilter === 'name' && (
               <>
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
                 <input
                   type="text"
                   placeholder="Buscar por nombre o apellido..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(0)}
+                  className="w-full min-h-[44px] rounded-xl border border-slate-200/80 bg-slate-50/50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                  autoComplete="off"
                 />
               </>
             )}
-
             {activeFilter === 'email' && (
               <>
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
                 <input
                   type="email"
-                  placeholder="Buscar por correo electrónico..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="correo@ejemplo.com"
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(0)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(0)}
+                  className="w-full min-h-[44px] rounded-xl border border-slate-200/80 bg-slate-50/50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                  autoComplete="email"
                 />
               </>
             )}
-
             {activeFilter === 'price' && (
-              <div className="flex gap-4 items-center">
+              <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">S/</span>
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                  />
+                  <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">S/</span>
+                  <input type="number" placeholder="Mínimo" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
+                    className="w-full min-h-[44px] rounded-xl border border-slate-200/80 bg-slate-50/50 py-2.5 pl-9 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2" />
                 </div>
-                <span className="text-gray-400">-</span>
+                <span className="text-slate-300">—</span>
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">S/</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                  />
+                  <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">S/</span>
+                  <input type="number" placeholder="Máximo" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
+                    className="w-full min-h-[44px] rounded-xl border border-slate-200/80 bg-slate-50/50 py-2.5 pl-9 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2" />
                 </div>
               </div>
             )}
-
             {activeFilter === 'specialty' && (
               <Listbox value={specialtyId} onChange={setSpecialtyId}>
-                <div className="relative w-full">
-                  <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white py-2.5 pl-10 pr-10 text-left border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-gray-400">
-                    <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                    <span className={`block truncate ${!specialtyId ? 'text-gray-400' : 'text-gray-900'}`}>
+                <div className="relative">
+                  <Listbox.Button className="relative flex min-h-[44px] w-full cursor-pointer items-center rounded-xl border border-slate-200/80 bg-slate-50/50 px-4 py-2.5 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+                    <Stethoscope className="mr-2.5 h-4 w-4 shrink-0 text-slate-400" strokeWidth={1.75} />
+                    <span className={specialtyId ? 'text-slate-900' : 'text-slate-400'}>
                       {specialtyId || 'Seleccionar especialidad...'}
                     </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </span>
+                    <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-slate-400" />
                   </Listbox.Button>
-                  <Transition
-                    as="div"
-                    leave="transition ease-in duration-100"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <Listbox.Options className="absolute z-10 mt-2 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Listbox.Option
-                        value=""
-                        className={({ active }) =>
-                          `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
-                          }`
-                        }
-                      >
-                        {({ selected }) => (
-                          <>
-                            <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-                              Seleccionar especialidad...
-                            </span>
-                            {selected && (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                <Check className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                            )}
-                          </>
-                        )}
+                  <Transition leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
+                    <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full overflow-auto rounded-xl border border-slate-200/80 bg-white py-1 shadow-lg focus:outline-none">
+                      <Listbox.Option value="" className={({ active }) => cn('relative cursor-pointer py-2.5 pl-10 pr-4 text-sm', active ? 'bg-blue-50 text-blue-900' : 'text-slate-600')}>
+                        {({ selected }) => (<><span className={selected ? 'font-semibold' : ''}>Todas las especialidades</span>{selected && <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-700"><Check className="h-4 w-4" /></span>}</>)}
                       </Listbox.Option>
-
-                      {['Cardiología', 'Pediatría', 'Traumatología', 'Dermatología', 'Neurología', 'Ginecología'].map((specialty) => (
-                        <Listbox.Option
-                          key={specialty}
-                          value={specialty}
-                          className={({ active }) =>
-                            `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
-                            }`
-                          }
-                        >
-                          {({ selected }) => (
-                            <>
-                              <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-                                {specialty}
-                              </span>
-                              {selected && (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                  <Check className="h-5 w-5" aria-hidden="true" />
-                                </span>
-                              )}
-                            </>
-                          )}
+                      {SPECIALTIES.map((s) => (
+                        <Listbox.Option key={s} value={s} className={({ active }) => cn('relative cursor-pointer py-2.5 pl-10 pr-4 text-sm', active ? 'bg-blue-50 text-blue-900' : 'text-slate-900')}>
+                          {({ selected }) => (<><span className={selected ? 'font-semibold' : ''}>{s}</span>{selected && <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-700"><Check className="h-4 w-4" /></span>}</>)}
                         </Listbox.Option>
                       ))}
                     </Listbox.Options>
@@ -450,146 +216,161 @@ export const SearchDoctors = () => {
           </div>
 
           <button
+            type="button"
             onClick={() => handleSearch(0)}
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50"
           >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" strokeWidth={2} />}
             {loading ? 'Buscando...' : 'Buscar'}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div role="alert" className="mb-6 rounded-2xl border border-rose-200/80 bg-rose-50/80 px-4 py-3.5 text-sm text-rose-700">
           {error}
         </div>
       )}
 
-      {loading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Buscando médicos...</p>
-        </div>
+      {/* Results label */}
+      {!loading && isSearching && (
+        <p className="mb-4 text-sm text-slate-500">
+          {filteredDoctors.length === 0 ? 'Sin resultados' : `${pageInfo.totalElements} médico${pageInfo.totalElements !== 1 ? 's' : ''} encontrado${pageInfo.totalElements !== 1 ? 's' : ''}`}
+        </p>
+      )}
+      {!loading && !isSearching && (
+        <p className="mb-4 text-sm font-medium tracking-wide text-slate-400 uppercase">
+          Médicos destacados
+        </p>
       )}
 
-      {/* Doctors Grid */}
-      {!loading && filteredDoctors.length > 0 && (
+      {/* Doctors grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-72 animate-pulse rounded-2xl bg-slate-100" />
+          ))}
+        </div>
+      ) : filteredDoctors.length > 0 ? (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDoctors.map((doctor) => (
-              <div
-                key={doctor.id}
-                onClick={() => handleDoctorClick(doctor.id)}
-                className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) ? 'cursor-pointer transform hover:-translate-y-1' : ''}`}
-              >
-                {/* Doctor Image */}
-                <div className="relative h-48 bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center overflow-hidden">
-                  {doctor.rutaFoto ? (
-                    <AnimatedImage
-                      src={doctor.rutaFoto}
-                      alt={`${doctor.nombres} ${doctor.apellidos}`}
-                      className="w-full h-full object-cover"
-                      fallbackSrc=""
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
-                      <User className="w-12 h-12 text-white" />
-                    </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filteredDoctors.map((doctor) => {
+              const especialidad = getEspecialidad(doctor);
+              const demo = isDemo(doctor.id);
+              const photoSrc = doctor.rutaFoto?.startsWith('/')
+                ? doctor.rutaFoto
+                : doctor.rutaFoto
+                  ? getImageUrl(doctor.rutaFoto)
+                  : null;
+
+              return (
+                <article
+                  key={doctor.id}
+                  onClick={() => handleDoctorClick(doctor.id)}
+                  className={cn(
+                    'group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200',
+                    !demo && 'cursor-pointer hover:border-blue-200/80 hover:shadow-[0_8px_32px_rgba(15,118,110,0.10)]'
                   )}
-                </div>
-
-                {/* Doctor Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    {doctor.nombres} {doctor.apellidos}
-                  </h3>
-                  <p className="text-blue-600 font-medium mb-3">
-                    {getEspecialidadNombre(doctor)}
-                  </p>
-
-                  {doctor.bio && (
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {doctor.bio}
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-between mb-4">
-                    {doctor.numeroColegiado && (
-                      <div>
-                        <p className="text-xs text-gray-500">Colegiado</p>
-                        <p className="text-sm font-semibold text-gray-900">{doctor.numeroColegiado}</p>
+                >
+                  {/* Photo */}
+                  <div className="relative h-52 overflow-hidden bg-slate-100">
+                    {photoSrc ? (
+                      <AnimatedImage
+                        src={photoSrc}
+                        alt={`${doctor.nombres} ${doctor.apellidos}`}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        fallbackSrc=""
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-blue-700 to-blue-800">
+                        <User className="h-14 w-14 text-white/60" strokeWidth={1} />
                       </div>
                     )}
+                    {/* Specialty pill over image */}
+                    <div className="absolute left-3 top-3">
+                      <span className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-blue-900 backdrop-blur-sm ring-1 ring-blue-100/80 shadow-sm">
+                        {especialidad}
+                      </span>
+                    </div>
+                    {/* Price pill */}
                     {doctor.precioConsulta && (
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500">Consulta desde</p>
-                        <p className="text-lg font-bold text-blue-600">S/ {doctor.precioConsulta}</p>
+                      <div className="absolute bottom-3 right-3">
+                        <span className="inline-flex items-center rounded-full bg-blue-700/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
+                          S/ {doctor.precioConsulta}
+                        </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Solo mostrar botón si NO es un doctor de demostración */}
-                  {(isSearching || ![1, 2, 3, 4, 5, 6].includes(doctor.id)) && (
-                    <button
-                      className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                      onClick={() => {
-                        console.log('Navigating to doctor profile with ID:', doctor.id);
-                        navigate(`/patient/doctor/${doctor.id}`);
-                      }}
-                    >
-                      Ver Perfil
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+                  {/* Info */}
+                  <div className="p-5">
+                    <h3 className="font-display text-lg font-semibold tracking-tight text-slate-900">
+                      {doctor.nombres} {doctor.apellidos}
+                    </h3>
+                    {doctor.numeroColegiado && (
+                      <p className="mt-0.5 text-xs text-slate-400">{doctor.numeroColegiado}</p>
+                    )}
+                    {doctor.bio && (
+                      <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-500">
+                        {doctor.bio}
+                      </p>
+                    )}
+                    {!demo && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/patient/doctor/${doctor.id}`); }}
+                        className="mt-4 inline-flex min-h-[40px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50/50 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors group-hover:border-blue-200 group-hover:bg-blue-50/50 group-hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                      >
+                        Ver perfil
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
           {isSearching && pageInfo.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-8">
+            <div className="mt-8 flex items-center justify-center gap-4">
               <button
+                type="button"
                 onClick={() => handlePageChange(pageInfo.number - 1)}
                 disabled={pageInfo.first}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Página anterior"
               >
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
-
-              <span className="text-sm font-medium text-gray-700">
-                Página {pageInfo.number + 1} de {pageInfo.totalPages}
+              <span className="text-sm font-medium text-slate-600">
+                {pageInfo.number + 1} / {pageInfo.totalPages}
               </span>
-
               <button
+                type="button"
                 onClick={() => handlePageChange(pageInfo.number + 1)}
                 disabled={pageInfo.last}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Página siguiente"
               >
-                <ChevronRight className="w-5 h-5 text-gray-600" />
+                <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           )}
         </>
-      )}
-
-      {!loading && filteredDoctors.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg mb-2">No se encontraron médicos</p>
-          <p className="text-gray-400 text-sm mb-4">
-            Intenta con otros términos de búsqueda
-          </p>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+            <User className="h-8 w-8" strokeWidth={1.5} />
+          </div>
+          <h3 className="mt-5 font-display text-lg font-semibold text-slate-900">Sin resultados</h3>
+          <p className="mt-2 max-w-xs text-sm text-slate-500">Intenta con otros términos o cambia el filtro de búsqueda</p>
           <button
-            onClick={() => {
-              setSearchTerm('');
-              setAllDoctors(showcaseDoctors);
-              setIsSearching(false);
-              setActiveFilter('name');
-            }}
-            className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+            type="button"
+            onClick={() => { setSearchTerm(''); setAllDoctors(showcaseDoctors); setIsSearching(false); setActiveFilter('name'); }}
+            className="mt-6 cursor-pointer text-sm font-semibold text-blue-700 transition-colors hover:text-blue-800"
           >
-            Ver doctores de demostración
+            Ver médicos destacados
           </button>
         </div>
       )}
