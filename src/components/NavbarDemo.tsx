@@ -91,17 +91,21 @@ export function NavbarDemo() {
                                 </>
                             ) : (
                                 <>
+                                    {/* Ghost: animated underline */}
                                     <Link
                                         to="/login"
-                                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                                        className="group relative px-2 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                                     >
                                         Iniciar Sesión
+                                        <span className="absolute bottom-0 left-0 h-px w-0 bg-gray-900 transition-all duration-300 group-hover:w-full" />
                                     </Link>
+                                    {/* Dark pill with arrow */}
                                     <Link
                                         to="/register"
-                                        className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition-colors shadow-sm"
+                                        className="group flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-full transition-all duration-200 shadow-sm"
                                     >
                                         Registrarse
+                                        <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                                     </Link>
                                 </>
                             )}
@@ -168,16 +172,18 @@ export function NavbarDemo() {
                                             <Link
                                                 to="/login"
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-white/50 text-center border border-gray-300 rounded-lg transition-all"
+                                                className="group relative px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 text-center transition-colors"
                                             >
                                                 Iniciar Sesión
+                                                <span className="absolute bottom-1.5 left-4 right-4 h-px w-0 bg-gray-900 transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
                                             </Link>
                                             <Link
                                                 to="/register"
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-center shadow-sm transition-all"
+                                                className="group flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl text-center shadow-sm transition-all"
                                             >
                                                 Registrarse
+                                                <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                                             </Link>
                                         </>
                                     )}

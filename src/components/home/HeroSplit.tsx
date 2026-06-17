@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { AnimatedSection } from '@/components/animated-section';
+import { AnimatedBadge } from '@/components/ui/animated-badge';
+import { Link } from 'react-router-dom';
 
 import { ArrowRight, Heart, ShieldPlus, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -52,16 +54,15 @@ export function HeroSplit() {
     return (
         <div className="container mx-auto px-4 py-12 lg:py-20 relative z-10">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-12 lg:gap-8">
-                
+
                 {/* Left Side: Content */}
                 <div className="lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
                     <AnimatedSection>
-                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/60 backdrop-blur-md border border-white/80 shadow-sm mb-8 text-sm font-semibold text-gray-800 hover:shadow-md transition-shadow cursor-default">
-                            <span className="relative flex h-2.5 w-2.5">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
-                            </span>
-                            Plataforma de Telemedicina
+                        {/* pt-10 makes room for the SVG laser effect that extends above the badge */}
+                        <div className="mb-5 md:mb-8 pt-10 flex justify-center lg:justify-start">
+                            <div className="scale-90 sm:scale-100 origin-center">
+                                <AnimatedBadge text="Plataforma de Telemedicina" color="#3b82f6" />
+                            </div>
                         </div>
                     </AnimatedSection>
 
@@ -91,13 +92,28 @@ export function HeroSplit() {
 
                     <AnimatedSection delay={300} className="w-full px-4 md:px-0">
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full justify-center lg:justify-start items-center lg:items-start">
-                            <button className="w-3/4 sm:w-auto px-5 py-2.5 md:px-8 md:py-4 text-sm md:text-base bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] flex items-center justify-center gap-2 cursor-pointer">
-                                Comienza Ahora
-                                <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
-                            </button>
-                            <button className="w-3/4 sm:w-auto px-5 py-2.5 md:px-8 md:py-4 text-sm md:text-base bg-white/50 hover:bg-white/80 backdrop-blur-md text-blue-900 border border-blue-200 rounded-full font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                            {/* Primary CTA */}
+                            <Link
+                                to="/register"
+                                className="group relative w-3/4 sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 md:px-7 md:py-3.5 text-sm md:text-base font-semibold text-white rounded-full overflow-hidden transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_35px_rgba(37,99,235,0.65)] hover:-translate-y-0.5"
+                            >
+                                {/* Animated gradient background */}
+                                <span className="absolute inset-0 bg-linear-to-r from-blue-600 via-blue-500 to-indigo-600 transition-all duration-300" />
+                                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-linear-to-r from-indigo-600 via-blue-500 to-blue-600 transition-opacity duration-500" />
+                                <span className="relative flex items-center gap-2">
+                                    Comienza Ahora
+                                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                                </span>
+                            </Link>
+
+                            {/* Secondary CTA */}
+                            <Link
+                                to="/patient/search"
+                                className="group w-3/4 sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 md:px-7 md:py-3.5 text-sm md:text-base font-semibold text-blue-700 rounded-full border border-blue-200 bg-white/50 hover:bg-white/90 backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                            >
                                 Ver Especialidades
-                            </button>
+                                <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                            </Link>
                         </div>
                     </AnimatedSection>
                 </div>
@@ -105,12 +121,12 @@ export function HeroSplit() {
                 {/* Right Side: Visuals / Mockup */}
                 <div className="lg:w-1/2 w-full max-w-lg mx-auto lg:mx-0 mt-4 md:mt-8 lg:mt-0">
                     <AnimatedSection delay={400} className="relative w-full aspect-square flex items-center justify-center scale-95 md:scale-100">
-                        
+
                         {/* Decorative Background Glow */}
                         <div className="absolute w-[110%] h-[110%] bg-linear-to-tr from-blue-300/40 via-indigo-400/30 to-purple-400/30 blur-[80px] rounded-full animate-pulse-slow z-0"></div>
-                        
+
                         {/* Main Glass Card */}
-                        <motion.div 
+                        <motion.div
                             initial={{ y: 30, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.6 }}
@@ -128,7 +144,7 @@ export function HeroSplit() {
                                 </div>
                                 <span className="px-2 py-1 md:px-3 md:py-1 bg-green-100 text-green-700 text-[10px] md:text-xs font-bold rounded-full border border-green-200 shadow-sm animate-pulse whitespace-nowrap ml-2">En línea</span>
                             </div>
-                            
+
                             <div className="space-y-3 md:space-y-4 mb-2">
                                 <div className="w-full h-10 md:h-12 bg-white/60 rounded-xl flex items-center px-4 shadow-sm border border-white/40">
                                     <div className="w-2/3 h-2 md:h-3 bg-gray-300/60 rounded-full"></div>
@@ -143,7 +159,7 @@ export function HeroSplit() {
                         </motion.div>
 
                         {/* Floating Stats Card */}
-                        <motion.div 
+                        <motion.div
                             initial={{ x: 50, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.9 }}
@@ -159,7 +175,7 @@ export function HeroSplit() {
                         </motion.div>
 
                         {/* Floating Shield Card */}
-                        <motion.div 
+                        <motion.div
                             initial={{ x: -50, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 1.1 }}
